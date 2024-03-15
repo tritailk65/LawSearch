@@ -1,7 +1,7 @@
 # LawSearch
 Repository mã nguồn chương trình Hệ tra cứu luật đất đai
 
-Thành viên
+Thành viên:
 | Họ tên  | MSSV |
 | ------------- | ------------- |
 | Trương Trí Tài  | 3120410011  |
