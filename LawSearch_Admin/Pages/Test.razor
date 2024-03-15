@@ -1,0 +1,54 @@
+﻿@page "/test"
+@inject HttpClient Http;
+@inject IArticalAdminService _articalAdminService;
+
+<h3>Test</h3>
+
+@if (artical == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Title</th>
+                <th>Number</th>
+                <th>Content</th>
+                <th>ChapterID</th>
+                <th>ChapterItemName</th>
+                <th>LawID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in artical)
+            {
+                <tr>
+                    <td>@i.ID</td>
+                    <td>@i.Name</td>
+                    <td>@i.Title</td>
+                    <td>@i.Number</td>
+                    <td>@i.Content</td>
+                    <td>@i.ChapterID</td>
+                    <td>@i.ChapterItemName</td>
+                    <td>@i.LawID</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Artical> artical;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var rs = await _articalAdminService.GetListArtical();
+        artical = rs;
+    }
+
+    
+}
