@@ -8,14 +8,14 @@
     width: 40%;
 }
 
-.list-concept {
-    height: 470px;
-    overflow-y: auto; 
+.list-keyphrase {
+    height: 500px;
+    overflow-y: auto;
     border: 1px solid #ccc;
     padding: 10px;
 }
 
-.concept-detail {
+.keyphrase-detail {
     width: 60%;
     margin-left: 10px;
     padding: 10px;
@@ -31,5 +31,3 @@ input[type="text"] {
     border: 1px solid #ccc;
     width: 100%;
 }
-
-

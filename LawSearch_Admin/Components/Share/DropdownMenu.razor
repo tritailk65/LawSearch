@@ -1,0 +1,35 @@
+﻿<div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" @onclick="ToggleDropdown">
+        @name
+    </button>
+    <div class="@DropdownClass">
+        @if (Options != null){
+            @foreach (var option in Options)
+            {
+                <button class="dropdown-item" @onclick="(() => SelectOption(option))">@option</button>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private string name = "Chọn văn bản luật để xem chi tiết";
+
+    private bool IsDropdownVisible = false;
+
+    private string DropdownClass => IsDropdownVisible ? "dropdown-menu show" : "dropdown-menu";
+
+    [Parameter]
+    public List<string>? Options { get; set; }
+
+    private void ToggleDropdown()
+    {
+        IsDropdownVisible = !IsDropdownVisible;
+    }
+
+    private void SelectOption(string option)
+    {
+        name = option;
+        IsDropdownVisible = false;
+    }
+}

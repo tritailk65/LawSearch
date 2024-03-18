@@ -19,22 +19,35 @@
 </div>
 
 <div class="content">
-    <div class="list-concept">
-        @if (concepts != null && concepts.Any())
-        {
-            <ul>
-                @foreach (var item in concepts)
-                {
-                    <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p>Loading...</p>
-        }
+    <div class="left-content">
+        <div class="search-container">
+            <input type="text" placeholder="Tìm kiếm..." @bind="@searchKeyword" @oninput="HandleSearchInputChange">
+        </div>
+        <div class="list-concept">        
+            @if (concepts != null && concepts.Any() && filterConcepts == null)
+            {
+                <ol>
+                    @foreach (var item in concepts)
+                    {
+                        <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
+                    }
+                </ol>
+            } else if (filterConcepts != null)
+            {
+                <ol>
+                    @foreach (var item in filterConcepts)
+                    {
+                        <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
+                    }
+                </ol>
+            }
+            else
+            {
+                <p>Loading...</p>
+            }
+        </div>
     </div>
-
+ 
     <div class="concept-detail">
         <ShowDetailConcept concept="@conceptDetail"/>
     </div>
@@ -42,7 +55,10 @@
 
 @code {
     public List<Concept> concepts;
+    public List<Concept> filterConcepts = null;
     public Concept conceptDetail;
+    public string searchKeyword = "";
+    public bool isSearch = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +69,20 @@
     private void ShowDetail(Concept concept)
     {
         conceptDetail = concept;
+    }
+
+    //Sẽ tối ưu hóa lại khi có thời gian (Tari)
+    private void HandleSearchInputChange(ChangeEventArgs e)
+    {
+        searchKeyword = e.Value.ToString();
+        IEnumerable<Concept> filter = concepts.Where(c => c.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
+        if (filter != null)
+        {
+            filterConcepts = filter.ToList();
+        } else
+        {
+            filterConcepts = null;
+        }
     }
 
     private void HandleClick(MouseEventArgs e)

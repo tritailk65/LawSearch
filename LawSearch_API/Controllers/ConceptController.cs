@@ -25,10 +25,7 @@ namespace LawSearch_API.Controllers
         public IActionResult Get()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-
             DataTable dtResult = _conceptService.GetListConcept();
-
-            /*            APIResult rs = new APIResult();*/
             return Ok(dtResult);
         }
     }

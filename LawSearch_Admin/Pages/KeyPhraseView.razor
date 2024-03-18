@@ -1,0 +1,85 @@
+﻿@page "/keyphrase"
+@inject IKeyPhraseAdminService _keyphraseService;
+
+<div class="title">
+    <h3>KeyPhrase</h3>
+</div>
+
+<div>
+    <Button ButtonStyle="add-button" @onclick="() => {}">
+        Add
+    </Button>
+    <Button ButtonStyle="delete-button" @onclick="() => {}">
+        Delete
+    </Button>
+    <Button ButtonStyle="reset-button" @onclick="() => {}">
+        Reset
+    </Button>
+</div>
+
+<div class="content">
+    <div class="left-content">
+        <div class="search-container">
+            <input type="text" placeholder="Tìm kiếm..." @bind="@searchKeyword" @oninput="HandleSearchInputChange">
+        </div>
+        <div class="list-keyphrase">
+            @if (keyPhrases != null && keyPhrases.Any() && filterKeyPhrase == null)
+            {
+                <ol>
+                    @foreach (var item in keyPhrases)
+                    {
+                        <li @onclick="@(()=> ShowDetail(item.ID))" style="cursor: pointer">@item.Keyphrase</li>
+                    }
+                </ol>
+            } else if (filterKeyPhrase != null){
+            <ol>
+                @foreach (var item in filterKeyPhrase)
+                {
+                    <li @onclick="@(()=> ShowDetail(item.ID))" style="cursor: pointer">@item.Keyphrase</li>
+                }
+            </ol>
+            }
+            else
+            {
+                <p>Loading...</p>
+            }
+        </div>
+    </div>
+
+    <div class="keyphrase-detail">
+        <KeyPhraseRelateDetail  keyPhrasesRelates="@keyPhraseRelates"/>
+    </div>
+</div>
+
+@code {
+    public List<KeyPhrase> keyPhrases;
+    public List<KeyPhrase> filterKeyPhrase;
+    public List<KeyPhraseRelate> keyPhraseRelates;
+    public string searchKeyword = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await _keyphraseService.GetListKeyPhrase();
+        keyPhrases = data;
+    }
+
+    private async void ShowDetail(int id)
+    {
+        var data = await _keyphraseService.GetKeyPhraseRelates(id);
+        keyPhraseRelates = data;
+    }
+
+    private void HandleSearchInputChange(ChangeEventArgs e)
+    {
+        searchKeyword = e.Value.ToString();
+        IEnumerable<KeyPhrase> filter = keyPhrases.Where(c => c.Keyphrase.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
+        if (filter != null)
+        {
+            filterKeyPhrase = filter.ToList();
+        }
+        else
+        {
+            filterKeyPhrase = null;
+        }
+    }
+}

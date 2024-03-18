@@ -1,31 +1,42 @@
 ﻿@page "/"
+@inject ILawDocAdminService lawDocService;
 
-<div>
+<div class="title">
     <h3 class="text_css">ViewLaw</h3>
 </div>
 
-<div>
-@*     <Button ButtonStyle="custom-button" @onclick="HandleClick">
-        Add
-    </Button>
-    <Button ButtonStyle="custom-button" @onclick="HandleClick">
-        Delete
-    </Button>
-    <Button ButtonStyle="custom-button" @onclick="HandleClick">
-        Reset
-    </Button> *@
+<div style="margin-top: 10px;">
+    <DropdownMenu Options="options" />
 </div>
 
-<div class="scrollable-div">
-    <DataList Items="@myDataList" />
+<div class="filter-container">
+    Ghi chú: Bộ lọc nâng cao sẽ ở đây
 </div>
 
+<div class="content-container">
+    <div class="left-content">
+
+    </div>
+    <div class="right-content">
+        @if (lawHTML != null)
+        {
+            @((MarkupString)lawHTML[0].contentHTML)
+        }
+    </div>
+</div>
 
 @code {
-    private void HandleClick(MouseEventArgs e)
-    {
-        // Xử lý sự kiện click tại đây
-    }
+    public List<LawDoc> lawDocs;
+    public List<LawHTML> lawHTML;
+    public List<string> options;
 
-    List<string> myDataList = new List<string> { "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3" };
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await lawDocService.GetListLawDoc();
+        options = data.Select(x => x.Name).ToList();
+        lawDocs = data;
+
+        var html = await lawDocService.GetLawHTML(2);
+        lawHTML = html;
+    }
 }

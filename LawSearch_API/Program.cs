@@ -40,6 +40,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IDbService, DbService>();
 builder.Services.AddScoped<IArticalService, ArticalService>();
 builder.Services.AddScoped<IConceptService, ConceptService>();
+builder.Services.AddScoped<IKeyPhraseService, KeyPharseService>();
+builder.Services.AddScoped<ILawDocService, LawDocService>();
 
 
 builder.Services.AddControllers();

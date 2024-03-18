@@ -1,5 +1,5 @@
 ﻿.add-button {
-    margin-top: 20px;
+    margin-top: 6px;
     background-color: #570DF8;
     color: white;
     border: none;
@@ -14,7 +14,7 @@
 }
 
 .delete-button {
-    margin-top: 20px;
+    margin-top: 6px;
     background-color: #F87676;
     color: white;
     border: none;
@@ -29,7 +29,7 @@
     }
 
 .reset-button {
-    margin-top: 20px;
+    margin-top: 6px;
     background-color: #3D4451;
     color: white;
     border: none;
