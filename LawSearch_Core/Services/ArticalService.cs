@@ -11,9 +11,9 @@ namespace LawSearch_Core.Services
 {
     public class ArticalService : IArticalService
     {
-        private readonly IDbConnectionService _dbConnection;
+        private readonly IDbService _dbConnection;
 
-        public ArticalService(IDbConnectionService dbConnection)
+        public ArticalService(IDbService dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -27,6 +27,11 @@ namespace LawSearch_Core.Services
                 string sql = "SELECT * FROM ARTICAL";
 
                 DataTable rs = _dbConnection.ExecuteReaderCommand(sql, "");
+
+
+                //Xử lý logic ơ day
+
+                //Tra ve ket qua
                 return rs;
 
             }catch 
@@ -37,5 +42,6 @@ namespace LawSearch_Core.Services
                 _dbConnection.CloseConnection();
             }
         }
+
     }
 }

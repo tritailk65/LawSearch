@@ -1,0 +1,31 @@
+﻿@page "/"
+
+<div>
+    <h3 class="text_css">ViewLaw</h3>
+</div>
+
+<div>
+@*     <Button ButtonStyle="custom-button" @onclick="HandleClick">
+        Add
+    </Button>
+    <Button ButtonStyle="custom-button" @onclick="HandleClick">
+        Delete
+    </Button>
+    <Button ButtonStyle="custom-button" @onclick="HandleClick">
+        Reset
+    </Button> *@
+</div>
+
+<div class="scrollable-div">
+    <DataList Items="@myDataList" />
+</div>
+
+
+@code {
+    private void HandleClick(MouseEventArgs e)
+    {
+        // Xử lý sự kiện click tại đây
+    }
+
+    List<string> myDataList = new List<string> { "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3" };
+}

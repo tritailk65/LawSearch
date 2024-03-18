@@ -18,4 +18,7 @@ namespace LawSearch_Core.Models
         public int LawID { get; set; }
 
     }
+
+
+
 }

@@ -1,0 +1,20 @@
+﻿.content {
+    display: flex;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.list-concept {
+    width:40%;
+    height: 500px;
+    overflow-y: auto; 
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.concept-detail {
+    width: 60%;
+    margin-left: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}

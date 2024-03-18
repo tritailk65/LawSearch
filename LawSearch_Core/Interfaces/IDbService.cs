@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LawSearch_Core.Interfaces
 {
-    public interface IDbConnectionService
+    public interface IDbService
     {
         IDbCommand CreateCommand(string? sql = null);
 

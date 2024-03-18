@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace LawSearch_Core.Services
 {
-    public class DbConnectionService : IDbConnectionService
+    public class DbService : IDbService
     {
         private readonly IDbConnection _dbConnection;
 
-        public DbConnectionService(IDbConnection dbConnection)
+        public DbService(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

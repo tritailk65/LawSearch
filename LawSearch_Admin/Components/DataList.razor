@@ -1,0 +1,20 @@
+﻿@typeparam TItem
+
+@if (Items != null && Items.Any())
+{
+    <ul>
+        @foreach (var item in Items)
+        {
+            <li>@item.ToString()</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public IEnumerable<TItem> Items { get; set; }
+}

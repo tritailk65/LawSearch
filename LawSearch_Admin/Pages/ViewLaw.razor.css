@@ -1,0 +1,13 @@
+﻿.text_css {
+    font-weight: bold;
+}
+
+/*The div cuon*/
+.scrollable-div {
+    margin-top: 30px;
+    width: 300px;
+    height: 500px;
+    overflow-y: auto; /* Kích hoạt thanh cuộn theo chiều dọc */
+    border: 1px solid #ccc;
+    padding: 10px;
+}

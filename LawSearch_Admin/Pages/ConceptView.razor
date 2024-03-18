@@ -1,0 +1,62 @@
+﻿@page "/concept"
+@inject IConceptAdminService _conceptService;
+
+
+<div class="title">
+    <h3 >Concept</h3>
+</div>
+
+<div>
+    <Button ButtonStyle="add-button" @onclick="() => {}">
+        Add
+    </Button>
+    <Button ButtonStyle="delete-button" @onclick="() => {}">
+        Delete
+    </Button>
+    <Button ButtonStyle="reset-button" @onclick="() => {}">
+        Reset
+    </Button>
+</div>
+
+<div class="content">
+    <div class="list-concept">
+        @if (concepts != null && concepts.Any())
+        {
+            <ul>
+                @foreach (var item in concepts)
+                {
+                    <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+    </div>
+
+    <div class="concept-detail">
+        <ShowDetailConcept concept="@conceptDetail"/>
+    </div>
+</div>
+
+@code {
+    public List<Concept> concepts;
+    public Concept conceptDetail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await _conceptService.GetListConcept();
+        concepts = data;
+    }
+
+    private void ShowDetail(Concept concept)
+    {
+        conceptDetail = concept;
+    }
+
+    private void HandleClick(MouseEventArgs e)
+    {
+        // Xử lý sự kiện click tại đây
+    }
+}

@@ -1,0 +1,15 @@
+﻿@if (@concept == null)
+{
+
+    <p>Chọn cocept để xem chi tiết</p>
+}
+else 
+{
+    <h4>Khái niệm: @concept.Name</h4>
+    <p>@concept.Description </p>
+}
+
+@code {
+    [Parameter]
+    public Concept? concept { get; set; } = null;
+}
