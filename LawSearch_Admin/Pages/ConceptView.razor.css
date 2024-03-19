@@ -1,0 +1,35 @@
+﻿.content {
+    display: flex;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.left-content {
+    width: 40%;
+}
+
+.list-concept {
+    height: 470px;
+    overflow-y: auto; 
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.concept-detail {
+    width: 60%;
+    margin-left: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.search-container {
+    display: flex;
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+

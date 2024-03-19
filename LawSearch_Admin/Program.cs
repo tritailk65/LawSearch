@@ -10,5 +10,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["BackendApiUrl"]) });
 builder.Services.AddScoped<IArticalAdminService, ArticalAdminService>();
+builder.Services.AddScoped<IConceptAdminService, ConceptAdminService>();
+builder.Services.AddScoped<IKeyPhraseAdminService, KeyPhraseAdminService>();
+builder.Services.AddScoped<ILawDocAdminService, LawDocAdminService>();
 
 await builder.Build().RunAsync();

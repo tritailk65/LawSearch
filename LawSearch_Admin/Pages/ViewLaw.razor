@@ -1,0 +1,42 @@
+﻿@page "/"
+@inject ILawDocAdminService lawDocService;
+
+<div class="title">
+    <h3 class="text_css">ViewLaw</h3>
+</div>
+
+<div style="margin-top: 10px;">
+    <DropdownMenu Options="options" />
+</div>
+
+<div class="filter-container">
+    Ghi chú: Bộ lọc nâng cao sẽ ở đây
+</div>
+
+<div class="content-container">
+    <div class="left-content">
+
+    </div>
+    <div class="right-content">
+        @if (lawHTML != null)
+        {
+            @((MarkupString)lawHTML[0].contentHTML)
+        }
+    </div>
+</div>
+
+@code {
+    public List<LawDoc> lawDocs;
+    public List<LawHTML> lawHTML;
+    public List<string> options;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await lawDocService.GetListLawDoc();
+        options = data.Select(x => x.Name).ToList();
+        lawDocs = data;
+
+        var html = await lawDocService.GetLawHTML(2);
+        lawHTML = html;
+    }
+}

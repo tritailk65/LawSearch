@@ -1,0 +1,33 @@
+﻿@if (@keyPhrasesRelates == null)
+{
+    <p>Chọn KeyPhrase để xem chi tiết mối quan hệ</p>
+}
+else
+{
+	<table class="table table-hover my-0">
+		<thead>
+			<tr>
+				<th>Chapter</th>
+				<th class="d-none d-xl-table-cell">Artical</th>
+				<th class="d-none d-xl-table-cell">Count</th>
+				<th class="d-none d-md-table-cell">KeyPhrase</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in keyPhrasesRelates)
+			{
+				<tr>
+					<td>@item.ChapterName</td>
+					<td class="d-none d-xl-table-cell">@item.ArticalName</td>
+					<td class="d-none d-xl-table-cell">@item.NumCount</td>
+					<td class="d-none d-md-table-cell">@item.KeyPhrase</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	[Parameter]
+	public List<KeyPhraseRelate>? keyPhrasesRelates { get; set; }
+}
