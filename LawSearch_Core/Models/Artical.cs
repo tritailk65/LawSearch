@@ -13,12 +13,11 @@ namespace LawSearch_Core.Models
         public string Title { get; set; }
         public int Number { get; set; }
         public string Content { get; set; }
+        public int ChapterItemID { get; set; }
         public int ChapterID { get; set; }
-        public string ChapterItemName { get; set; }
         public int LawID { get; set; }
-
+        public int ChapterNumber { get; set; }
+        public double score { get; set; }
+        public List<Clause> lstClause { get; set; }
     }
-
-
-
 }

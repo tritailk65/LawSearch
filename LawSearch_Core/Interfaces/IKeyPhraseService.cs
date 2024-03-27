@@ -1,10 +1,13 @@
-﻿using System.Data;
+﻿using LawSearch_Core.Models;
+using System.Data;
 
 namespace LawSearch_Core.Interfaces
 {
     public interface IKeyPhraseService
     {
-        DataTable GetListKeyPhrase();
-        DataTable GetKeyPhraseRelateDetailsByID(int ID);
+        List<KeyPhrase> GetListKeyPhrase();
+        List<KeyPhraseRelate> GetKeyPhraseRelateDetailsByID(int ID);
+        KeyPhrase AddKeyPhrase(KeyPhrase keyPhrase);
+        void DeleteKeyPhrase(int id);
     }
 }
