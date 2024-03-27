@@ -10,11 +10,13 @@ namespace LawSearch_Core.Models
     {
         public int ID { get; set; }
         public string Keyphrase {  get; set; }
-        public int? source { get; set; } = null;
+        public string Key { get; set; }
+        public KeyPhraseSource Source { get; set; }
         public int? ConceptID { get; set; } = null;
         public int? NumberArtical { get; set; } = null;
-        public string KeyNorm { get; set; }
+        public string? KeyNorm { get; set; }
         public int? LawID { get; set; } = null;
+        public int Count { get; set; }
 
     }
 
@@ -26,5 +28,12 @@ namespace LawSearch_Core.Models
         public int ArticalID { get; set; }
         public int NumCount { get; set; }
         public string ChapterName { get; set; }
+    }
+
+    public enum KeyPhraseSource
+    {
+        Auto = 0,
+        Manual = 1,
+        Search = 2
     }
 }

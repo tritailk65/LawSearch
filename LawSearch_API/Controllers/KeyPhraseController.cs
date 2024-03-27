@@ -1,7 +1,10 @@
-﻿using LawSearch_Core.Interfaces;
+﻿using LawSearch_API.Utils;
+using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
 using LawSearch_Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
 
 namespace LawSearch_API.Controllers
@@ -20,23 +23,39 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetAllKeyPhrase()
+        public APIResult GetAllKeyPhrase()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-
-            DataTable dtResult = keyPhraseService.GetListKeyPhrase();
-            return Ok(dtResult);
-
+            List<KeyPhrase> dtResult = keyPhraseService.GetListKeyPhrase();
+            APIResult result = new APIResult();
+            return result.Success(dtResult);
         }
 
         [HttpGet("[action]")]
-        public ActionResult GetKeyPhraseRelate(int ID)
+        public APIResult GetKeyPhraseRelate([BindRequired]int ID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            List<KeyPhraseRelate> dtResult = keyPhraseService.GetKeyPhraseRelateDetailsByID(ID);
+            APIResult result = new APIResult();
+            return result.Success(dtResult);
+        }
 
-            DataTable dtResult = keyPhraseService.GetKeyPhraseRelateDetailsByID(ID);
-            return Ok(dtResult);
+        [HttpPost]
+        public APIResult AddKeyPhrase([FromBody] KeyPhrase keyPhrase)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            KeyPhrase dtResult = keyPhraseService.AddKeyPhrase(keyPhrase);
+            APIResult result = new APIResult();
+            return result.Success(dtResult);
+        }
 
+        [HttpDelete]
+        public APIResult DeleteKeyPhrase([BindRequired] int id)
+        { 
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.DeleteKeyPhrase(id);
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Xóa keyphrase thành công!");
         }
     }
 }

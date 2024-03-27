@@ -1,6 +1,9 @@
-﻿using LawSearch_Core.Interfaces;
+﻿using LawSearch_API.Utils;
+using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
 using LawSearch_Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -22,11 +25,48 @@ namespace LawSearch_API.Controllers
 
         // GET: api/<ConceptController>
         [HttpGet]
-        public IActionResult Get()
+        public APIResult GetListConcept()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            DataTable dtResult = _conceptService.GetListConcept();
-            return Ok(dtResult);
+            List<Concept> dtResult = _conceptService.GetListConcept();
+            APIResult rs = new();
+            return rs.Success(dtResult);
+        }
+
+        [HttpPost]
+        public APIResult AddConcept([FromBody] Concept concept)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            Concept dtConcept = _conceptService.AddConcept(concept);
+            APIResult rs = new();
+            return rs.Success(dtConcept);
+        }
+
+        [HttpPut]
+        public APIResult UpdateConcept([FromBody] Concept concept)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            Concept dtConcept = _conceptService.UpdateConcept(concept);
+            APIResult rs = new();
+            return rs.Success(dtConcept);
+        }
+
+        [HttpDelete]
+        public APIResult DeleteConcept([BindRequired] int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.DeleteConcept(id);
+            APIResult rs = new();
+            return rs.MessageSuccess("Xóa concept thành công !");
+        }
+
+        [HttpGet("[action]")]
+        public APIResult GetListKeyPhrases([BindRequired]int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            List<KeyPhrase> lst = _conceptService.GetKeyPhrasesFormConceptID(id);
+            APIResult rs = new();
+            return rs.Success(lst);
         }
     }
 }
