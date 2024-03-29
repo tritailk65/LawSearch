@@ -111,6 +111,12 @@
     {
         var data = await _conceptService.GetListConcept();
         concepts = data;
+
+        foreach (var concept in concepts)
+        {
+            Console.WriteLine($"Concept Name: {concept.Name}");
+            
+        }
     }
 
     private void ShowDetail(Concept concept)
@@ -118,7 +124,7 @@
         conceptDetail = concept;
     }
 
-    //Tối ưu hóa lại hàm này khi có thời gian 
+    //Tối ưu hóa lại hàm này khi có thời gian
     private void HandleSearchInputChange(ChangeEventArgs e)
     {
         searchKeyword = e.Value.ToString();
@@ -126,14 +132,29 @@
         if (filter != null)
         {
             filterConcepts = filter.ToList();
-        } else
+        }
+        else
         {
             filterConcepts = null;
+        }
+
+        // Log the search keyword and filtered concepts
+        Console.WriteLine($"Search Keyword: {searchKeyword}");
+        if (filterConcepts != null)
+        {
+            foreach (var concept in filterConcepts)
+            {
+                Console.WriteLine($"Filtered Concept: {concept.Name}");
+                // Add more properties to log if needed
+            }
         }
     }
 
     private void HandleClick(MouseEventArgs e)
     {
         // Xử lý sự kiện click button tại đây
+
+        // Log the click event
+        Console.WriteLine("Button clicked!");
     }
 }
