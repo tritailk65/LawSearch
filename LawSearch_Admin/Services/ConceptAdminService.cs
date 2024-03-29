@@ -1,6 +1,7 @@
 ﻿using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
+using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Text.Json;
 
