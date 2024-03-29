@@ -5,7 +5,89 @@
     <h3>KeyPhrase</h3>
 </div>
  *@
-<div>
+
+@* Băt đầu web *@
+<div class="background_view">
+    <div class="main_view">
+        <div class="left_view">
+            <div class="search_bar_view">
+                @*search bar*@
+                <div class="search_bar">
+                    <div class="text_input_view">
+                        <input placeholder="Thanh tìm kiếm..." />
+                    </div>
+                    <div class="search_btn">
+                        <img class="icon" src="assests/icon/search_icon.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="list_keyphrase_view">
+                @*list keyphrase*@
+                <div class="list_keyphrase">
+                    <ul>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>99. An_dưỡng</a></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="right_view">
+            <div class="buttons_view">
+                @*buttons*@
+                <div>
+                    <input placeholder="new keyphrase" />
+                </div>
+                <div class="my_button">
+                    <a>Add new keyphrase</a>
+                </div>
+                <div class="my_button">
+                    <a>Delete keyphrase</a>
+                </div>
+            </div>
+            <div class="table_view">
+                @*table*@
+            </div>
+        </div>
+    </div>
+</div>
+@* Kết thúc web *@
+
+
+@* <div>
     <Button ButtonStyle="add-button" @onclick="() => {}">
         Add
     </Button>
@@ -49,9 +131,9 @@
     <div class="keyphrase-detail">
         <KeyPhraseRelateDetail  keyPhrasesRelates="@keyPhraseRelates"/>
     </div>
-</div>
+</div> *@
 
-@code {
+@* @code {
     public List<KeyPhrase> keyPhrases;
     public List<KeyPhrase> filterKeyPhrase;
     public List<KeyPhraseRelate> keyPhraseRelates;
@@ -82,4 +164,4 @@
             filterKeyPhrase = null;
         }
     }
-}
+} *@
