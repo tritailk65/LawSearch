@@ -14,11 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Pages\SearchLawView.razor.css" />
+    <None Remove="Pages\SearchPage.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\SearchLawView.razor.css" />
+    <Content Include="Pages\SearchPage.razor.css" />
   </ItemGroup>
 
   <ItemGroup>

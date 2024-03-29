@@ -13,6 +13,7 @@ builder.Services.AddScoped<IArticalAdminService, ArticalAdminService>();
 builder.Services.AddScoped<IConceptAdminService, ConceptAdminService>();
 builder.Services.AddScoped<IKeyPhraseAdminService, KeyPhraseAdminService>();
 builder.Services.AddScoped<ILawDocAdminService, LawDocAdminService>();
+builder.Services.AddScoped<ISearchAdminService, SearchAdminService>();
 
 /*builder.Services.AddFluentUIComponents();*/
 
