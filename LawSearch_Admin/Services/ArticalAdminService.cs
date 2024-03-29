@@ -1,4 +1,5 @@
 ﻿using LawSearch_Admin.Interfaces;
+using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
 using System.Net.Http.Json;
 
@@ -15,7 +16,12 @@ namespace LawSearch_Admin.Services
 
         public async Task<List<Artical>> GetListArtical()
         {
-            return await _httpClient.GetFromJsonAsync<List<Artical>>($"/api/Artical");
+/*            APIResultVM rs = new APIResultVM();
+            rs = await _httpClient.GetFromJsonAsync<APIResultVM>($"/api/Artical");*/
+            List<Artical> lst = new List<Artical>();
+
+
+            return lst;
         }
     }
 }
