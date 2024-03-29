@@ -2,9 +2,9 @@
 @inject IConceptAdminService _conceptService;
 
 
-<div class="title">
+@* <div class="title">
     <h3 >Concept</h3>
-</div>
+</div> *@
 
 <div>
     <Button ButtonStyle="add-button" @onclick="() => {}">
@@ -71,7 +71,7 @@
         conceptDetail = concept;
     }
 
-    //Sẽ tối ưu hóa lại khi có thời gian (Tari)
+    //Tối ưu hóa lại hàm này khi có thời gian 
     private void HandleSearchInputChange(ChangeEventArgs e)
     {
         searchKeyword = e.Value.ToString();
@@ -87,6 +87,6 @@
 
     private void HandleClick(MouseEventArgs e)
     {
-        // Xử lý sự kiện click tại đây
+        // Xử lý sự kiện click button tại đây
     }
 }
