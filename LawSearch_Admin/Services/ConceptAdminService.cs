@@ -1,5 +1,6 @@
 ﻿using LawSearch_Admin.Interfaces;
 using LawSearch_Core.Models;
+using System.Collections.Generic;
 using System.Net.Http.Json;
 
 namespace LawSearch_Admin.Services
@@ -15,7 +16,7 @@ namespace LawSearch_Admin.Services
 
         public async Task<List<Concept>> GetListConcept()
         {
-             return await httpClient.GetFromJsonAsync<List<Concept>>($"api/concept");
+            return await httpClient.GetFromJsonAsync<List<Concept>>($"api/concept");
         }
 
 
