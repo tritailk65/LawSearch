@@ -16,12 +16,10 @@ namespace LawSearch_Admin.Services
 
         public async Task<List<Artical>> GetListArtical()
         {
+/*            APIResultVM rs = new APIResultVM();
+            rs = await _httpClient.GetFromJsonAsync<APIResultVM>($"/api/Artical");*/
             List<Artical> lst = new List<Artical>();
-            var rs = await _httpClient.GetFromJsonAsync<APIResultVM<Artical>>($"/api/Artical");
-            if (rs.Status == 200 && rs.Data.Count > 0)
-            {
-                lst = rs.Data.ToList();
-            }
+
 
             return lst;
         }

@@ -22,12 +22,14 @@ namespace BlazorAppAPI.Controllers
 
         // GET: api/<ArticalController>
         [HttpGet]
-        public APIResult GetAllArtical()
+        public ActionResult GetAllArtical()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+
             DataTable dtResult = _articalService.GetAllArtical();
-            APIResult rs = new APIResult();
-            return rs.Success(dtResult);
+
+/*            APIResult rs = new APIResult();*/
+            return Ok(dtResult);
 
         }
 
