@@ -6,7 +6,54 @@
     <h3 >Concept</h3>
 </div> *@
 
-<div>
+@* Băt đầu web *@
+<div class="background_view">
+    <div class="main_view">
+        <div class="button_concept_view">
+            <div class="my_button"><a>Add new concept</a></div>
+            <div class="my_button"><a>Edit</a></div>
+            <div class="my_button"><a>Delete</a></div>
+        </div>
+        <div class="content_view">
+            <div class="list_concept_view">
+                <ul>
+                    <li><div class="item_selected"><a>1. Thửa đất</a></div></li>
+                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
+                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
+                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
+                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
+                </ul>
+            </div>
+            <div class="content_concept_view">
+                <a id="content_of_concept">
+                    Thửa đất là phần diện tích đất được giới hạn bởi ranh giới xác định trên thực địa hoặc được mô tả trên hồ sơ.
+                </a>
+            </div>
+            <div class="list_keyphrase_of_concept_view">
+                <div class="keyphrase_buttons_view">
+                    <div class="search_keyphrase_view">
+                        <input placeholder="new keyphrase" />
+                    </div>
+                    <div class="my_button add_new_keyphrase_button">
+                        <a>Add new keyphrase</a>
+                    </div>
+                </div>
+                <div class="list_keyphrase_view">
+                    <ul>
+                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Kết thúc web *@
+
+@* <div>
     <Button ButtonStyle="add-button" @onclick="() => {}">
         Add
     </Button>
@@ -51,7 +98,7 @@
     <div class="concept-detail">
         <ShowDetailConcept concept="@conceptDetail"/>
     </div>
-</div>
+</div> *@
 
 @code {
     public List<Concept> concepts;
