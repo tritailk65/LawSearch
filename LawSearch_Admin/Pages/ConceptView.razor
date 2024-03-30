@@ -1,10 +1,5 @@
 ﻿@page "/concept"
-@inject IConceptAdminService _conceptService;
-
-
-@* <div class="title">
-    <h3 >Concept</h3>
-</div> *@
+@inject IConceptAdminService conceptAdminService;
 
 @* Băt đầu web *@
 <div class="background_view">
@@ -53,108 +48,15 @@
 </div>
 @* Kết thúc web *@
 
-@* <div>
-    <Button ButtonStyle="add-button" @onclick="() => {}">
-        Add
-    </Button>
-    <Button ButtonStyle="delete-button" @onclick="() => {}">
-        Delete
-    </Button>
-    <Button ButtonStyle="reset-button" @onclick="() => {}">
-        Reset
-    </Button>
-</div>
-
-<div class="content">
-    <div class="left-content">
-        <div class="search-container">
-            <input type="text" placeholder="Tìm kiếm..." @bind="@searchKeyword" @oninput="HandleSearchInputChange">
-        </div>
-        <div class="list-concept">        
-            @if (concepts != null && concepts.Any() && filterConcepts == null)
-            {
-                <ol>
-                    @foreach (var item in concepts)
-                    {
-                        <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
-                    }
-                </ol>
-            } else if (filterConcepts != null)
-            {
-                <ol>
-                    @foreach (var item in filterConcepts)
-                    {
-                        <li @onclick="@(()=> ShowDetail(item))" style="cursor: pointer">@item.Name</li>
-                    }
-                </ol>
-            }
-            else
-            {
-                <p>Loading...</p>
-            }
-        </div>
-    </div>
- 
-    <div class="concept-detail">
-        <ShowDetailConcept concept="@conceptDetail"/>
-    </div>
-</div> *@
-
 @code {
-    public List<Concept> concepts;
-    public List<Concept> filterConcepts = null;
-    public Concept conceptDetail;
-    public string searchKeyword = "";
-    public bool isSearch = false;
+    private string host_ip = "http://localhost:8080";
 
-    protected override async Task OnInitializedAsync()
+    public List<Concept> Concepts;
+    
+    protected override async Task OnInitializedAsync() 
     {
-        var data = await _conceptService.GetListConcept();
-        concepts = data;
-
-        foreach (var concept in concepts)
-        {
-            Console.WriteLine($"Concept Name: {concept.Name}");
-            
-        }
-    }
-
-    private void ShowDetail(Concept concept)
-    {
-        conceptDetail = concept;
-    }
-
-    //Tối ưu hóa lại hàm này khi có thời gian
-    private void HandleSearchInputChange(ChangeEventArgs e)
-    {
-        searchKeyword = e.Value.ToString();
-        IEnumerable<Concept> filter = concepts.Where(c => c.Name.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
-        if (filter != null)
-        {
-            filterConcepts = filter.ToList();
-        }
-        else
-        {
-            filterConcepts = null;
-        }
-
-        // Log the search keyword and filtered concepts
-        Console.WriteLine($"Search Keyword: {searchKeyword}");
-        if (filterConcepts != null)
-        {
-            foreach (var concept in filterConcepts)
-            {
-                Console.WriteLine($"Filtered Concept: {concept.Name}");
-                // Add more properties to log if needed
-            }
-        }
-    }
-
-    private void HandleClick(MouseEventArgs e)
-    {
-        // Xử lý sự kiện click button tại đây
-
-        // Log the click event
-        Console.WriteLine("Button clicked!");
+        //Console.WriteLine("Start Fetch Concepts");
+        var data = await conceptAdminService.GetListConcept();
+        Concepts = data;
     }
 }
