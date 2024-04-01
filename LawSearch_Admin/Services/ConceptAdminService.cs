@@ -35,6 +35,26 @@ namespace LawSearch_Admin.Services
             return lst;
         }
 
+        public async Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id)
+        {
+            List<KeyPhrase> ls = new();
+            var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/Concept/GetListKeyPhrases?id="+concept_id);
 
+            if (rs != null && rs.Status == 200)
+            {
+                if (rs.Data.Count > 0)
+                {
+                    ls = rs.Data.ToList();
+                } else
+                {
+                    // Handle error here
+                }
+            } else
+            {
+                // Handle error here
+            }
+
+            return ls;
+        }
     }
 }

@@ -3,31 +3,76 @@
 
 @* Băt đầu web *@
 <div class="background_view">
+    @if (isOpenForm_AddNewConcept)
+    {
+        <div class="form_add_new_concept_background_view">
+            <div class="form_add_new_concept_view">
+                <div class="top_form_view">
+                    <div class="title_form"><a>Add New Concept</a></div>
+                    <div class="close_btn" onclick="@(() => {CloseAddNewConceptForm();})"><img class="icon" src="/assests/icon/close_480px.png"/></div>
+                </div>
+                <div>
+                    <div class="concept_input_view">
+                        <a>Concept:</a>
+                        <div class="input_concept">
+                            <input placeholder="concept" />
+                        </div>
+                    </div>
+                    <div class="description_input_view">
+                        <a>Description:</a>
+                        <div class="input_description">
+                            <textarea placeholder="@Description_text"></textarea>
+                        </div>
+                    </div>
+                    <div class="confirm_btn_view">
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="main_view">
         <div class="button_concept_view">
-            <div class="my_button"><a>Add new concept</a></div>
+            <div class="my_button" onclick="@(() => {OpenAddNewConceptForm();})"><a>Add new concept</a></div>
             <div class="my_button"><a>Edit</a></div>
             <div class="my_button"><a>Delete</a></div>
         </div>
         <div class="content_view">
             <div class="list_concept_view">
                 <ul>
-                    <li><div class="item_selected"><a>1. Thửa đất</a></div></li>
-                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
-                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
-                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
-                    <li><div class="item_not_selected"><a>1. Thửa đất</a></div></li>
+                    @if(isLoading_GetListConcept)
+                    {
+                        <a>Loading...</a>
+                    } else
+                    {
+                        if (Concepts != null)
+                        {
+                            foreach (var concept in Concepts)
+                            {
+                                <li>
+                                    <div 
+                                        class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
+                                         onclick="@(async Task() => {await SelectConceptFunction(concept);})">
+                                        <a>@concept.ID. @concept.Name</a>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <a>Empty</a>
+                        }
+                    }
                 </ul>
             </div>
             <div class="content_concept_view">
                 <a id="content_of_concept">
-                    Thửa đất là phần diện tích đất được giới hạn bởi ranh giới xác định trên thực địa hoặc được mô tả trên hồ sơ.
+                    @SelectedConcept?.Content
                 </a>
             </div>
             <div class="list_keyphrase_of_concept_view">
                 <div class="keyphrase_buttons_view">
                     <div class="search_keyphrase_view">
-                        <input placeholder="new keyphrase" />
+                        <input id="textInput" type="text" placeholder="new keyphrase" />
                     </div>
                     <div class="my_button add_new_keyphrase_button">
                         <a>Add new keyphrase</a>
@@ -35,11 +80,22 @@
                 </div>
                 <div class="list_keyphrase_view">
                     <ul>
-                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>diện tích</a></div></li>
+                        @if (isLoading_GetListKeyphrase)
+                        {
+                            <li><a>Loading...</a></li>
+                        } else
+                        {
+                            if (Keyphrases == null || Keyphrases.Count == 0)
+                            {
+                                <a>Empty</a>
+                            } else
+                            {
+                                foreach (var keyphrase in Keyphrases)
+                                {
+                                    <li><div class="keyphrase_not_selected"><a>@keyphrase.Keyphrase</a></div></li>
+                                }
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -48,15 +104,73 @@
 </div>
 @* Kết thúc web *@
 
-@code {
-    private string host_ip = "http://localhost:8080";
+@* Băt đầu script *@
+<script>
 
-    public List<Concept> Concepts;
-    
+</script>
+@* Kết thúc script *@
+
+@code {
+    public Boolean isLoading_GetListConcept = true;
+    public Boolean isLoading_GetListKeyphrase = true;
+    public Boolean isOpenForm_AddNewConcept = true;
+    public List<Concept>? Concepts;
+    public Concept? SelectedConcept;
+    public List<KeyPhrase>? Keyphrases;
+    string search_keyphrase = "";
+    string Description_text = "A concept is defined as an abstract idea. It is understood to be a fundamental building block underlying principles, thoughts and beliefs. Concepts play an important role in all aspects of cognition. As such, concepts are studied within such disciplines as linguistics, psychology, and philosophy, and these disciplines are interested in the logical and psychological structure of concepts, and how they are put together to form thoughts and sentences. The study of concepts has served as an important flagship of an emerging interdisciplinary approach, cognitive science.";
+
     protected override async Task OnInitializedAsync() 
     {
-        //Console.WriteLine("Start Fetch Concepts");
-        var data = await conceptAdminService.GetListConcept();
-        Concepts = data;
+        // fetch concept
+        var data_concept = await conceptAdminService.GetListConcept();
+        if (data_concept == null || data_concept.Count == 0)
+        {
+            Concepts = null;
+            return;
+        }
+
+        Concepts = data_concept;
+        SelectedConcept = Concepts[0];
+        isLoading_GetListConcept = false;
+
+        // fetch keyphrase
+        if (Concepts[0] != null)
+        {
+            await fetchKeyphrase(Concepts[0].ID);
+        }
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public async Task fetchKeyphrase(int concept_id)
+    {
+        isLoading_GetListKeyphrase = true;
+        var data_keyphrase = await conceptAdminService.GetListKeyphraseByConceptID(concept_id);
+        if (Keyphrases != null) Keyphrases.Clear();
+        Keyphrases = data_keyphrase;
+        isLoading_GetListKeyphrase = false;
+    }
+
+    public async Task SelectConceptFunction(Concept concept)
+    {
+        SelectedConcept = concept;
+        await fetchKeyphrase(concept.ID);
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public void OpenAddNewConceptForm()
+    {
+        isOpenForm_AddNewConcept = true;
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public void CloseAddNewConceptForm()
+    {
+        isOpenForm_AddNewConcept = false;
+        // Re-render Method
+        StateHasChanged();
     }
 }

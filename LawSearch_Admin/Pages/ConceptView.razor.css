@@ -70,10 +70,11 @@ input[type="text"] {
     }
 
     .list_concept_view {
-        width: 410px;
-        min-height: 400px;
+        width: 600px;
+        height: 600px;
         border-right: 2px solid #44475D;
         padding: 20px;
+        overflow: auto;
     }
 
     .list_concept_view ul {
@@ -83,7 +84,7 @@ input[type="text"] {
     }
 
     .item_selected {
-        width: 370px;
+        width: 300px;
         padding: 10px 15px;
         border-radius: 10px;
         background-color: #7367F0;
@@ -92,7 +93,7 @@ input[type="text"] {
     }
 
     .item_not_selected {
-        width: 370px;
+        width: 300px;
         padding: 10px 15px;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -165,7 +166,9 @@ input[type="text"] {
     }
 
     .list_keyphrase_view {
-        padding: 20px
+        height: 410px;
+        padding: 20px;
+        overflow: auto;
     }
 
     .list_keyphrase_view ul {
@@ -175,5 +178,136 @@ input[type="text"] {
 
     .keyphrase_not_selected {
         padding: 15px 10px;
+    }
+
+    .form_add_new_concept_background_view {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(10, 20, 46, 0.7);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 400px 0px;
+    }
+
+    .form_add_new_concept_view {
+        width: 1200px;
+        height: 500px;
+        background-color: #0A142E;
+        border: 2px solid #44475D;
+    }
+
+    .top_form_view {
+        width: 100%;
+        height: 50px;
+        background-color: #25293C;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .icon {
+        width: 25px;
+        height: 25px;
+    }
+    .close_btn {
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .title_form {
+        width: 1150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .title_form a {
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .concept_input_view {
+        width: 450px;
+        display: flex;
+        flex-direction: row;
+        padding: 12px 22px;
+        display: flex;
+        align-items: center;
+    }
+
+    .concept_input_view a {
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .concept_input_view div {
+        margin-left: 20px;
+    }
+
+    .input_concept {
+        width: 250px;
+        height: 70px;
+        border: 2px solid #7065E8;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input_concept input {
+        width: 93%;
+        font-size: 20px;
+        border: none;
+        outline: none;
+        color: white;
+        background: transparent;
+    }
+
+    .description_input_view {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 22px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .description_input_view a {
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .description_input_view div {
+        margin-top: 20px;
+    }
+
+    .input_description {
+        width: 100%;
+        height: 200px;
+        border: 2px solid #7065E8;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input_description textarea {
+        width: 97%;
+        height: 93%;
+        font-size: 20px;
+        border: none;
+        outline: none;
+        color: white;
+        background: transparent;
+        white-space: pre-wrap;
+        resize: none;
     }
 }
