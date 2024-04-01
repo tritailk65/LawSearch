@@ -9,22 +9,25 @@
             <div class="form_add_new_concept_view">
                 <div class="top_form_view">
                     <div class="title_form"><a>Add New Concept</a></div>
-                    <div class="close_btn" onclick="@(() => {CloseAddNewConceptForm();})"><img class="icon" src="/assests/icon/close_480px.png"/></div>
+                    <div class="close_btn" @onclick="CloseAddNewConceptForm"><img class="icon" src="assests/icon/close_480px.png" /></div>
                 </div>
                 <div>
                     <div class="concept_input_view">
                         <a>Concept:</a>
                         <div class="input_concept">
-                            <input placeholder="concept" />
+                            <input id="input_concept" placeholder="concept" @oninput="SetNewConcept" />
                         </div>
                     </div>
+                    <div class="warning_input"><a>@warning_input_conecept</a></div>
                     <div class="description_input_view">
                         <a>Description:</a>
                         <div class="input_description">
-                            <textarea placeholder="@Description_text"></textarea>
+                            <textarea id="input_description" placeholder="@Description_text" @oninput="SetNewDescription"></textarea>
                         </div>
                     </div>
-                    <div class="confirm_btn_view">
+                    <div class="warning_input"><a>@warning_input_description</a></div>
+                    <div class="confirm_btn_view" @onclick="AddNewConcept">
+                        <div class="confirm_btn"><a>Confirm</a></div>
                     </div>
                 </div>
             </div>
@@ -32,7 +35,7 @@
     }
     <div class="main_view">
         <div class="button_concept_view">
-            <div class="my_button" onclick="@(() => {OpenAddNewConceptForm();})"><a>Add new concept</a></div>
+            <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
             <div class="my_button"><a>Edit</a></div>
             <div class="my_button"><a>Delete</a></div>
         </div>
@@ -105,8 +108,8 @@
 @* Kết thúc web *@
 
 @* Băt đầu script *@
-<script>
-
+<script type="text/javascript">
+    
 </script>
 @* Kết thúc script *@
 
@@ -119,6 +122,10 @@
     public List<KeyPhrase>? Keyphrases;
     string search_keyphrase = "";
     string Description_text = "A concept is defined as an abstract idea. It is understood to be a fundamental building block underlying principles, thoughts and beliefs. Concepts play an important role in all aspects of cognition. As such, concepts are studied within such disciplines as linguistics, psychology, and philosophy, and these disciplines are interested in the logical and psychological structure of concepts, and how they are put together to form thoughts and sentences. The study of concepts has served as an important flagship of an emerging interdisciplinary approach, cognitive science.";
+    string new_concept = "";
+    string new_description = "";
+    string warning_input_conecept = "";
+    string warning_input_description = "";
 
     protected override async Task OnInitializedAsync() 
     {
@@ -170,7 +177,59 @@
     public void CloseAddNewConceptForm()
     {
         isOpenForm_AddNewConcept = false;
+        warning_input_conecept = "";
+        warning_input_description = "";
         // Re-render Method
         StateHasChanged();
+    }
+
+    public void SetNewConcept(ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            new_concept = e.Value?.ToString() ?? "";
+        }
+    }
+
+    public void SetNewDescription(ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            new_description = e.Value?.ToString() ?? "";
+        }
+    }
+
+
+    public void AddNewConcept()
+    {
+        if(new_concept == "")
+        {
+            warning_input_conecept = "Please fill in this field";
+            // Re-render Method
+            StateHasChanged();
+            return;
+        }
+
+        if (new_description == "")
+        {
+            warning_input_description = "Please fill in this field";
+            // Re-render Method
+            StateHasChanged();
+            return;
+        }
+
+        if(new_concept != "" && new_description != "")
+        {
+            warning_input_conecept = "";
+            warning_input_description = "";
+            // Re-render Method
+            StateHasChanged();
+
+            // Logic add here
+            var rs = conceptAdminService.AddConcept(new_concept, new_description);
+
+            Console.WriteLine(new_concept);
+            Console.WriteLine(new_description);
+        }
     }
 }
