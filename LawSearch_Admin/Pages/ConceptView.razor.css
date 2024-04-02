@@ -343,4 +343,55 @@ input[type="text"] {
         font-size: 16px;
         color: red;
     }
+
+    .dialog_delete_view {
+        width: 600px;
+        height: 270px;
+        background-color: #2F3349;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dialog_title_view {
+        width: 100%;
+        height: 87px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .dialog_title_view a {
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .dialog_buttons_view {
+        width: 100%;
+        height: 93px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0px 40px;
+    }
+
+    .button_dialog {
+        width: 180px;
+        height: 63px;
+        background-color: #3B4054;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .button_dialog a {
+        font-size: 30px;
+        font-weight: bold;
+    }
 }

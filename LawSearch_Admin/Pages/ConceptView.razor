@@ -34,11 +34,73 @@
             </div>
         </div>
     }
+    @if (isOpenForm_EditConcept)
+    {
+        <div class="form_add_new_concept_background_view">
+            <div class="form_add_new_concept_view">
+                <div class="top_form_view">
+                    <div class="title_form"><a>Edit Concept</a></div>
+                    <div class="close_btn" @onclick="CloseEditConceptForm"><img class="icon" src="assests/icon/close_480px.png" /></div>
+                </div>
+                <div>
+                    <div class="concept_input_view">
+                        <a>Concept:</a>
+                        <div class="input_concept">
+                            <input 
+                                id="input_concept" 
+                                placeholder="concept" 
+                                @oninput="SetNewConcept" 
+                                value="@SelectedConcept?.Name" 
+                            />
+                        </div>
+                    </div>
+                    <div class="warning_input"><a>@warning_input_conecept</a></div>
+                    <div class="description_input_view">
+                        <a>Description:</a>
+                        <div class="input_description">
+                            <textarea 
+                                id="input_description" 
+                                placeholder="@Description_text" 
+                                @oninput="SetNewDescription"
+                                value="@SelectedConcept?.Content"
+                            >
+                            </textarea>
+                        </div>
+                    </div>
+                    <div class="warning_input"><a>@warning_input_description</a></div>
+                    <div class="confirm_btn_view" @onclick="EditConcept">
+                        <div class="confirm_btn"><a>Confirm</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }@if (isOpenForm_DeleteConcept)
+    {
+        <div class="form_add_new_concept_background_view">
+            <div class="dialog_delete_view">
+                <div class="dialog_title_view">
+                    <a>Are you confirm delete this?</a>
+                </div>
+                <div class="dialog_buttons_view">
+                    <div 
+                        class="button_dialog" 
+                        style="background-color: #7367F0"
+                        @onclick="ConfirmDeleteConcept"
+                    >
+                        <a>Yes</a>
+                    </div>
+                    <div class="button_dialog" @onclick="CancelDeleteConcept">
+                        <a>No</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="main_view">
         <div class="button_concept_view">
             <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
-            <div class="my_button"><a>Edit</a></div>
-            <div class="my_button"><a>Delete</a></div>
+            <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
+            <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
         </div>
         <div class="content_view">
             <div class="list_concept_view">
@@ -117,7 +179,9 @@
 @code {
     public Boolean isLoading_GetListConcept = true;
     public Boolean isLoading_GetListKeyphrase = true;
-    public Boolean isOpenForm_AddNewConcept = true;
+    public Boolean isOpenForm_AddNewConcept = false;
+    public Boolean isOpenForm_EditConcept = false;
+    public Boolean isOpenForm_DeleteConcept = true;
     public List<Concept>? Concepts;
     public Concept? SelectedConcept;
     public List<KeyPhrase>? Keyphrases;
@@ -231,15 +295,105 @@
 
             if(rsAddConcept != null)
             {
-                //Chỗ này xây dựng một component để thông báo, dùng đỡ alert cho đỡ tốn time
                 await JsRuntime.InvokeVoidAsync("alert", rsAddConcept);
-                //Close add component
-                //re-render
+                CloseAddNewConceptForm();
+            } else
+            {
+                // handler error
             }
-
-            Console.WriteLine(new_concept);
-            Console.WriteLine(new_description);
         }
     }
 
+    public void OpenEditConceptForm()
+    {
+        isOpenForm_EditConcept = true;
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public void CloseEditConceptForm()
+    {
+        isOpenForm_EditConcept = false;
+        warning_input_conecept = "";
+        warning_input_description = "";
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public async void EditConcept()
+    {
+        if(SelectedConcept == null)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "You have not selected yet!");
+            return;
+        }
+
+        if (new_concept == SelectedConcept?.Name && new_description == SelectedConcept.Content)
+        {
+            CloseEditConceptForm();
+            return;
+        }
+
+        if(new_concept == "" && new_description == "")
+        {
+            CloseEditConceptForm();
+            return;
+        }
+
+        if (new_concept == "" || new_description == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Please fill in concept");
+            return;
+        }
+
+        if (new_description == "")
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Please fill in description");
+            return;
+        }
+
+        Concept c = new Concept();
+        c = SelectedConcept;
+        c.Name = new_concept;
+        c.Content = new_description;
+
+        var rs = testAPI_Edit_Concept(c);
+        if(rs)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Edit is success!");
+            CloseEditConceptForm();
+        } else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Edit is failed!");
+            CloseEditConceptForm();
+        }
+    }
+
+    public Boolean testAPI_Edit_Concept(Concept c)
+    {
+        return true;
+    }
+
+    public void OpenDeleteConceptForm()
+    {
+        isOpenForm_DeleteConcept = true;
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public void CloseDeleteConceptForm()
+    {
+        isOpenForm_DeleteConcept = false;
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public void ConfirmDeleteConcept()
+    {
+        CloseDeleteConceptForm();
+    }
+    public void CancelDeleteConcept()
+    {
+        CloseDeleteConceptForm();
+    }
 }
