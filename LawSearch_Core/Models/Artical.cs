@@ -20,4 +20,13 @@ namespace LawSearch_Core.Models
         public double score { get; set; }
         public List<Clause> lstClause { get; set; }
     }
+
+    public class ArticalResult
+    {
+        public int ID { get; set; }
+        public string Content { get; set; }
+        public string Title { get; set; }
+        public string LawName { get; set; } 
+
+    }
 }

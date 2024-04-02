@@ -5,6 +5,6 @@ namespace LawSearch_Admin.Interfaces
 {
     public interface ISearchAdminService
     {
-        Task<SearchArticalResult> GetResultSearchLaw(string input);
+        Task<List<ArticalResult>> GetResultSearchLaw(string input);
     }
 }

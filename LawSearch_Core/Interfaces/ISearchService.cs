@@ -9,6 +9,6 @@ namespace LawSearch_Core.Interfaces
 {
     public interface ISearchService
     {
-        SearchArticalResult SearchLawByText(string searchInput);
+        List<ArticalResult> SearchLawByText(string searchInput);
     }
 }
