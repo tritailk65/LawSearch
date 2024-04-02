@@ -1,5 +1,6 @@
 ﻿@page "/concept"
 @inject IConceptAdminService conceptAdminService;
+@inject IJSRuntime JsRuntime;
 
 @* Băt đầu web *@
 <div class="background_view">
@@ -200,7 +201,7 @@
     }
 
 
-    public void AddNewConcept()
+    public async void AddNewConcept()
     {
         if(new_concept == "")
         {
@@ -226,10 +227,19 @@
             StateHasChanged();
 
             // Logic add here
-            var rs = conceptAdminService.AddConcept(new_concept, new_description);
+            var rsAddConcept = await conceptAdminService.AddConcept(new_concept, new_description);
+
+            if(rsAddConcept != null)
+            {
+                //Chỗ này xây dựng một component để thông báo, dùng đỡ alert cho đỡ tốn time
+                await JsRuntime.InvokeVoidAsync("alert", rsAddConcept);
+                //Close add component
+                //re-render
+            }
 
             Console.WriteLine(new_concept);
             Console.WriteLine(new_description);
         }
     }
+
 }

@@ -2,6 +2,13 @@
 
 namespace LawSearch_Admin.ViewModels
 {
+    public class APIResultVM
+    {
+        public int Status { set; get; }
+        public string? Message { set; get; }
+        public string? Data { set; get; }
+    }
+
     public class APIResultVM<T>
     {
         public int Status { set; get; }

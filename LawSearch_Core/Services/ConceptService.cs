@@ -31,14 +31,19 @@ namespace LawSearch_Core.Services
                 string content = concept.Content;
 
                 string sql = string.Format("Exec GetConcept N'{0}',N'{1}'", name, content);
-                int insertRs = _db.ExecuteScalarCommand<int>(sql);
-                if(insertRs == -1)
+                var rs = _db.ExecuteReaderCommand(sql,"");
+                int idNewConcept = 0;
+                if(rs.Rows.Count > 0)
+                {
+                    idNewConcept = Globals.GetIDinDT(rs, 0, 0);
+                }
+                if(idNewConcept == -1)
                 {
                     throw new BadRequestException("Name or content is null !", 400, 400);
-                }else
+                }else if(idNewConcept != 0)
                 {
-                    string query = "select * from [Concept]  with(nolock) where id = " + insertRs;
-                    DataTable dt = _db.ExecuteReaderCommand(sql, "");
+                    string query = "select * from [Concept]  with(nolock) where id = " + idNewConcept;
+                    DataTable dt = _db.ExecuteReaderCommand(query, "");
                     Concept c = new Concept
                     {
                         ID = Globals.GetIDinDT(dt, 0, "ID"),
@@ -47,6 +52,7 @@ namespace LawSearch_Core.Services
                     };
                     return c;
                 }
+                return null;
             }
             catch
             {
