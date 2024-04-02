@@ -1,5 +1,5 @@
 ﻿@page "/keyphrase"
-@inject IKeyPhraseAdminService _keyphraseService;
+@inject IKeyPhraseAdminService keyphraseService;
 @* 
 <div class="title">
     <h3>KeyPhrase</h3>
@@ -14,9 +14,9 @@
                 @*search bar*@
                 <div class="search_bar">
                     <div class="text_input_view">
-                        <input placeholder="Thanh tìm kiếm..." />
+                        <input placeholder="Search keyphrase..." @oninput="SetSearchKeyphrase" />
                     </div>
-                    <div class="search_btn">
+                    <div class="search_btn" @onclick="SearchKeyphraseFunc">
                         <img class="icon" src="assests/icon/search_icon.png" />
                     </div>
                 </div>
@@ -25,42 +25,69 @@
                 @*list keyphrase*@
                 <div class="list_keyphrase">
                     <ul>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>1. An_dưỡng</a></div></li>
-                        <li><div class="keyphrase_not_selected"><a>99. An_dưỡng</a></div></li>
+                        @if(isLoadingKeyphrase)
+                        {
+                            <li><a>Loading...</a></li>
+                        } else
+                        {
+                            if (Keyphrases == null || Keyphrases.Count == 0)
+                            {
+                                <li><a>Empty</a></li>
+                            } else
+                            {
+                                if (isSearching)
+                                {
+                                    if (FilterKeyPhrase == null || FilterKeyPhrase.Count == 0)
+                                    {
+                                        <li><a>Empty</a></li>
+                                    } else
+                                    {
+                                        foreach (KeyPhrase k in FilterKeyPhrase)
+                                        {
+                                            if (SelectedKeyphrase?.ID == k.ID)
+                                            {
+                                                <li>
+                                                    <div class="keyphrase_selected">
+                                                        <a>@k.ID. @k.Keyphrase</a>
+                                                    </div>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <div class="keyphrase_not_selected"
+                                                         onclick="@(() => {ClickKeyphrase(k);})">
+                                                        <a>@k.ID. @k.Keyphrase</a>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                } else
+                                {
+                                    foreach (KeyPhrase k in Keyphrases)
+                                    {
+                                        if (SelectedKeyphrase?.ID == k.ID)
+                                        {
+                                            <li>
+                                                <div class="keyphrase_selected">
+                                                    <a>@k.ID. @k.Keyphrase</a>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <div class="keyphrase_not_selected"
+                                                     onclick="@(() => {ClickKeyphrase(k);})">
+                                                    <a>@k.ID. @k.Keyphrase</a>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -68,8 +95,8 @@
         <div class="right_view">
             <div class="buttons_view">
                 @*buttons*@
-                <div>
-                    <input placeholder="new keyphrase" />
+                <div class="input_add_keyphrase_view">
+                    <input placeholder="new keyphrase" @oninput="SetNewKeyphrase" />
                 </div>
                 <div class="my_button">
                     <a>Add new keyphrase</a>
@@ -80,6 +107,138 @@
             </div>
             <div class="table_view">
                 @*table*@
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="document_column">Document</th>
+                            <th class="chapter_column">Chapter</th>
+                            <th class="article_column">Article</th>
+                            <th class="count_column">Count</th>
+                            <th class="action_column"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>QUY ĐỊNH VỀ THU TIỀN THUÊ ĐẤT, THUÊ MẶT NƯỚC</td>
+                            <td>Chương 10</td>
+                            <td>Điều 100</td>
+                            <td>999</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png"/></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                        <tr>
+                            <td>Luật đất đai 2013</td>
+                            <td>Chương 6</td>
+                            <td>Điều 1</td>
+                            <td>1</td>
+                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -134,27 +293,38 @@
 </div> *@
 
 @code {
-    public List<KeyPhrase> keyPhrases;
-    public List<KeyPhrase> filterKeyPhrase;
-    public List<KeyPhraseRelate> keyPhraseRelates;
+    public Boolean isLoadingKeyphrase = true;
+    public Boolean isSearching = false;
+    public List<KeyPhrase>? Keyphrases;
+    public List<KeyPhrase>? FilterKeyPhrase;
+    public List<KeyPhraseRelate>? keyPhraseRelates;
     public string searchKeyword = "";
+    public KeyPhrase? SelectedKeyphrase;
+    public string SearchKeyphrase = "";
+    public string NewKeyphrase = "";
 
     protected override async Task OnInitializedAsync()
     {
-        var data = await _keyphraseService.GetListKeyPhrase();
-        keyPhrases = data;
+        var data = await keyphraseService.GetListKeyPhrase();
+        Keyphrases = data;
+        isLoadingKeyphrase = false;
+        if (Keyphrases.Count > 0)
+        {
+            SelectedKeyphrase = Keyphrases[0];
+        }
     }
 
+    @*
     private async void ShowDetail(int id)
     {
-        var data = await _keyphraseService.GetKeyPhraseRelates(id);
+        var data = await keyphraseService.GetKeyPhraseRelates(id);
         keyPhraseRelates = data;
     }
 
     private void HandleSearchInputChange(ChangeEventArgs e)
     {
         searchKeyword = e.Value.ToString();
-        IEnumerable<KeyPhrase> filter = keyPhrases.Where(c => c.Keyphrase.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
+        IEnumerable<KeyPhrase> filter = Keyphrases.Where(c => c.Keyphrase.Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
         if (filter != null)
         {
             filterKeyPhrase = filter.ToList();
@@ -163,5 +333,52 @@
         {
             filterKeyPhrase = null;
         }
+    }
+    *@
+
+    public void ClickKeyphrase(KeyPhrase k)
+    {
+        SelectedKeyphrase = k;
+        StateHasChanged();
+    }
+
+    public void SetSearchKeyphrase(ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            SearchKeyphrase = e.Value?.ToString() ?? "";
+        }
+    }
+
+    public void SetNewKeyphrase(ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            NewKeyphrase = e.Value?.ToString() ?? "";
+        }
+    }
+
+    public void SearchKeyphraseFunc()
+    {
+        if (SearchKeyphrase == "")
+        {
+            isSearching = false;
+            return;
+        }
+        if (Keyphrases == null) return;
+
+        IEnumerable<KeyPhrase> filter = Keyphrases.Where(c => c.Keyphrase.Contains(SearchKeyphrase, StringComparison.OrdinalIgnoreCase));
+
+        isSearching = true;
+        if (filter != null)
+        {
+            FilterKeyPhrase = filter.ToList();
+        }else
+        {
+            FilterKeyPhrase = null;
+        }
+
+        // Re-render method
+        StateHasChanged();
     }
 }

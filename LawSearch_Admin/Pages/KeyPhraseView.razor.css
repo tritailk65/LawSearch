@@ -189,14 +189,15 @@ input[type="text"] {
 
 @media only screen and (max-width: 1540px) {
     .my_button {
-        height: 72px;
-        background-color: #3B4054;
+        font-size: 18px;
+        font-weight: bold;
+        height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 10px;
+        background-color: #3B4054;
         cursor: pointer;
-        padding: 22px 40px;
     }
 
     .background_view {
@@ -293,8 +294,10 @@ input[type="text"] {
     }
 
     .list_keyphrase ul {
-        padding: 0px; /* remove default value*/
-        list-style-type: none; /* remove default value*/
+        /* remove default value - begin */
+        padding: 0px;
+        list-style-type: none;
+        /* remove default value - end */
         overflow: auto;
     }
 
@@ -304,7 +307,6 @@ input[type="text"] {
 
     .keyphrase_not_selected {
         width: 85%;
-        height: 53px;
         background-color: transparent;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -314,13 +316,16 @@ input[type="text"] {
         cursor: pointer;
     }
 
+    .keyphrase_not_selected a {
+        white-space: pre-wrap;
+    }
+
     .keyphrase_not_selected:hover {
         background-color: #7065E8;
     }
 
     .keyphrase_selected {
         width: 85%;
-        height: 53px;
         background-color: #7065E8;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -330,14 +335,113 @@ input[type="text"] {
         cursor: pointer;
     }
 
+    .keyphrase_selected a {
+        white-space: pre-wrap;
+    }
+
     .right_view {
         width: 60%;
-        background-color: lime;
+        background-color: transparent;
     }
 
     .buttons_view {
+        width: 100%;
+        height: 105px;
         display: flex;
         flex-direction: row;
-        justify-content: right;
+        align-items: center;
+        justify-content: space-around;
+        border-bottom: 2px solid #44475D;
     }
+
+    .input_add_keyphrase_view {
+        width: 200px;
+        height: 70px;
+        border: 2px solid #786BF9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input_add_keyphrase_view input {
+        width: 180px;
+        height: 50px;
+        font-size: 20px;
+        border: none;
+        outline: none;
+        color: white;
+        background: transparent;
+    }
+    /* css table - begin */
+    .table_view {
+        width: 100%;
+        height: 510px;
+        padding: 20px;
+        overflow: auto;
+    }
+
+    .table_view table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .table_view th {
+        text-align: center;
+        padding: 8px;
+        color: #786BF9;
+    }
+
+    .table_view td:first-child {
+        text-align: left;
+    }
+
+    .table_view td {
+        text-align: center;
+        padding: 10px 8px;
+        word-wrap: break-word;
+    }
+
+    .table_view td:last-child {
+        padding: 10px 8px;
+        word-wrap: break-word;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .document_column {
+        width: 35%;
+    }
+
+    .chapter_column {
+        width: 20%;
+    }
+
+    .article_column {
+        width: 15%;
+    }
+
+    .count_column {
+        width: 10%;
+    }
+
+    .action_column {
+        width: 20%;
+    }
+
+    .icon_table {
+        width: 30px;
+        height: 30px;
+    }
+    .delete_btn_table {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    /* css table - end */
 }
