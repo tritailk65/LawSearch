@@ -74,8 +74,7 @@
                 </div>
             </div>
         </div>
-    }
-    @if (isOpenForm_DeleteConcept)
+    }@if (isOpenForm_DeleteConcept)
     {
         <div class="form_add_new_concept_background_view">
             <div class="dialog_delete_view">
@@ -111,7 +110,7 @@
                         <a>Loading...</a>
                     } else
                     {
-                        if (Concepts != null && Concepts.Count() > 0)
+                        if (Concepts != null)
                         {
                             foreach (var concept in Concepts)
                             {
@@ -133,10 +132,7 @@
             </div>
             <div class="content_concept_view">
                 <a id="content_of_concept">
-                    @if(SelectedConcept != null)
-                    {
-                        @SelectedConcept?.Content;
-                    }
+                    @SelectedConcept?.Content
                 </a>
             </div>
             <div class="list_keyphrase_of_concept_view">
@@ -186,9 +182,9 @@
     public Boolean isOpenForm_AddNewConcept = false;
     public Boolean isOpenForm_EditConcept = false;
     public Boolean isOpenForm_DeleteConcept = false;
-    public List<Concept> Concepts = new List<Concept>();
-    public Concept? SelectedConcept = new Concept();
-    public List<KeyPhrase> Keyphrases = new List<KeyPhrase>();
+    public List<Concept>? Concepts;
+    public Concept? SelectedConcept;
+    public List<KeyPhrase>? Keyphrases;
     string search_keyphrase = "";
     string Description_text = "A concept is defined as an abstract idea. It is understood to be a fundamental building block underlying principles, thoughts and beliefs. Concepts play an important role in all aspects of cognition. As such, concepts are studied within such disciplines as linguistics, psychology, and philosophy, and these disciplines are interested in the logical and psychological structure of concepts, and how they are put together to form thoughts and sentences. The study of concepts has served as an important flagship of an emerging interdisciplinary approach, cognitive science.";
     string new_concept = "";
@@ -202,28 +198,18 @@
         var data_concept = await conceptAdminService.GetListConcept();
         if (data_concept == null || data_concept.Count == 0)
         {
-            Concepts.Clear();
-        } else
-        {
-            Concepts = data_concept;
+            Concepts = null;
+            return;
         }
 
-        if (Concepts.Count() > 0)
-        {
-            SelectedConcept = Concepts[0];
-        } else
-        {
-            SelectedConcept = null;
-        }
+        Concepts = data_concept;
+        SelectedConcept = Concepts[0];
         isLoading_GetListConcept = false;
 
         // fetch keyphrase
-        if (Concepts.Count() > 0)
+        if (Concepts[0] != null)
         {
             await fetchKeyphrase(Concepts[0].ID);
-        } else
-        {
-            isLoading_GetListKeyphrase = false;
         }
         // Re-render Method
         StateHasChanged();

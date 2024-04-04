@@ -186,7 +186,5 @@ namespace LawSearch_Core.Services
                 _db.CloseConnection();
             }
         }
-
-
     }
 }

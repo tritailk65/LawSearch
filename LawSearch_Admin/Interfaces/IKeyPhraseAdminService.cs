@@ -7,10 +7,5 @@ namespace LawSearch_Admin.Interfaces
         Task<List<KeyPhrase>> GetListKeyPhrase();
 
         Task<List<KeyPhraseRelate>> GetKeyPhraseRelates(int id);
-
-        Task<string> AddKeyphrase(KeyPhrase keyphrase);
-
-        Task<string> DeleteKeyphrase(int id);
-
     }
 }
