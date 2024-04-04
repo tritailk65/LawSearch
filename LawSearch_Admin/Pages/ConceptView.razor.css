@@ -70,7 +70,7 @@ input[type="text"] {
     }
 
     .list_concept_view {
-        width: 600px;
+        width: 30%;
         height: 600px;
         border-right: 2px solid #44475D;
         padding: 20px;
@@ -80,16 +80,21 @@ input[type="text"] {
     .list_concept_view ul {
         padding: 0px; /* remove default value*/
         list-style-type: none; /* remove default value*/
-        font-size: 20px;
+        font-size: 16px;
     }
 
     .item_selected {
         width: 300px;
         padding: 10px 15px;
         border-radius: 10px;
-        background-color: #7367F0;
         margin-bottom: 10px;
         cursor: pointer;
+        background-color: #7367F0;
+    }
+
+    .item_selected a {
+        width: 80%;
+        word-break: break-word;
     }
 
     .item_not_selected {
@@ -100,46 +105,50 @@ input[type="text"] {
         cursor: pointer;
     }
 
+    .item_not_selected a {
+        width: 80%;
+        word-break: break-word;
+    }
+
     .item_not_selected:hover {
         background-color: #7367F0;
     }
 
     .content_concept_view {
-        width: 898px;
+        width: 40%;
         padding: 20px;
     }
 
     .content_concept_view a {
-        font-size: 20px;
+        width: 92%;
+        font-size: 16px;
     }
 
     .list_keyphrase_of_concept_view {
-        width: 410px;
+        width: 30%;
         border-left: 2px solid #44475D;
     }
 
     .keyphrase_buttons_view {
         width: 100%;
-        height: 171px;
-        padding: 10px 20px;
+        padding: 20px 20px;
         border-bottom: 2px solid #44475D;
     }
 
     .search_keyphrase_view {
-        width: 291px;
-        height: 69px;
+        width: 100%;
+        height: 50px;
         border: 2px solid #7065E8;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 15px 10px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
     .search_keyphrase_view input {
-        width: 261px;
-        font-size: 24px;
+        width: 97%;
+        font-size: 16px;
         border: none;
         outline: none;
         color: white;
@@ -147,18 +156,17 @@ input[type="text"] {
     }
 
     .my_button {
-        height: 72px;
         background-color: #3B4054;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 10px;
         cursor: pointer;
-        padding: 22px 40px;
+        padding: 12px 30px;
     }
 
     .my_button a {
-        font-size: 24px;
+        font-size: 16px;
     }
 
     .my_button:hover {
@@ -245,7 +253,7 @@ input[type="text"] {
 
     .concept_input_view a {
         font-weight: bold;
-        font-size: 20px;
+        font-size: 16px;
     }
 
     .concept_input_view div {
@@ -254,7 +262,7 @@ input[type="text"] {
 
     .input_concept {
         width: 250px;
-        height: 55px;
+        height: 45px;
         border: 2px solid #7065E8;
         border-radius: 10px;
         display: flex;
@@ -264,7 +272,7 @@ input[type="text"] {
 
     .input_concept input {
         width: 93%;
-        font-size: 20px;
+        font-size: 16px;
         border: none;
         outline: none;
         color: white;
@@ -282,7 +290,7 @@ input[type="text"] {
 
     .description_input_view a {
         font-weight: bold;
-        font-size: 20px;
+        font-size: 16px;
     }
 
     .description_input_view div {
@@ -302,7 +310,7 @@ input[type="text"] {
     .input_description textarea {
         width: 97%;
         height: 93%;
-        font-size: 20px;
+        font-size: 16px;
         border: none;
         outline: none;
         color: white;

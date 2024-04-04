@@ -1,5 +1,6 @@
 ﻿@page "/keyphrase"
 @inject IKeyPhraseAdminService keyphraseService;
+@inject IJSRuntime JsRuntime;
 @* 
 <div class="title">
     <h3>KeyPhrase</h3>
@@ -8,13 +9,46 @@
 
 @* Băt đầu web *@
 <div class="background_view">
+    @if (isOpenDialog_DeleteDialog)
+    {
+        <div class="form_add_new_concept_background_view">
+            <div class="dialog_delete_view">
+                <div class="dialog_title_view">
+                    <a>Are you confirm delete this?</a>
+                </div>
+                <div class="dialog_buttons_view">
+                    <div class="button_dialog"
+                         style="background-color: #7367F0"
+                         @onclick="ConfirmDelete">
+                        <a>Yes</a>
+                    </div>
+                    <div class="button_dialog" @onclick="CancelDelete">
+                        <a>No</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (isLoadingAddNewKeyphrase)
+    {
+        <div class="form_add_new_concept_background_view">
+            <div class="process_view">
+                <div class="process_title">
+                    <a>Processing</a>
+                </div>
+                <div>
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="main_view">
         <div class="left_view">
             <div class="search_bar_view">
                 @*search bar*@
                 <div class="search_bar">
                     <div class="text_input_view">
-                        <input placeholder="Search keyphrase..." @oninput="SetSearchKeyphrase" />
+                        <input placeholder="Search keyphrase..." @oninput="SetSearchKeyphrase"/>
                     </div>
                     <div class="search_btn" @onclick="SearchKeyphraseFunc">
                         <img class="icon" src="assests/icon/search_icon.png" />
@@ -44,6 +78,149 @@
                                     {
                                         foreach (KeyPhrase k in FilterKeyPhrase)
                                         {
+                                            string id = k.ID.ToString();
+                                            string keyphraseText = k.Keyphrase.ToString();
+                                            int maximumString = 35;
+                                            int CountChar(string s)
+                                            {
+                                                int count = 0;
+                                                foreach (char c in s)
+                                                {
+                                                    count++;
+                                                }
+                                                return count / maximumString;
+                                            }
+                                            int numLine = CountChar(keyphraseText);
+                                            int test = numLine;
+                                            if (numLine > 0)
+                                            {
+                                                List<string> keyphraseLines = new List<string>();
+                                                for (int i = 0; i < numLine; i++)
+                                                {
+                                                    string line = keyphraseText.Substring(i * maximumString, maximumString);
+                                                    keyphraseLines.Add(line);
+                                                }
+
+                                                if (keyphraseText.Length % 35 != 0)
+                                                {
+                                                    string remaining = keyphraseText.Substring(numLine * maximumString);
+                                                    keyphraseLines.Add(remaining);
+                                                }
+
+                                                if (SelectedKeyphrase?.ID == k.ID)
+                                                {
+                                                    <li>
+                                                        <div class="keyphrase_selected">
+                                                            <a>
+                                                                @k.ID.
+                                                                @foreach (var text in keyphraseLines)
+                                                                {
+                                                                    @text<br>
+                                                                }
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                } else
+                                                {
+                                                    <li>
+                                                        <div class="keyphrase_not_selected"
+                                                             onclick="@(async Task() => {await ClickKeyphrase(k);})">
+                                                            <a>
+                                                                @k.ID.
+                                                                @foreach (var text in keyphraseLines)
+                                                                {
+                                                                    @text<br>
+                                                                }
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            } else
+                                            {
+                                                if (SelectedKeyphrase?.ID == k.ID)
+                                                {
+                                                    <li>
+                                                        <div class="keyphrase_selected">
+                                                            <a>@k.ID. @k.Keyphrase</a>
+                                                        </div>
+                                                    </li>
+                                                }else
+                                                {
+                                                    <li>
+                                                        <div class="keyphrase_not_selected"
+                                                                onclick="@(async Task() => {await ClickKeyphrase(k);})">
+                                                            <a>@k.ID. @k.Keyphrase</a>
+                                                        </div>
+                                                    </li>
+                                                }   
+                                            }
+                                        }
+                                    }
+                                } else
+                                {
+                                    foreach (KeyPhrase k in Keyphrases)
+                                    {
+                                        string id = k.ID.ToString();
+                                        string keyphraseText = k.Keyphrase.ToString();
+                                        int maximumString = 35;
+                                        int CountChar(string s)
+                                        {
+                                            int count = 0;
+                                            foreach (char c in s)
+                                            {
+                                                count++;
+                                            }
+                                            return count / maximumString;
+                                        }
+                                        int numLine = CountChar(keyphraseText);
+                                        int test = numLine;
+                                        if (numLine > 0)
+                                        {
+                                            List<string> keyphraseLines = new List<string>();
+                                            for (int i = 0; i < numLine; i++)
+                                            {
+                                                string line = keyphraseText.Substring(i * maximumString, maximumString);
+                                                keyphraseLines.Add(line);
+                                            }
+
+                                            if (keyphraseText.Length % maximumString != 0)
+                                            {
+                                                string remaining = keyphraseText.Substring(numLine * maximumString);
+                                                keyphraseLines.Add(remaining);
+                                            }
+
+                                            if (SelectedKeyphrase?.ID == k.ID)
+                                            {
+                                                <li>
+                                                    <div class="keyphrase_selected">
+                                                        <a>
+                                                            @k.ID.
+                                                            @foreach (var text in keyphraseLines)
+                                                            {
+                                                                @text<br>
+                                                            }
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <div class="keyphrase_not_selected"
+                                                            onclick="@(async Task() => {await ClickKeyphrase(k);})">
+                                                        <a>
+                                                            @k.ID.
+                                                            @foreach (var text in keyphraseLines)
+                                                            {
+                                                                @text<br>
+                                                            }
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                        else
+                                        {
                                             if (SelectedKeyphrase?.ID == k.ID)
                                             {
                                                 <li>
@@ -56,33 +233,11 @@
                                             {
                                                 <li>
                                                     <div class="keyphrase_not_selected"
-                                                         onclick="@(() => {ClickKeyphrase(k);})">
+                                                            onclick="@(async Task() => {await ClickKeyphrase(k);})">
                                                         <a>@k.ID. @k.Keyphrase</a>
                                                     </div>
                                                 </li>
                                             }
-                                        }
-                                    }
-                                } else
-                                {
-                                    foreach (KeyPhrase k in Keyphrases)
-                                    {
-                                        if (SelectedKeyphrase?.ID == k.ID)
-                                        {
-                                            <li>
-                                                <div class="keyphrase_selected">
-                                                    <a>@k.ID. @k.Keyphrase</a>
-                                                </div>
-                                            </li>
-                                        }
-                                        else
-                                        {
-                                            <li>
-                                                <div class="keyphrase_not_selected"
-                                                     onclick="@(() => {ClickKeyphrase(k);})">
-                                                    <a>@k.ID. @k.Keyphrase</a>
-                                                </div>
-                                            </li>
                                         }
                                     }
                                 }
@@ -96,12 +251,12 @@
             <div class="buttons_view">
                 @*buttons*@
                 <div class="input_add_keyphrase_view">
-                    <input placeholder="new keyphrase" @oninput="SetNewKeyphrase" />
+                    <input placeholder="new keyphrase" @oninput="SetNewKeyphrase" value="@NewKeyphrase" />
                 </div>
-                <div class="my_button">
+                <div class="my_button" @onclick="AddNewKeyphrase">
                     <a>Add new keyphrase</a>
                 </div>
-                <div class="my_button">
+                <div class="my_button" @onclick="OpenDeleteDialog">
                     <a>Delete keyphrase</a>
                 </div>
             </div>
@@ -118,127 +273,59 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>QUY ĐỊNH VỀ THU TIỀN THUÊ ĐẤT, THUÊ MẶT NƯỚC</td>
-                            <td>Chương 10</td>
-                            <td>Điều 100</td>
-                            <td>999</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png"/></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
-                        <tr>
-                            <td>Luật đất đai 2013</td>
-                            <td>Chương 6</td>
-                            <td>Điều 1</td>
-                            <td>1</td>
-                            <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
-                        </tr>
+                        @if (isLoadingKeyphraseRelates)
+                        {
+                            
+                        } else
+                        {
+                            if (KeyphraseRelates == null || KeyphraseRelates.Count == 0)
+                            {
+                                
+                            } else
+                            {
+                                foreach(KeyPhraseRelate kr in KeyphraseRelates)
+                                {
+                                    <tr>
+                                        <td>...</td>
+                                        @if (kr.ChapterName == "")
+                                        {
+
+                                            <td>...</td>
+                                        } else
+                                        {
+
+                                            <td>@kr.ChapterName</td>
+                                        }
+
+                                        @if (kr.ArticalName == "")
+                                        {
+
+                                            <td>...</td>
+                                        }
+                                        else
+                                        {
+
+                                            <td>@kr.ArticalName</td>
+                                        }
+
+                                        <td>@kr.NumCount</td>
+                                        <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                                    </tr>
+                                }
+                            }
+                        }
                     </tbody>
                 </table>
+                @if (isLoadingKeyphraseRelates)
+                {
+                    <div class="message_table_view"><a>Loading...</a></div>
+                } else
+                {
+                    if (KeyphraseRelates == null || KeyphraseRelates.Count == 0)
+                    {
+                        <div class="message_table_view"><a>Empty</a></div>
+                    }
+                }
             </div>
         </div>
     </div>
@@ -294,10 +381,13 @@
 
 @code {
     public Boolean isLoadingKeyphrase = true;
+    public Boolean isLoadingKeyphraseRelates = true;
+    public Boolean isOpenDialog_DeleteDialog = false;
+    public Boolean isLoadingAddNewKeyphrase = false;
     public Boolean isSearching = false;
     public List<KeyPhrase>? Keyphrases;
     public List<KeyPhrase>? FilterKeyPhrase;
-    public List<KeyPhraseRelate>? keyPhraseRelates;
+    public List<KeyPhraseRelate>? KeyphraseRelates;
     public string searchKeyword = "";
     public KeyPhrase? SelectedKeyphrase;
     public string SearchKeyphrase = "";
@@ -305,13 +395,28 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await fetchKeyphrase();
+    }
+
+    public async Task fetchKeyphrase()
+    {
         var data = await keyphraseService.GetListKeyPhrase();
         Keyphrases = data;
         isLoadingKeyphrase = false;
         if (Keyphrases.Count > 0)
         {
             SelectedKeyphrase = Keyphrases[0];
+            await fetchInfoKeyphrase(Keyphrases[0].ID);
         }
+    }
+
+    public async Task fetchInfoKeyphrase(int id_keyphrase)
+    {
+        isLoadingKeyphraseRelates = true;
+        var data = await keyphraseService.GetKeyPhraseRelates(id_keyphrase);
+        if (KeyphraseRelates != null) KeyphraseRelates.Clear();
+        KeyphraseRelates = data;
+        isLoadingKeyphraseRelates = false;
     }
 
     @*
@@ -336,9 +441,10 @@
     }
     *@
 
-    public void ClickKeyphrase(KeyPhrase k)
+    public async Task ClickKeyphrase(KeyPhrase k)
     {
         SelectedKeyphrase = k;
+        await SelectKeyphrase();
         StateHasChanged();
     }
 
@@ -367,7 +473,7 @@
         }
         if (Keyphrases == null) return;
 
-        IEnumerable<KeyPhrase> filter = Keyphrases.Where(c => c.Keyphrase.Contains(SearchKeyphrase, StringComparison.OrdinalIgnoreCase));
+        IEnumerable<KeyPhrase> filter = Keyphrases.Where(c => c.Keyphrase.Contains(SearchKeyphrase.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase));
 
         isSearching = true;
         if (filter != null)
@@ -378,6 +484,59 @@
             FilterKeyPhrase = null;
         }
 
+        // Re-render method
+        StateHasChanged();
+    }
+
+    public async Task SelectKeyphrase()
+    {
+        if (SelectedKeyphrase == null) return;
+        await fetchInfoKeyphrase(SelectedKeyphrase.ID);
+        // Re-render method
+        StateHasChanged();
+    }
+
+    public void OpenDeleteDialog()
+    {
+        isOpenDialog_DeleteDialog = true;
+        // Re-render method
+        StateHasChanged();
+    }
+
+    public void CloseDeleteDialog()
+    {
+        isOpenDialog_DeleteDialog = false;
+        // Re-render method
+        StateHasChanged();
+    }
+
+    public async Task ConfirmDelete()
+    {
+        if (SelectedKeyphrase == null) return;
+        var message = await keyphraseService.DeleteKeyphrase(SelectedKeyphrase.ID);
+        await JsRuntime.InvokeVoidAsync("alert", message);
+
+        await fetchKeyphrase();
+        CloseDeleteDialog();
+    }
+
+    public void CancelDelete()
+    {
+        CloseDeleteDialog();
+    }
+
+    public async Task AddNewKeyphrase()
+    {
+        if (NewKeyphrase == "") return;
+
+        KeyPhrase k = new KeyPhrase();
+        k.Keyphrase = NewKeyphrase;
+        isLoadingAddNewKeyphrase = true;
+        var message = await keyphraseService.AddKeyphrase(k);
+        await JsRuntime.InvokeVoidAsync("alert", message);
+
+        NewKeyphrase = "";
+        isLoadingAddNewKeyphrase = false;
         // Re-render method
         StateHasChanged();
     }
