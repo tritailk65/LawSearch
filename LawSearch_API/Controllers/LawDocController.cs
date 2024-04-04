@@ -29,7 +29,7 @@ namespace LawSearch_API.Controllers
         public APIResult GetListLaw()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            DataTable dtResult = lawDocService.GetListLawDoc();
+            List<LawDoc> dtResult = lawDocService.GetListLawDoc();
             APIResult rs = new();
             return rs.Success(dtResult);
         }

@@ -1,0 +1,98 @@
+﻿@page "/editlaw"
+
+@inject ILawDocAdminService lawDocAdminService;
+
+<div class="body-container">
+    <div class="header-content">
+        <div class="title">
+            Select your document
+        </div>
+        <select class="custom-select">
+            @if(lstLawDoc != null)
+            {
+                @foreach (var law in lstLawDoc)
+                {
+                    <option class="dropdown-item" value="@law.Name">@law.Name</option>
+                }
+            }
+        </select>
+        <div class="btn">
+            <Button ButtonStyle="add-button btn-custom" @onclick="() => {}">
+                Add New
+            </Button>
+            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
+                Edit
+            </Button>
+            <Button ButtonStyle="delete-button btn-custom" @onclick="() => {}">
+                Delete
+            </Button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        @if (lawVM == null)
+        {
+            <div class="loading_">
+                <span class="loader"></span>
+            </div>
+        }
+        else if (lawVM != null)
+        {
+            <div class="left-content">
+                <div class="index">
+                    @if (lawVM.lstChapters.Count > 0)
+                    {
+                        foreach (var c in lawVM.lstChapters)
+                        {
+                            <div class="chapter">
+                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                @c.Name @c.Title
+                            </div>
+                            if (c.lstSections != null && c.lstSections.Count > 0)
+                            {
+                                foreach (var s in c.lstSections)
+                                {
+                                    if (s.Name != "")
+                                    {
+                                        <div class="section">
+                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                            @s.Name
+                                        </div>
+                                    }
+                                    if (s.lstArticals.Count > 0)
+                                    {
+                                        foreach (var a in s.lstArticals)
+                                        {
+                                            <div class="artical">
+                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
+                                                @a.Name: @a.Title
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        }
+        <div class="right-content">
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<LawDoc> lstLawDoc = new List<LawDoc>();
+    public List<Chapter> lstChapter = new List<Chapter>();
+
+    public LawVM lawVM = new LawVM();
+
+    protected override async Task OnInitializedAsync()
+    {
+        lawVM = null;
+        var lstLawDocData = await lawDocAdminService.GetListLawDoc();
+        lstLawDoc = lstLawDocData;
+    }
+}
+

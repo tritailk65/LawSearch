@@ -1,0 +1,37 @@
+﻿@page "/importlaw"
+@inject ILawDocAdminService lawDocAdminService;
+
+<div class="import-container">
+    <div class="title-container">
+        <div class="title">
+            Document name:
+        </div>
+        <input class="input" type="text" @bind-value="@Name"/>
+    </div>
+    <div class="content-container">
+        <div class="title">
+            Document content:
+        </div>
+        <TextArea @bind-ChildData="Content" />
+    </div>
+    <div class="import-btn">
+        <Button ButtonStyle="add-button btn-custom" @onclick="() => ImportNewLaw()">
+            Import
+        </Button>
+    </div>
+
+</div>
+
+@code {
+    public string Name;
+    public string Content;
+
+    public async void ImportNewLaw()
+    {
+        var rs = await lawDocAdminService.ImportLaw(Name, Content);
+        if(rs == true)
+        {
+            
+        }
+    }
+}
