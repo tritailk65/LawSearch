@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace LawSearch_Core.Interfaces
 {
-    public interface ISearchService
+    public interface IChapterService
     {
-        List<ArticalResult> SearchLawByText(string searchInput);
+        List<Chapter> GetListChapterByLawID(int id);
     }
 }

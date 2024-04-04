@@ -1,6 +1,8 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,16 +22,22 @@ namespace BlazorAppAPI.Controllers
             this.logger = logger;
         }
 
-        // GET: api/<ArticalController>
         [HttpGet]
         public APIResult GetAllArtical()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            DataTable dtResult = _articalService.GetAllArtical();
+            List<Artical> dtResult = _articalService.GetAllArtical();
             APIResult rs = new APIResult();
             return rs.Success(dtResult);
-
         }
 
+        [HttpGet("[action]")]
+        public APIResult GetByLawID([BindRequired] int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            List<Artical> dtResult = _articalService.GetListArticalByLawID(id);
+            APIResult rs = new APIResult();
+            return rs.Success(dtResult);
+        }
     }
 }

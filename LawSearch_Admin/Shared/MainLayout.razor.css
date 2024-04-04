@@ -18,6 +18,7 @@
 .logo {
     float: left;
     margin: 16px;
+    cursor:pointer;
 }
 
 .logo-img {
@@ -67,5 +68,4 @@ main {
     height: 100%;
     background-color: #25293C
 }
-
 

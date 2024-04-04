@@ -1,0 +1,22 @@
+﻿<textarea class="input" @oninput="HandleOnChange">@data</textarea>
+
+@code {
+    private string data;
+
+    [Parameter] public string ChildData { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ChildDataChanged { get; set; }
+
+    private async Task HandleOnChange(ChangeEventArgs args)
+    {
+        data = args.Value.ToString();
+        await ChildDataChanged.InvokeAsync(data);
+    }
+
+    protected override void OnParametersSet()
+    {
+        data = ChildData;
+        base.OnParametersSet();
+    }
+}

@@ -10,6 +10,7 @@ namespace LawSearch_Core.Interfaces
 {
     public interface IArticalService
     {
-        DataTable GetAllArtical();
+        List<Artical> GetAllArtical();
+        List<Artical> GetListArticalByLawID(int lawID);
     }
 }

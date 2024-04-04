@@ -19,7 +19,7 @@ namespace LawSearch_Core.Services
             _db = db;
         }
 
-        public SearchArticalResult SearchLawByText(string searchInput)
+        public List<ArticalResult> SearchLawByText(string searchInput)
         {
             try
             {
@@ -89,7 +89,28 @@ namespace LawSearch_Core.Services
 
                 rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
 
-                return rs;
+                foreach (var artical in rs.lstArticals)
+                {
+                    DataTable dsDetail = _db.ExecuteReaderCommand("exec GetArticalDetail2 " + artical.ID,"");
+                    artical.Title = Globals.GetinDT_String(dsDetail, 0, "ChapterName") + " - " + Globals.GetinDT_String(dsDetail, 0, "Name");
+                    artical.Content = Globals.GetinDT_String(dsDetail, 0, "Title");
+                    artical.LawName = Globals.GetinDT_String(dsDetail, 0, "LawName");
+                }
+
+                List<ArticalResult> aRS = new List<ArticalResult>();
+                foreach (var item in rs.lstArticals)
+                {
+                    aRS.Add(new ArticalResult
+                    {
+                        Title = item.Title,
+                        Content = item.Content,
+                        LawName = item.LawName,
+                      
+                        ID = item.ID,
+                    });
+                }
+
+                return aRS;
 
             } catch
             {

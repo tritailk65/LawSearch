@@ -41,14 +41,27 @@ namespace LawSearch_Core.Services
             }
         }
 
-        public DataTable GetListLawDoc()
+        public List<LawDoc> GetListLawDoc()
         {
             try
             {
+                List<LawDoc> lawDocs = new List<LawDoc>();
                 db.OpenConnection();
-                var sql = "select ID, name from Law where status = 1 order by Name";
+                var sql = "select ID, name, status from Law where status = 1 order by ID";
                 DataTable rs = db.ExecuteReaderCommand(sql, "");
-                return rs;
+                if(rs.Rows.Count > 0)
+                {
+                    for(var i =0;i<rs.Rows.Count; i++)
+                    {
+                        lawDocs.Add(new LawDoc
+                        {
+                            ID = Globals.GetIDinDT(rs, i, "ID"),
+                            Name = Globals.GetinDT_String(rs, i, "Name"),
+                            Status = Globals.GetinDT_String(rs, i, "Status")
+                        });
+                    }
+                }
+                return lawDocs;
             }catch
             {
                 throw;

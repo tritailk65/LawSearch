@@ -14,7 +14,6 @@ namespace LawSearch_Core.Models
         public int ID { get; set; }
         public string Name { get; set; }
         public string Status { get; set; }
-
         public List<Chapter> lstChapters { get; set; }
 
     }

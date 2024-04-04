@@ -13,18 +13,18 @@
         </div>
     </div>
 
-@*     @if (lstResult != null)
-    { *@
+    @if (lstResult != null)
+    {
         <div class="result-container">
             <div class="result-total">
-                Khoảng 18 kết quả
+                Khoảng (@lstResult.Count) kết quả - () giây
             </div>
-                @for (int i = 0; i < 18; i++)
+                @for (int i = 0; i < lstResult.Count; i++)
                 {
-                <SearchResultItem Rank="@rank" Info="@title" />
+                    <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
                 }
         </div>
-    @* } *@
+    } 
 </div>
 
 @code{
@@ -32,7 +32,7 @@
     public string title = "Điều 83 | Chương 6 | Luật đất đai 2013";
 
     public string input ;
-    public SearchArticalResult lstResult = null;
+    public List<ArticalResult> lstResult = null;
     public List<Artical> lstArtical;
 
     protected override async Task OnInitializedAsync()
@@ -46,6 +46,7 @@
         {
             var rs = await searchAdminService.GetResultSearchLaw(input);
             lstResult = rs;
+            StateHasChanged();  //Re-render dom
         }
     }
 }

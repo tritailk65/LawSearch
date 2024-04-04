@@ -46,6 +46,8 @@ builder.Services.AddScoped<IConceptService, ConceptService>();
 builder.Services.AddScoped<IKeyPhraseService, KeyPharseService>();
 builder.Services.AddScoped<ILawDocService, LawDocService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IChapterService, ChapterService>();
+builder.Services.AddScoped<ISectionService, SectionService>();
 
 
 builder.Services.AddControllers();

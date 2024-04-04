@@ -1,17 +1,17 @@
 ﻿﻿<div class="result-item">
     <div class="result-info">
-        [@Rank] - [@Info]
+        [Rank #@Rank] - [@Artical.Title] - [@Artical.LawName]
     </div>
     <div class="result-content">
-        Hỗ trợ khi nhà nước thu hồi đất
+        @Artical.Content
     </div>
     <hr />
 </div>
 
 @code {
     [Parameter]
-    public string Rank { get; set; }
+    public int Rank { get; set; } 
 
     [Parameter]
-    public string Info { get; set; }
+    public ArticalResult Artical { get; set; } 
 }

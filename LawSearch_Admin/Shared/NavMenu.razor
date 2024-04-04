@@ -7,10 +7,21 @@
             </NavLink>
         </div>
 
-        <div class="nav-item ">
-            <NavLink class="nav-link" href="lawdocuments">
-                <img class="nav-item-icon" src="assests/icon/document_icon.png" aria-hidden="true" /> Law Documents
+        <div class="nav-item dropdown">
+            <NavLink class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="nav-item-icon" src="assests/icon/search_icon.png" aria-hidden="true" /> Law Documents
             </NavLink>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <NavLink class="nav-link" href="viewlaw">
+                    <img class="nav-item-icon" src="assests/icon/viewlaw_icon.png" aria-hidden="true" /> View law
+                </NavLink>                
+                <NavLink class="nav-link" href="editlaw">
+                    <img class="nav-item-icon" src="assests/icon/editlaw_icon.png" aria-hidden="true" /> Edit law
+                </NavLink>                
+                <NavLink class="nav-link" href="importlaw">
+                    <img class="nav-item-icon" src="assests/icon/import_law.png" aria-hidden="true" /> Import law
+                </NavLink>
+            </div>
         </div>
 
         <div class="nav-item ">
@@ -26,13 +37,13 @@
         </div>
 
         <div class="nav-item ">
-            <NavLink class="nav-link" href="usermanagement">
+            <NavLink class="nav-link" href="#">
                 <img class="nav-item-icon" src="assests/icon/user_management_icon.png" aria-hidden="true"> User Management
             </NavLink>
         </div>
 
         <div class="nav-item">
-            <NavLink class="nav-link" href="historysearch">
+            <NavLink class="nav-link" href="#">
                 <img class="nav-item-icon" src="assests/icon/history_icon.png" aria-hidden="true" /> History search
             </NavLink>
         </div>
@@ -40,6 +51,8 @@
 </div>
 
 @code {
+
+    List<string> dropdownOptions = new List<string> { "Option 1", "Option 2", "Option 3" };
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -48,4 +61,6 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    private bool expandSubNav;
 }

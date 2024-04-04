@@ -1,42 +1,1727 @@
-﻿
-@inject ILawDocAdminService lawDocService;
+﻿@page "/viewlaw"
+@inject ILawDocAdminService lawDocAdminService;
 
-<div class="title">
-    <h3 class="text_css">ViewLaw</h3>
-</div>
-
-<div style="margin-top: 10px;">
-    <DropdownMenu Options="options" />
-</div>
-
-<div class="filter-container">
-    Ghi chú: Bộ lọc nâng cao sẽ ở đây
-</div>
-
-<div class="content-container">
-    <div class="left-content">
-
+<div class="body-container">
+    <div class="header-content">
+        <div class="title">
+            Select your document
+        </div>
+        <select class="custom-select" @onchange="GetDataLaw">
+            @if (lstLawDoc != null)
+            {
+                @foreach (var law in lstLawDoc)
+                {
+                    <option class="dropdown-item" value="@law.ID">@law.Name</option>
+                }
+            }
+        </select>
+        <div class="btn">
+            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
+                View full document
+            </Button>
+        </div>
     </div>
-    <div class="right-content">
-        @if (lawHTML != null)
+
+    <div class="main-content">
+        @if(lawVM == null)
         {
-            @((MarkupString)lawHTML[0].contentHTML)
+            <div class="loading_">
+                <span class="loader"></span>
+            </div>
+        } else if(lawVM != null)
+        {
+            <div class="left-content">
+                <div class="index">
+                    @if (lawVM.lstChapters.Count > 0)
+                    {
+                        foreach (var c in lawVM.lstChapters)
+                        {
+                            <div class="chapter">
+                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                @c.Name @c.Title
+                            </div>
+                            if (c.lstSections != null && c.lstSections.Count > 0)
+                            {
+                                foreach (var s in c.lstSections)
+                                {
+                                    if(s.Name != "")
+                                    {
+                                        <div class="section">
+                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                            @s.Name
+                                        </div>
+                                    }
+                                    if (s.lstArticals.Count > 0)
+                                    {
+                                        foreach (var a in s.lstArticals)
+                                        {
+                                            <div class="artical">
+                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
+                                                @a.Name: @a.Title
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                </div>
+            </div>
         }
+        <div class="right-content">
+            <div style="width: 90%; float: left; margin-right: 15px; background-repeat: no-repeat; background-position: 260px 170px; background-image: linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)), url(&quot;https://images.thuvienphapluat.vn/legaldocuments/EffectSeal.aspx?ef=Hi%e1%bb%87u+l%e1%bb%b1c%3a+%c4%90%c3%a3+bi%e1%ba%bft&amp;st=T%c3%acnh+tr%e1%ba%a1ng%3a+%c4%90%c3%a3+bi%e1%ba%bft&quot;);" class="cldivContentDocVn" id="divContentDoc">
+
+
+
+                <div class="content1">
+
+
+                    <div>
+
+                        <div>
+
+                            <table border="0" cellspacing="0" cellpadding="0">
+                                <!--VABWAFAATABfADIAMAAyADIAMAA1ADMAMQA=-->
+                                <tbody>
+                                    <tr>
+                                        <td width="223" valign="top" style="width: 167.4pt; padding: 0cm 5.4pt 0cm 5.4pt">
+                                            <p align="center" style="margin-top: 6.0pt; text-align: center">
+                                                <b>
+                                                    QUỐC HỘI<br>
+                                                    -------
+                                                </b>
+                                            </p>
+                                        </td>
+                                        <td width="367" valign="top" style="width: 275.4pt; padding: 0cm 5.4pt 0cm 5.4pt">
+                                            <p align="center" style="margin-top: 6.0pt; text-align: center">
+                                                <b>
+                                                    CỘNG HÒA XÃ HỘI
+                                                    CHỦ NGHĨA VIỆT NAM<br>
+                                                    Độc lập - Tự do - Hạnh phúc
+                                                    <br>
+                                                    ---------------
+                                                </b>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="223" valign="top" style="width: 167.4pt; padding: 0cm 5.4pt 0cm 5.4pt">
+                                            <p align="center" style="margin-top: 6.0pt; text-align: center">
+                                                Luật số:
+                                                45/2013/QH13
+                                            </p>
+                                        </td>
+                                        <td width="367" valign="top" style="width: 275.4pt; padding: 0cm 5.4pt 0cm 5.4pt">
+                                            <p align="right" style="margin-top: 6.0pt; text-align: right">
+                                                <i>
+                                                    Hà Nội, ngày 29
+                                                    tháng 11 năm 2013
+                                                </i>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p style="margin-top: 6.0pt"><span lang="VI">&nbsp;</span></p>
+
+                            <p align="center" style="margin-top: 6.0pt; text-align: center"><a name="loai_1"><b><span lang="VI" style="font-size: 12.0pt">LUẬT</span></b></a></p>
+
+                            <p align="center" style="margin-top: 6.0pt; text-align: center"><a name="loai_1_name"><span lang="VI">ĐẤT ĐAI</span></a></p>
+
+                            <p style="margin-top: 6.0pt">
+                                <i>
+                                    <span lang="VI">
+                                        Căn cứ Hiến pháp nước Cộng hòa xã
+                                        hội chủ nghĩa Việt Nam;
+                                    </span>
+                                </i>
+                            </p>
+
+                            <p style="margin-top: 6.0pt"><i><span lang="VI">Quốc hội ban hành Luật đất đai,</span></i></p>
+
+                            <p style="margin-top: 6.0pt"><a name="chuong_1"><b><span lang="VI">Chương 1.</span></b></a></p>
+
+                            <p align="center" style="margin-top: 6.0pt; text-align: center"><a name="chuong_1_name"><b><span lang="VI" style="font-size: 12.0pt">QUY ĐỊNH CHUNG</span></b></a></p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_1">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 1. Phạm vi
+                                            điều chỉnh
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Luật này quy định về chế độ sở hữu đất
+                                    đai, quyền hạn và trách nhiệm của Nhà nước đại diện chủ sở hữu toàn dân về đất
+                                    đai và thống nhất quản lý về đất đai, chế độ quản lý và sử dụng đất đai, quyền
+                                    và nghĩa vụ của người sử dụng đất đối với đất đai thuộc lãnh thổ của nước Cộng
+                                    hòa xã hội chủ nghĩa Việt Nam.
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_2">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 2. Đối tượng
+                                            áp dụng
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_2">
+                                    <span lang="VI">
+                                        1. Cơ quan nhà nước
+                                        thực hiện quyền hạn và trách nhiệm đại diện chủ sở hữu toàn dân về đất đai, thực
+                                        hiện nhiệm vụ thống nhất quản lý nhà nước về đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_2_2">
+                                    <span lang="VI">
+                                        2. Người sử dụng
+                                        đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_2">
+                                    <span lang="VI">
+                                        3. Các đối tượng
+                                        khác có liên quan đến việc quản lý, sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_3">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 3. Giải
+                                            thích từ ngữ
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Trong Luật này, các từ ngữ dưới đây
+                                    được hiểu như sau:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_3">
+                                    <span lang="VI">
+                                        1. <i>Thửa đất</i>
+                                        là phần diện tích đất được giới hạn bởi ranh giới xác định trên thực địa hoặc
+                                        được mô tả trên hồ sơ.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_3">
+                                    <span lang="VI">
+                                        2. <i>
+                                            Quy hoạch sử
+                                            dụng đất
+                                        </i> là việc phân bổ và khoanh vùng đất đai theo không gian sử dụng cho
+                                        các mục tiêu phát triển kinh tế - xã hội, quốc phòng, an ninh, bảo vệ môi trường
+                                        và thích ứng biến đổi khí hậu trên cơ sở tiềm năng đất đai và nhu cầu sử dụng đất
+                                        của các ngành, lĩnh vực đối với từng vùng kinh tế - xã hội và đơn vị hành chính
+                                        trong một khoảng thời gian xác định.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_3_3">
+                                    <span lang="VI">
+                                        3. <i>
+                                            Kế hoạch
+                                            sử dụng đấ
+                                        </i>t là việc phân chia quy hoạch sử dụng đất theo thời gian để thực
+                                        hiện trong kỳ quy hoạch sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_3">
+                                    <span lang="VI">
+                                        4. <i>
+                                            Bản đồ địa
+                                            chính
+                                        </i> là bản đồ thể hiện các thửa đất và các yếu tố địa lý có liên quan, lập
+                                        theo đơn vị hành chính xã, phường, thị trấn, được cơ quan nhà nước có thẩm quyền
+                                        xác nhận.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_5_3">
+                                    <span lang="VI">
+                                        5. <i>
+                                            Bản đồ hiện
+                                            trạng sử dụng đất
+                                        </i> là bản đồ thể hiện sự phân bố các loại đất tại một thời
+                                        điểm xác định, được lập theo từng đơn vị hành chính.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_6_3">
+                                    <span lang="VI">
+                                        6. <i>
+                                            Bản đồ quy
+                                            hoạch sử dụng đất
+                                        </i> là bản đồ được lập tại thời điểm đầu kỳ quy hoạch, thể hiện
+                                        sự phân bổ các loại đất tại thời điểm cuối kỳ của quy hoạch đó.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_7_3">
+                                    <span lang="VI">
+                                        7. <i>
+                                            Nhà nước
+                                            giao quyền sử dụng đất
+                                        </i> (sau đây gọi là Nhà nước giao đất) là việc Nhà nước
+                                        ban hành quyết định giao đất để trao quyền sử dụng đất cho đối tượng có nhu cầu
+                                        sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_8_3">
+                                    <span lang="VI">
+                                        8. <i>
+                                            Nhà nước
+                                            cho thuê quyền sử dụng đất
+                                        </i> (sau đây gọi là Nhà nước cho thuê đất) là việc
+                                        Nhà nước quyết định trao quyền sử dụng đất cho đối tượng có nhu cầu sử dụng đất
+                                        thông qua hợp đồng cho thuê quyền sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_37">
+                                    <span lang="VI">
+                                        9. Nhà nước công
+                                        nhận quyền sử dụng đất là việc Nhà nước trao quyền sử dụng đất cho người đang sử
+                                        dụng đất ổn định mà không có nguồn gốc được Nhà nước giao đất, cho thuê đất
+                                        thông qua việc cấp Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài
+                                        sản khác gắn liền với đất lần đầu đối với thửa đất xác định.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_10_3">
+                                    <span lang="VI">
+                                        10. <i>
+                                            Chuyển
+                                            quyền sử dụng đất
+                                        </i> là việc chuyển giao quyền sử dụng đất từ người này sang
+                                        người khác thông qua các hình thức chuyển đổi, chuyển nhượng, thừa kế, tặng cho
+                                        quyền sử dụng đất và góp vốn bằng quyền sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_86">
+                                    <span lang="VI">
+                                        11. <i>
+                                            Nhà nước
+                                            thu hồi đất
+                                        </i> là việc Nhà nước quyết định thu lại quyền sử dụng đất của người
+                                        được Nhà nước trao quyền sử dụng đất hoặc thu lại đất của người sử dụng đất vi
+                                        phạm pháp luật về đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_12_3">
+                                    <span lang="VI">
+                                        12. <i>
+                                            Bồi thường
+                                            về đất
+                                        </i> là việc Nhà nước trả lại giá trị quyền sử dụng đất đối với diện tích
+                                        đất thu hồi cho người sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_13_3">
+                                    <span lang="VI">
+                                        13. <i>
+                                            Chi phí đầu
+                                            tư vào đất còn lại
+                                        </i> bao gồm chi phí san lấp mặt bằng và chi phí khác liên
+                                        quan trực tiếp có căn cứ chứng minh đã đầu tư vào đất mà đến thời điểm Nhà nước
+                                        thu hồi đất còn chưa thu hồi được.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_14_3">
+                                    <span lang="VI">
+                                        14. <i>
+                                            Hỗ trợ
+                                            khi Nhà nước thu hồi đất
+                                        </i> là việc Nhà nước trợ giúp cho người có đất thu hồi
+                                        để ổn định đời sống, sản xuất và phát triển.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_15_3">
+                                    <span lang="VI">
+                                        15. <i>
+                                            Đăng ký đất
+                                            đai, nhà ở, tài sản khác gắn liền với đất
+                                        </i> là việc kê khai và ghi nhận tình
+                                        trạng pháp lý về quyền sử dụng đất, quyền sở hữu nhà ở, tài sản khác gắn liền với
+                                        đất và quyền quản lý đất đối với một thửa đất vào hồ sơ địa chính.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_16_3">
+                                    <span lang="VI">
+                                        16. <i>
+                                            Giấy chứng
+                                            nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất
+                                        </i>
+                                        là chứng thư pháp lý để Nhà nước xác nhận quyền sử dụng đất, quyền sở hữu nhà ở,
+                                        tài sản khác gắn liền với đất hợp pháp của người có quyền sử dụng đất, quyền sở
+                                        hữu nhà ở và quyền sở hữu tài sản khác gắn liền với đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_17_3">
+                                    <span lang="VI">
+                                        17. <i>
+                                            Thống kê
+                                            đất đai
+                                        </i> là việc Nhà nước tổng hợp, đánh giá trên hồ sơ địa chính về hiện trạng
+                                        sử dụng đất tại thời điểm thống kê và tình hình biến động đất đai giữa hai lần
+                                        thống kê.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_18_3">
+                                    <span lang="VI">
+                                        18. <i>
+                                            Kiểm kê đất
+                                            đai
+                                        </i> là việc Nhà nước tổ chức điều tra, tổng hợp, đánh giá trên hồ sơ địa
+                                        chính và trên thực địa về hiện trạng sử dụng đất tại thời điểm kiểm kê và tình
+                                        hình biến động đất đai giữa hai lần kiểm kê.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_19_3">
+                                    <span lang="VI">
+                                        19. <i>Giá đất</i>
+                                        là giá trị của quyền sử dụng đất tính trên một đơn vị diện tích đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_20_3">
+                                    <span lang="VI">
+                                        20. <i>
+                                            Giá trị
+                                            quyền sử dụng đất
+                                        </i> là giá trị bằng tiền của quyền sử dụng đất đối với một diện
+                                        tích đất xác định trong thời hạn sử dụng đất xác định.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_21_3">
+                                    <span lang="VI">
+                                        21. <i>
+                                            Tiền sử dụng
+                                            đất
+                                        </i> là số tiền mà người sử dụng đất phải trả cho Nhà nước khi được Nhà nước
+                                        giao đất có thu tiền sử dụng đất, cho phép chuyển mục đích sử dụng đất, công nhận
+                                        quyền sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_22_3">
+                                    <span lang="VI">
+                                        22. <i>
+                                            Hệ thống
+                                            thông tin đất đai
+                                        </i> là hệ thống tổng hợp các yếu tố hạ tầng kỹ thuật công nghệ
+                                        thông tin, phần mềm, dữ liệu và quy trình, thủ tục được xây dựng để thu thập,
+                                        lưu trữ, cập nhật, xử lý, phân tích, tổng hợp và truy xuất thông tin đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_23_3">
+                                    <span lang="VI">
+                                        23. Cơ sở dữ liệu
+                                        đất đai là tập hợp các dữ liệu đất đai được sắp xếp, tổ chức để truy cập, khai
+                                        thác, quản lý và cập nhật thông qua phương tiện điện tử.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_24_3">
+                                    <span lang="VI">
+                                        24. <i>
+                                            Tranh chấp
+                                            đất đai
+                                        </i> là tranh chấp về quyền, nghĩa vụ của người sử dụng đất giữa hai hoặc
+                                        nhiều bên trong quan hệ đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_25_3">
+                                    <span lang="VI">
+                                        25. <i>
+                                            Hủy hoại
+                                            đất
+                                        </i> là hành vi làm biến dạng địa hình, làm suy giảm chất lượng đất, gây ô
+                                        nhiễm đất, làm mất hoặc giảm khả năng sử dụng đất theo mục đích đã được xác định.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_26_3">
+                                    <span lang="VI">
+                                        26<i>
+                                            . Tổ chức sự
+                                            nghiệp công lập
+                                        </i> là tổ chức do cơ quan có thẩm quyền của Nhà nước, tổ chức
+                                        chính trị, tổ chức chính trị - xã hội thành lập, có chức năng thực hiện các hoạt
+                                        động dịch vụ công theo quy định của pháp luật.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_27_3">
+                                    <span lang="VI">
+                                        27. <i>
+                                            Tổ chức
+                                            kinh tế
+                                        </i> bao gồm doanh nghiệp, hợp tác xã và tổ chức kinh tế khác theo quy định
+                                        của pháp luật về dân sự, trừ doanh nghiệp có vốn đầu tư nước ngoài.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_28_3">
+                                    <span lang="VI">
+                                        28. Đất để xây dựng
+                                        công trình ngầm là phần đất để xây dựng công trình trong lòng đất mà công trình
+                                        này không phải là phần ngầm của công trình xây dựng trên mặt đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_29_3">
+                                    <span lang="VI">
+                                        29. <i>
+                                            Hộ gia
+                                            đình sử dụng đất
+                                        </i> là những người có quan hệ hôn nhân, huyết thống, nuôi dưỡng
+                                        theo quy định của pháp luật về hôn nhân và gia đình, đang sống chung và có quyền
+                                        sử dụng đất chung tại thời điểm được Nhà nước giao đất, cho thuê đất, công nhận
+                                        quyền sử dụng đất; nhận chuyển quyền sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_30_3">
+                                    <span lang="VI">
+                                        30. <i>
+                                            Hộ gia
+                                            đình, cá nhân trực tiếp sản xuất nông nghiệp
+                                        </i>là hộ gia đình, cá nhân đã được
+                                        Nhà nước giao, cho thuê, công nhận quyền sử dụng đất nông nghiệp; nhận chuyển
+                                        quyền sử dụng đất nông nghiệp và có nguồn thu nhập ổn định từ sản xuất nông
+                                        nghiệp trên đất đó.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_4">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 4. Sở hữu đất
+                                            đai
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Đất đai thuộc sở hữu toàn dân do Nhà
+                                    nước đại diện chủ sở hữu và thống nhất quản lý. Nhà nước trao quyền sử dụng đất
+                                    cho người sử dụng đất theo quy định của Luật này.
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_5">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 5. Người sử
+                                            dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Người sử dụng đất được Nhà nước giao
+                                    đất, cho thuê đất, công nhận quyền sử dụng đất, nhận chuyển quyền sử dụng đất
+                                    theo quy định của Luật này, bao gồm:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_5">
+                                    <span lang="VI">
+                                        1. Tổ chức trong
+                                        nước gồm cơ quan nhà nước, đơn vị vũ trang nhân dân, tổ chức chính trị, tổ chức
+                                        chính trị - xã hội, tổ chức kinh tế, tổ chức chính trị xã hội - nghề nghiệp, tổ
+                                        chức xã hội, tổ chức xã hội - nghề nghiệp, tổ chức sự nghiệp công lập và tổ chức
+                                        khác theo quy định của pháp luật về dân sự (sau đây gọi chung là tổ chức);
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_5">
+                                    <span lang="VI">
+                                        2. Hộ gia đình,
+                                        cá nhân trong nước (sau đây gọi chung là hộ gia đình, cá nhân);
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_5">
+                                    <span lang="VI">
+                                        3. Cộng đồng dân
+                                        cư gồm cộng đồng người Việt Nam sinh sống trên cùng địa bàn thôn, làng, ấp, bản,
+                                        buôn, phum, sóc, tổ dân phố và điểm dân cư tương tự có cùng phong tục, tập quán
+                                        hoặc có chung dòng họ;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_5">
+                                    <span lang="VI">
+                                        4. Cơ sở tôn giáo
+                                        gồm chùa, nhà thờ, nhà nguyện, thánh thất, thánh đường, niệm phật đường, tu viện,
+                                        trường đào tạo riêng của tôn giáo, trụ sở của tổ chức tôn giáo và cơ sở khác của
+                                        tôn giáo;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_5_5">
+                                    <span lang="VI">
+                                        5. Tổ chức nước
+                                        ngoài có chức năng ngoại giao gồm cơ quan đại diện ngoại giao, cơ quan lãnh sự,
+                                        cơ quan đại diện khác của nước ngoài có chức năng ngoại giao được Chính phủ Việt
+                                        Nam thừa nhận; cơ quan đại diện của tổ chức thuộc Liên hợp quốc, cơ quan hoặc tổ
+                                        chức liên chính phủ, cơ quan đại diện của tổ chức liên chính phủ;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_6_5">
+                                    <span lang="VI">
+                                        6. Người Việt Nam
+                                        định cư ở nước ngoài theo quy định của pháp luật về quốc tịch;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_7_5">
+                                    <span lang="VI">
+                                        7. Doanh nghiệp
+                                        có vốn đầu tư nước ngoài gồm doanh nghiệp 100% vốn đầu tư nước ngoài, doanh
+                                        nghiệp liên doanh, doanh nghiệp Việt Nam mà nhà đầu tư nước ngoài mua cổ phần,
+                                        sáp nhập, mua lại theo quy định của pháp luật về đầu tư.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_6">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 6. Nguyên tắc
+                                            sử dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_6">
+                                    <span lang="VI">
+                                        1. Đúng quy hoạch,
+                                        kế hoạch sử dụng đất và đúng mục đích sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_6">
+                                    <span lang="VI">
+                                        2. Tiết kiệm, có
+                                        hiệu quả, bảo vệ môi trường và không làm tổn hại đến lợi ích chính đáng của người
+                                        sử dụng đất xung quanh.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_6">
+                                    <span lang="VI">
+                                        3. Người sử dụng
+                                        đất thực hiện quyền, nghĩa vụ của mình trong thời hạn sử dụng đất theo quy định
+                                        của Luật này và quy định khác của pháp luật có liên quan.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_7">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 7. Người chịu
+                                            trách nhiệm trước Nhà nước đối với việc sử dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_7">
+                                    <span lang="VI">
+                                        1. Người đứng đầu
+                                        của tổ chức, tổ chức nước ngoài có chức năng ngoại giao, doanh nghiệp có vốn đầu
+                                        tư nước ngoài đối với việc sử dụng đất của tổ chức mình.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_7">
+                                    <span lang="VI">
+                                        2. Chủ tịch Ủy
+                                        ban nhân dân xã, phường, thị trấn đối với việc sử dụng đất nông nghiệp vào mục
+                                        đích công ích; đất phi nông nghiệp đã giao cho Ủy ban nhân dân xã, phường, thị
+                                        trấn (sau đây gọi chung là Ủy ban nhân dân cấp xã) để sử dụng vào mục đích xây
+                                        dựng trụ sở Ủy ban nhân dân, các công trình công cộng phục vụ hoạt động văn
+                                        hóa, giáo dục, y tế, thể dục thể thao, vui chơi, giải trí, chợ, nghĩa trang,
+                                        nghĩa địa và công trình công cộng khác của địa phương.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_7">
+                                    <span lang="VI">
+                                        3. Người đại diện
+                                        cho cộng đồng dân cư là trưởng thôn, làng, ấp, bản, buôn, phum, sóc, tổ dân phố
+                                        hoặc người được cộng đồng dân cư thỏa thuận cử ra đối với việc sử dụng đất đã
+                                        giao, công nhận cho cộng đồng dân cư.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_7">
+                                    <span lang="VI">
+                                        4. Người đứng đầu
+                                        cơ sở tôn giáo đối với việc sử dụng đất đã giao cho cơ sở tôn giáo.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_5_7">
+                                    <span lang="VI">
+                                        5. Chủ hộ gia
+                                        đình đối với việc sử dụng đất của hộ gia đình.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_6_7">
+                                    <span lang="VI">
+                                        6. Cá nhân, người
+                                        Việt Nam định cư ở nước ngoài đối với việc sử dụng đất của mình.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_7_7">
+                                    <span lang="VI">
+                                        7. Người có chung
+                                        quyền sử dụng đất hoặc người đại diện cho nhóm người có chung quyền sử dụng đất
+                                        đối với việc sử dụng đất đó.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_8">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 8. Người chịu
+                                            trách nhiệm trước Nhà nước đối với đất được giao để quản lý
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_8">
+                                    <span lang="VI">
+                                        1. Người đứng đầu
+                                        của tổ chức chịu trách nhiệm đối với việc quản lý đất trong các trường hợp sau
+                                        đây:
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_a_1_8">
+                                    <span lang="VI">
+                                        a) Tổ chức được
+                                        giao quản lý công trình công cộng, gồm công trình đường giao thông, cầu, cống,
+                                        vỉa hè, hệ thống cấp nước, hệ thống thoát nước, hệ thống công trình thủy lợi,
+                                        đê, đập; quảng trường, tượng đài, bia tưởng niệm;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_b_1_8">
+                                    <span lang="VI">
+                                        b) Tổ chức kinh
+                                        tế được giao quản lý diện tích đất để thực hiện dự án đầu tư theo hình thức xây
+                                        dựng - chuyển giao (BT) và các hình thức khác theo quy định của pháp luật về đầu
+                                        tư;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_c_1_8">
+                                    <span lang="VI">
+                                        c) Tổ chức được
+                                        giao quản lý đất có mặt nước của các sông và đất có mặt nước chuyên dùng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_d_1_8">
+                                    <span lang="VI">
+                                        d) Tổ chức được
+                                        giao quản lý quỹ đất đã thu hồi theo quyết định của cơ quan nhà nước có thẩm
+                                        quyền.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_8">
+                                    <span lang="VI">
+                                        2. Chủ tịch Ủy
+                                        ban nhân dân cấp xã chịu trách nhiệm đối với việc quản lý đất sử dụng vào mục
+                                        đích công cộng được giao để quản lý, đất chưa giao, đất chưa cho thuê tại địa
+                                        phương.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_8">
+                                    <span lang="VI">
+                                        3. Chủ tịch Ủy
+                                        ban nhân dân tỉnh, thành phố trực thuộc trung ương chịu trách nhiệm đối với việc
+                                        quản lý đất chưa sử dụng tại các đảo chưa có người ở thuộc địa phương.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_8">
+                                    <span lang="VI">
+                                        4. Người đại diện
+                                        cho cộng đồng dân cư là người chịu trách nhiệm đối với đất được giao cho cộng đồng
+                                        dân cư quản lý.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_9">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 9. Khuyến
+                                            khích đầu tư vào đất đai
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Nhà nước có chính sách khuyến khích
+                                    người sử dụng đất đầu tư lao động, vật tư tiền vốn và áp dụng thành tựu khoa học,
+                                    công nghệ vào các việc sau đây:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_9">
+                                    <span lang="VI">
+                                        1. Bảo vệ, cải tạo,
+                                        làm tăng độ màu mỡ của đất;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_9">
+                                    <span lang="VI">
+                                        2. Khai hoang, phục
+                                        hóa, lấn biển, đưa diện tích đất trống, đồi núi trọc, đất có mặt nước hoang hóa
+                                        vào sử dụng theo quy hoạch, kế hoạch sử dụng đất;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_9">
+                                    <span lang="VI">
+                                        3. Phát triển kết
+                                        cấu hạ tầng để làm tăng giá trị của đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_10">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 10. Phân loại
+                                            đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Căn cứ vào mục đích sử dụng, đất đai
+                                    được phân loại như sau:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_10">
+                                    <span lang="VI">
+                                        1. Nhóm đất nông
+                                        nghiệp bao gồm các loại đất sau đây:
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_a_1_10">
+                                    <span lang="VI">
+                                        a) Đất trồng
+                                        cây hàng năm gồm đất trồng lúa và đất trồng cây hàng năm khác;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_b_1_10">
+                                    <span lang="VI">
+                                        b) Đất trồng
+                                        cây lâu năm;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_c_1_10">
+                                    <span lang="VI">
+                                        c) Đất rừng sản
+                                        xuất;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_d_1_10">
+                                    <span lang="VI">
+                                        d) Đất rừng
+                                        phòng hộ;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_dd_1_10">
+                                    <span lang="VI">
+                                        đ) Đất rừng đặc
+                                        dụng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_e_1_10">
+                                    <span lang="VI">
+                                        e) Đất nuôi trồng
+                                        thủy sản;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt"><a name="diem_g_1_10"><span lang="VI">g) Đất làm muối;</span></a></p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_h_1_10">
+                                    <span lang="VI">
+                                        h) Đất nông
+                                        nghiệp khác gồm đất sử dụng để xây dựng nhà kính và các loại nhà khác phục vụ mục
+                                        đích trồng trọt, kể cả các hình thức trồng trọt không trực tiếp trên đất; xây dựng
+                                        chuồng trại chăn nuôi gia súc, gia cầm và các loại động vật khác được pháp luật
+                                        cho phép; đất trồng trọt, chăn nuôi, nuôi trồng thủy sản cho mục đích học tập,
+                                        nghiên cứu thí nghiệm; đất ươm tạo cây giống, con giống và đất trồng hoa, cây cảnh;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_10">
+                                    <span lang="VI">
+                                        2. Nhóm đất phi
+                                        nông nghiệp bao gồm các loại đất sau đây:
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_a_2_10">
+                                    <span lang="VI">
+                                        a) Đất ở gồm đất
+                                        ở tại nông thôn, đất ở tại đô thị;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_b_2_10">
+                                    <span lang="VI">
+                                        b) Đất xây dựng
+                                        trụ sở cơ quan;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_c_2_10">
+                                    <span lang="VI">
+                                        c) Đất sử dụng
+                                        vào mục đích quốc phòng, an ninh;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_d_2_10">
+                                    <span lang="VI">
+                                        d) Đất xây dựng
+                                        công trình sự nghiệp gồm đất xây dựng trụ sở của tổ chức sự nghiệp; đất xây dựng
+                                        cơ sở văn hóa, xã hội, y tế, giáo dục và đào tạo, thể dục thể thao, khoa học và
+                                        công nghệ, ngoại giao và công trình sự nghiệp khác;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_dd_2_10">
+                                    <span lang="VI">
+                                        đ) Đất sản xuất,
+                                        kinh doanh phi nông nghiệp gồm đất khu công nghiệp, cụm công nghiệp, khu chế xuất;
+                                        đất thương mại, dịch vụ; đất cơ sở sản xuất phi nông nghiệp; đất sử dụng cho hoạt
+                                        động khoáng sản; đất sản xuất vật liệu xây dựng, làm đồ gốm;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_e_2_10">
+                                    <span lang="VI">
+                                        e) Đất sử dụng
+                                        vào mục đích công cộng gồm đất giao thông (gồm cảng hàng không, sân bay, cảng
+                                        đường thủy nội địa, cảng hàng hải, hệ thống đường sắt, hệ thống đường bộ và
+                                        công trình giao thông khác); thủy lợi; đất có di tích lịch sử - văn hóa, danh
+                                        lam thắng cảnh; đất sinh hoạt cộng đồng, khu vui chơi, giải trí công cộng; đất
+                                        công trình năng lượng; đất công trình bưu chính, viễn thông; đất chợ; đất bãi
+                                        thải, xử lý chất thải và đất công trình công cộng khác;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_g_2_10">
+                                    <span lang="VI">
+                                        g) Đất cơ sở
+                                        tôn giáo, tín ngưỡng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_h_2_10">
+                                    <span lang="VI">
+                                        h) Đất làm
+                                        nghĩa trang, nghĩa địa, nhà tang lễ, nhà hỏa táng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_i_2_10">
+                                    <span lang="VI">
+                                        i) Đất sông,
+                                        ngòi, kênh, rạch, suối và mặt nước chuyên dùng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_k_2_10">
+                                    <span lang="VI">
+                                        k) Đất phi nông
+                                        nghiệp khác gồm đất làm nhà nghỉ, lán, trại cho người lao động trong cơ sở sản
+                                        xuất; đất xây dựng kho và nhà để chứa nông sản, thuốc bảo vệ thực vật, phân
+                                        bón, máy móc, công cụ phục vụ cho sản xuất nông nghiệp và đất xây dựng công
+                                        trình khác của người sử dụng đất không nhằm mục đích kinh doanh mà công trình
+                                        đó không gắn liền với đất ở;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_10">
+                                    <span lang="VI">
+                                        3. Nhóm đất chưa
+                                        sử dụng gồm các loại đất chưa xác định mục đích sử dụng.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_11">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 11. Căn cứ
+                                            để xác định loại đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Việc xác định loại đất theo một trong
+                                    các căn cứ sau đây:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_11">
+                                    <span lang="VI">
+                                        1. Giấy chứng nhận
+                                        quyền sử dụng đất, Giấy chứng nhận quyền sở hữu nhà ở và quyền sử dụng đất ở đã
+                                        được cấp trước ngày 10 tháng 12 năm 2009; Giấy chứng nhận quyền sử dụng đất,
+                                        quyền sở hữu nhà ở và tài sản khác gắn liền với đất;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_11">
+                                    <span lang="VI">
+                                        2. Giấy tờ về
+                                        quyền sử dụng đất quy định tại các khoản 1, 2 và 3 Điều 100 của Luật này đối với
+                                        trường hợp chưa được cấp Giấy chứng nhận quy định tại khoản 1 Điều này;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_11">
+                                    <span lang="VI">
+                                        3. Quyết định
+                                        giao đất, cho thuê đất, cho phép chuyển mục đích sử dụng đất của cơ quan nhà nước
+                                        có thẩm quyền đối với trường hợp chưa được cấp Giấy chứng nhận quy định tại khoản
+                                        1 Điều này;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1">
+                                    <span lang="VI">
+                                        4. Đối với trường hợp
+                                        không có giấy tờ quy định tại các khoản 1, 2 và 3 Điều này thì việc xác định loại
+                                        đất thực hiện theo quy định của Chính phủ.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_12">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 12. Những
+                                            hành vi bị nghiêm cấm
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_12">
+                                    <span lang="VI">
+                                        1. Lấn, chiếm, hủy
+                                        hoại đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_12">
+                                    <span lang="VI">
+                                        2. Vi phạm quy
+                                        hoạch, kế hoạch sử dụng đất đã được công bố.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_12">
+                                    <span lang="VI">
+                                        3. Không sử dụng
+                                        đất, sử dụng đất không đúng mục đích.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_12">
+                                    <span lang="VI">
+                                        4. Không thực hiện
+                                        đúng quy định của pháp luật khi thực hiện quyền của người sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_5_12">
+                                    <span lang="VI">
+                                        5. Nhận chuyển
+                                        quyền sử dụng đất nông nghiệp vượt hạn mức đối với hộ gia đình, cá nhân theo
+                                        quy định của Luật này.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_6_12">
+                                    <span lang="VI">
+                                        6. Sử dụng đất,
+                                        thực hiện giao dịch về quyền sử dụng đất mà không đăng ký với cơ quan nhà nước
+                                        có thẩm quyền.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_7_12">
+                                    <span lang="VI">
+                                        7. Không thực hiện
+                                        hoặc thực hiện không đầy đủ nghĩa vụ tài chính đối với Nhà nước.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_8_12">
+                                    <span lang="VI">
+                                        8. Lợi dụng chức
+                                        vụ, quyền hạn để làm trái quy định về quản lý đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_9_12">
+                                    <span lang="VI">
+                                        9. Không cung cấp
+                                        hoặc cung cấp thông tin về đất đai không chính xác theo quy định của pháp luật.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_10_12">
+                                    <span lang="VI">
+                                        10. Cản trở,
+                                        gây khó khăn đối với việc thực hiện quyền của người sử dụng đất theo quy định của
+                                        pháp luật.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt"><a name="chuong_2"><b><span lang="VI">Chương 2.</span></b></a></p>
+
+                            <p align="center" style="margin-top: 6.0pt; text-align: center">
+                                <a name="chuong_2_name">
+                                    <b>
+                                        <span lang="VI" style="font-size: 12.0pt">
+                                            QUYỀN VÀ TRÁCH
+                                            NHIỆM CỦA NHÀ NƯỚC ĐỐI VỚI ĐẤT ĐAI
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="muc_1">
+                                    <b>
+                                        <span lang="VI">
+                                            MỤC 1. QUYỀN CỦA
+                                            NHÀ NƯỚC ĐỐI VỚI ĐẤT ĐAI
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_13">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 13. Quyền của
+                                            đại diện chủ sở hữu về đất đai
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_13">
+                                    <span lang="VI">
+                                        1. Quyết định
+                                        quy hoạch sử dụng đất, kế hoạch sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_13">
+                                    <span lang="VI">
+                                        2. Quyết định mục
+                                        đích sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_13">
+                                    <span lang="VI">
+                                        3. Quy định hạn
+                                        mức sử dụng đất, thời hạn sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_4_13">
+                                    <span lang="VI">
+                                        4. Quyết định
+                                        thu hồi đất, trưng dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_5_13">
+                                    <span lang="VI">
+                                        5. Quyết định
+                                        giá đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_6_13">
+                                    <span lang="VI">
+                                        6. Quyết định
+                                        trao quyền sử dụng đất cho người sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_7_13">
+                                    <span lang="VI">
+                                        7. Quyết định
+                                        chính sách tài chính về đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_8_13">
+                                    <span lang="VI">
+                                        8. Quy định quyền
+                                        và nghĩa vụ của người sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_14">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 14. Nhà nước
+                                            quyết định mục đích sử dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Nhà nước quyết định mục đích sử dụng
+                                    đất thông qua quy hoạch sử dụng đất, kế hoạch sử dụng đất và cho phép chuyển mục
+                                    đích sử dụng đất.
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_15">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 15. Nhà nước
+                                            quy định hạn mức sử dụng đất, thời hạn sử dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_15">
+                                    <span lang="VI">
+                                        1. Nhà nước quy
+                                        định hạn mức sử dụng đất gồm hạn mức giao đất nông nghiệp, hạn mức giao đất ở,
+                                        hạn mức công nhận quyền sử dụng đất ở và hạn mức nhận chuyển quyền sử dụng đất
+                                        nông nghiệp.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_15">
+                                    <span lang="VI">
+                                        2. Nhà nước quy
+                                        định thời hạn sử dụng đất bằng các hình thức sau đây:
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_a_2_15">
+                                    <span lang="VI">
+                                        a) Sử dụng đất ổn
+                                        định lâu dài;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_b_2_15">
+                                    <span lang="VI">
+                                        b) Sử dụng đất
+                                        có thời hạn.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_16">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 16. Nhà nước
+                                            quyết định thu hồi đất, trưng dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_16">
+                                    <span lang="VI">
+                                        1. Nhà nước quyết
+                                        định thu hồi đất trong các trường hợp sau đây:
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_a_1_16">
+                                    <span lang="VI">
+                                        a) Thu hồi đất
+                                        vì mục đích quốc phòng, an ninh; phát triển kinh tế - xã hội vì lợi ích quốc
+                                        gia, công cộng;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_b_1_16">
+                                    <span lang="VI">
+                                        b) Thu hồi đất
+                                        do vi phạm pháp luật về đất đai;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="diem_c_1_16">
+                                    <span lang="VI">
+                                        c) Thu hồi đất
+                                        do chấm dứt việc sử dụng đất theo pháp luật, tự nguyện trả lại đất, có nguy cơ
+                                        đe dọa tính mạng con người.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_16">
+                                    <span lang="VI">
+                                        2. Nhà nước quyết
+                                        định trưng dụng đất trong trường hợp thật cần thiết để thực hiện nhiệm vụ quốc
+                                        phòng, an ninh hoặc trong tình trạng chiến tranh, tình trạng khẩn cấp, phòng,
+                                        chống thiên tai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_17">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 17. Nhà nước
+                                            trao quyền sử dụng đất cho người sử dụng đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <span lang="VI">
+                                    Nhà nước trao quyền sử dụng đất cho
+                                    người sử dụng đất thông qua các hình thức sau đây:
+                                </span>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_17">
+                                    <span lang="VI">
+                                        1. Quyết định
+                                        giao đất không thu tiền sử dụng đất, giao đất có thu tiền sử dụng đất;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_17">
+                                    <span lang="VI">
+                                        2. Quyết định
+                                        cho thuê đất thu tiền thuê đất hàng năm, cho thuê đất thu tiền thuê đất một lần
+                                        cho cả thời gian thuê;
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_3_17">
+                                    <span lang="VI">
+                                        3. Công nhận quyền
+                                        sử dụng đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_18">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 18. Nhà nước
+                                            quyết định giá đất
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_18">
+                                    <span lang="VI">
+                                        1. Nhà nước quy
+                                        định nguyên tắc, phương pháp định giá đất.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_18">
+                                    <span lang="VI">
+                                        2. Nhà nước ban
+                                        hành khung giá đất, bảng giá đất và quyết định giá đất cụ thể.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="dieu_19">
+                                    <b>
+                                        <span lang="VI">
+                                            Điều 19. Nhà nước
+                                            quyết định chính sách tài chính về đất đai
+                                        </span>
+                                    </b>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_1_19">
+                                    <span lang="VI">
+                                        1. Nhà nước quyết
+                                        định chính sách thu, chi tài chính về đất đai.
+                                    </span>
+                                </a>
+                            </p>
+
+                            <p style="margin-top: 6.0pt">
+                                <a name="khoan_2_19">
+                                    <span lang="VI">
+                                        2. Nhà nước điều
+                                        tiết phần giá trị tăng thêm từ đất mà không do đầu tư của người sử dụng đất
+                                        mang lại thông qua chính sách thuế, tiền sử dụng đất, tiền thuê đất, đầu tư cơ
+                                        sở hạ tầng và chính sách hỗ trợ cho người có đất thu hồi.
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @code {
-    public List<LawDoc> lawDocs;
-    public List<LawHTML> lawHTML;
-    public List<string> options;
+    public List<LawDoc> lstLawDoc = new List<LawDoc>();
+
+    public LawVM lawVM = new LawVM();
+
+    public int LawID;
 
     protected override async Task OnInitializedAsync()
     {
-        var data = await lawDocService.GetListLawDoc();
-        options = data.Select(x => x.Name).ToList();
-        lawDocs = data;
+        lawVM = null;
+        var lstLawDocData = await lawDocAdminService.GetListLawDoc();
+        lstLawDoc = lstLawDocData;
+        var data = await lawDocAdminService.GetDataLaw(lstLawDoc[0].ID);
+        
+        lawVM = data;
+    }
 
-        var html = await lawDocService.GetLawHTML(2);
-        lawHTML = html;
+    private async void GetDataLaw(ChangeEventArgs e)
+    {
+        lawVM = null;
+        int id = Convert.ToInt32(e.Value);
+        var data = await lawDocAdminService.GetDataLaw(id);
+        lawVM = data;
+        StateHasChanged();
     }
 }

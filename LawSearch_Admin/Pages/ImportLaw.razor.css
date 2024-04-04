@@ -1,0 +1,35 @@
+﻿.import-container {
+    width: 100%;
+    min-height: 88vh;
+    background-color: #303348;
+    border-radius: 20px;
+}
+
+.title-container{
+    display: flex;
+    height: 50px;
+    margin: 20px;
+    padding-top: 20px;
+}
+
+.title {
+    width: 10%
+}
+
+.input {
+    width: 90%;
+    background-color: #303348;
+    border: 1px solid #434968;
+    color: white
+}
+
+.content-container {
+    display: flex;
+    height: 400px;
+    margin: 20px;
+    padding-top: 20px;
+}
+
+.import-btn{
+    float:right;
+}

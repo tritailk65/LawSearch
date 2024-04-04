@@ -15,6 +15,8 @@ namespace LawSearch_Core.Models
         public int LawID { get; set; }
         public List<Section> lstSection { get; set; }
 
+        public Chapter() { lstSection = new List<Section>(); }
+
         internal string GetTextSignBeginArtical(string chapterContent)
         {
             string content = chapterContent;

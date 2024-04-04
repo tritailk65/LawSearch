@@ -51,3 +51,8 @@
     width: 24px;
     margin: 6px;
 }
+
+.dropdown-menu {
+    float: left;
+    background-color: #2F3349;
+}

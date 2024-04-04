@@ -1,4 +1,5 @@
-﻿using LawSearch_Core.Models;
+﻿using LawSearch_Admin.ViewModels;
+using LawSearch_Core.Models;
 
 namespace LawSearch_Admin.Interfaces
 {
@@ -6,5 +7,7 @@ namespace LawSearch_Admin.Interfaces
     {
         Task<List<LawDoc>> GetListLawDoc();
         Task<List<LawHTML>> GetLawHTML(int id);
+        Task<LawVM> GetDataLaw(int id);
+        Task<bool> ImportLaw(string name, string content);
     }
 }

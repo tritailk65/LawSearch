@@ -11,8 +11,9 @@ namespace LawSearch_Core.Interfaces
 {
     public interface ILawDocService
     {
-        DataTable GetListLawDoc();
+        List<LawDoc> GetListLawDoc();
         DataTable GetLawHTML(int ID);
         void ImportLaw(string name, string content);
+
     }
 }
