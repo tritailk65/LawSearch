@@ -30,11 +30,56 @@ namespace LawSearch_Admin.Services
         {
             List<KeyPhrase> lst = new List<KeyPhrase>();
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/keyphrase");
-            if(rs != null && rs.Status == 200 && rs.Data.Count != 0)
+            if (rs != null && rs.Status == 200 && rs.Data.Count != 0)
             {
                 lst = rs.Data.ToList();
             }
             return lst;
         }
+
+        public async Task<string> AddKeyphrase(KeyPhrase keyphrase)
+        {
+            var body = new
+            {
+                KeyPhrase = keyphrase.Keyphrase
+            };
+
+
+            var rs = await httpClient.PostAsJsonAsync($"api/KeyPhrase", body);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                return "Add success!";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    return resultPost.Message.ToString();
+                }
+            }
+            return "An unknown error"; //Lỗi do logic bị sai
+        }
+
+        public async Task<string> DeleteKeyphrase(int id)
+        {
+            var rs = await httpClient.DeleteAsync($"api/KeyPhrase?id=" + id);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                return "Delete success!";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    return resultPost.Message.ToString();
+                }
+            }
+            return "An unknown error"; //Lỗi do logic bị sai
+        }
+
     }
 }

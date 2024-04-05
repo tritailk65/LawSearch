@@ -10,7 +10,7 @@
 
 .list-concept {
     height: 470px;
-    overflow-y: auto; 
+    overflow-y: auto;
     border: 1px solid #ccc;
     padding: 10px;
 }
@@ -32,7 +32,7 @@ input[type="text"] {
     width: 100%;
 }
 
-@media only screen and (max-width: 1540px)  {
+@media only screen and (max-width: 1540px) {
     .background_view {
         width: 100%;
         min-height: 530px;
@@ -59,9 +59,9 @@ input[type="text"] {
         padding: 20px 40px;
     }
 
-    .button_concept_view div {
-        margin-left: 15px;
-    }
+        .button_concept_view div {
+            margin-left: 15px;
+        }
 
 
     .content_view {
@@ -70,27 +70,32 @@ input[type="text"] {
     }
 
     .list_concept_view {
-        width: 600px;
+        width: 30%;
         height: 600px;
         border-right: 2px solid #44475D;
         padding: 20px;
         overflow: auto;
     }
 
-    .list_concept_view ul {
-        padding: 0px; /* remove default value*/
-        list-style-type: none; /* remove default value*/
-        font-size: 20px;
-    }
+        .list_concept_view ul {
+            padding: 0px; /* remove default value*/
+            list-style-type: none; /* remove default value*/
+            font-size: 16px;
+        }
 
     .item_selected {
         width: 300px;
         padding: 10px 15px;
         border-radius: 10px;
-        background-color: #7367F0;
         margin-bottom: 10px;
         cursor: pointer;
+        background-color: #7367F0;
     }
+
+        .item_selected a {
+            width: 80%;
+            word-break: break-word;
+        }
 
     .item_not_selected {
         width: 300px;
@@ -100,70 +105,73 @@ input[type="text"] {
         cursor: pointer;
     }
 
-    .item_not_selected:hover {
-        background-color: #7367F0;
-    }
+        .item_not_selected a {
+            width: 80%;
+            word-break: break-word;
+        }
+
+        .item_not_selected:hover {
+            background-color: #7367F0;
+        }
 
     .content_concept_view {
-        width: 898px;
+        width: 40%;
         padding: 20px;
     }
 
-    .content_concept_view a {
-        font-size: 20px;
-    }
+        .content_concept_view a {
+            width: 92%;
+            font-size: 16px;
+        }
 
     .list_keyphrase_of_concept_view {
-        width: 410px;
+        width: 30%;
         border-left: 2px solid #44475D;
     }
 
     .keyphrase_buttons_view {
         width: 100%;
-        height: 171px;
-        padding: 10px 20px;
+        padding: 20px 20px;
         border-bottom: 2px solid #44475D;
     }
 
     .search_keyphrase_view {
-        width: 291px;
-        height: 69px;
+        width: 100%;
+        height: 50px;
         border: 2px solid #7065E8;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 15px 10px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
-    .search_keyphrase_view input {
-        width: 261px;
-        font-size: 24px;
-        border: none;
-        outline: none;
-        color: white;
-        background: transparent;
-    }
+        .search_keyphrase_view input {
+            width: 97%;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            background: transparent;
+        }
 
     .my_button {
-        height: 72px;
         background-color: #3B4054;
         display: flex;
         align-items: center;
         justify-content: center;
         border-radius: 10px;
         cursor: pointer;
-        padding: 22px 40px;
+        padding: 12px 30px;
     }
 
-    .my_button a {
-        font-size: 24px;
-    }
+        .my_button a {
+            font-size: 16px;
+        }
 
-    .my_button:hover {
-        background-color: #7367F0;
-    }
+        .my_button:hover {
+            background-color: #7367F0;
+        }
 
     .list_keyphrase_view {
         height: 410px;
@@ -171,10 +179,10 @@ input[type="text"] {
         overflow: auto;
     }
 
-    .list_keyphrase_view ul {
-        padding: 0px; /* remove default value*/
-        list-style-type: none; /* remove default value*/
-    }
+        .list_keyphrase_view ul {
+            padding: 0px; /* remove default value*/
+            list-style-type: none; /* remove default value*/
+        }
 
     .keyphrase_not_selected {
         padding: 15px 10px;
@@ -213,6 +221,7 @@ input[type="text"] {
         width: 25px;
         height: 25px;
     }
+
     .close_btn {
         width: 50px;
         height: 50px;
@@ -229,10 +238,10 @@ input[type="text"] {
         justify-content: center;
     }
 
-    .title_form a {
-        font-weight: bold;
-        font-size: 20px;
-    }
+        .title_form a {
+            font-weight: bold;
+            font-size: 20px;
+        }
 
     .concept_input_view {
         width: 450px;
@@ -243,18 +252,18 @@ input[type="text"] {
         align-items: center;
     }
 
-    .concept_input_view a {
-        font-weight: bold;
-        font-size: 20px;
-    }
+        .concept_input_view a {
+            font-weight: bold;
+            font-size: 16px;
+        }
 
-    .concept_input_view div {
-        margin-left: 20px;
-    }
+        .concept_input_view div {
+            margin-left: 20px;
+        }
 
     .input_concept {
         width: 250px;
-        height: 55px;
+        height: 45px;
         border: 2px solid #7065E8;
         border-radius: 10px;
         display: flex;
@@ -262,14 +271,14 @@ input[type="text"] {
         justify-content: center;
     }
 
-    .input_concept input {
-        width: 93%;
-        font-size: 20px;
-        border: none;
-        outline: none;
-        color: white;
-        background: transparent;
-    }
+        .input_concept input {
+            width: 93%;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            background: transparent;
+        }
 
     .description_input_view {
         width: 100%;
@@ -280,14 +289,14 @@ input[type="text"] {
         justify-content: center;
     }
 
-    .description_input_view a {
-        font-weight: bold;
-        font-size: 20px;
-    }
+        .description_input_view a {
+            font-weight: bold;
+            font-size: 16px;
+        }
 
-    .description_input_view div {
-        margin-top: 20px;
-    }
+        .description_input_view div {
+            margin-top: 20px;
+        }
 
     .input_description {
         width: 100%;
@@ -299,17 +308,17 @@ input[type="text"] {
         justify-content: center;
     }
 
-    .input_description textarea {
-        width: 97%;
-        height: 93%;
-        font-size: 20px;
-        border: none;
-        outline: none;
-        color: white;
-        background: transparent;
-        white-space: pre-wrap;
-        resize: none;
-    }
+        .input_description textarea {
+            width: 97%;
+            height: 93%;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            background: transparent;
+            white-space: pre-wrap;
+            resize: none;
+        }
 
     .confirm_btn_view {
         width: 100%;
@@ -330,19 +339,19 @@ input[type="text"] {
         cursor: pointer;
     }
 
-    .confirm_btn a {
-        font-size: 20px;
-    }
+        .confirm_btn a {
+            font-size: 20px;
+        }
 
     .warning_input {
         width: 100%;
         padding-left: 22px;
     }
 
-    .warning_input a {
-        font-size: 16px;
-        color: red;
-    }
+        .warning_input a {
+            font-size: 16px;
+            color: red;
+        }
 
     .dialog_delete_view {
         width: 600px;
@@ -364,10 +373,10 @@ input[type="text"] {
         margin-bottom: 20px;
     }
 
-    .dialog_title_view a {
-        font-size: 30px;
-        font-weight: bold;
-    }
+        .dialog_title_view a {
+            font-size: 30px;
+            font-weight: bold;
+        }
 
     .dialog_buttons_view {
         width: 100%;
@@ -390,8 +399,8 @@ input[type="text"] {
         cursor: pointer;
     }
 
-    .button_dialog a {
-        font-size: 30px;
-        font-weight: bold;
-    }
+        .button_dialog a {
+            font-size: 30px;
+            font-weight: bold;
+        }
 }

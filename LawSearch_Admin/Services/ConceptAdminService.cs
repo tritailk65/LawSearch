@@ -28,7 +28,7 @@ namespace LawSearch_Admin.Services
 
             if (rs != null && rs.Status == 200)
             {
-                if(rs.Data.Count > 0)
+                if (rs.Data.Count > 0)
                 {
                     lst = rs.Data.ToList();
                 }
@@ -40,18 +40,20 @@ namespace LawSearch_Admin.Services
         public async Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id)
         {
             List<KeyPhrase> ls = new();
-            var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/Concept/GetListKeyPhrases?id="+concept_id);
+            var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/Concept/GetListKeyPhrases?id=" + concept_id);
 
             if (rs != null && rs.Status == 200)
             {
                 if (rs.Data.Count > 0)
                 {
                     ls = rs.Data.ToList();
-                } else
+                }
+                else
                 {
                     // Handle error here
                 }
-            } else
+            }
+            else
             {
                 // Handle error here
             }
