@@ -46,25 +46,21 @@
                     <div class="concept_input_view">
                         <a>Concept:</a>
                         <div class="input_concept">
-                            <input 
-                                id="input_concept" 
-                                placeholder="concept" 
-                                @oninput="SetNewConcept" 
-                                value="@SelectedConcept?.Name" 
-                            />
+                            <input id="input_concept"
+                                   placeholder="concept"
+                                   @oninput="SetNewConcept"
+                                   value="@SelectedConcept?.Name" />
                         </div>
                     </div>
                     <div class="warning_input"><a>@warning_input_conecept</a></div>
                     <div class="description_input_view">
                         <a>Description:</a>
                         <div class="input_description">
-                            <textarea 
-                                id="input_description" 
-                                placeholder="@Description_text" 
-                                @oninput="SetNewDescription"
-                                value="@SelectedConcept?.Content"
-                            >
-                            </textarea>
+                            <textarea id="input_description"
+                                      placeholder="@Description_text"
+                                      @oninput="SetNewDescription"
+                                      value="@SelectedConcept?.Content">
+                                </textarea>
                         </div>
                     </div>
                     <div class="warning_input"><a>@warning_input_description</a></div>
@@ -74,7 +70,8 @@
                 </div>
             </div>
         </div>
-    }@if (isOpenForm_DeleteConcept)
+    }
+    @if (isOpenForm_DeleteConcept)
     {
         <div class="form_add_new_concept_background_view">
             <div class="dialog_delete_view">
@@ -82,11 +79,9 @@
                     <a>Are you confirm delete this?</a>
                 </div>
                 <div class="dialog_buttons_view">
-                    <div 
-                        class="button_dialog" 
-                        style="background-color: #7367F0"
-                        @onclick="ConfirmDeleteConcept"
-                    >
+                    <div class="button_dialog"
+                         style="background-color: #7367F0"
+                         @onclick="ConfirmDeleteConcept">
                         <a>Yes</a>
                     </div>
                     <div class="button_dialog" @onclick="CancelDeleteConcept">
@@ -105,18 +100,18 @@
         <div class="content_view">
             <div class="list_concept_view">
                 <ul>
-                    @if(isLoading_GetListConcept)
+                    @if (isLoading_GetListConcept)
                     {
                         <a>Loading...</a>
-                    } else
+                    }
+                    else
                     {
-                        if (Concepts != null)
+                        if (Concepts != null && Concepts.Count() > 0)
                         {
                             foreach (var concept in Concepts)
                             {
                                 <li>
-                                    <div 
-                                        class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
+                                    <div class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
                                          onclick="@(async Task() => {await SelectConceptFunction(concept);})">
                                         <a>@concept.ID. @concept.Name</a>
                                     </div>
@@ -132,7 +127,11 @@
             </div>
             <div class="content_concept_view">
                 <a id="content_of_concept">
-                    @SelectedConcept?.Content
+                    @if (SelectedConcept != null)
+                    {
+                        @SelectedConcept?.Content
+                        ;
+                    }
                 </a>
             </div>
             <div class="list_keyphrase_of_concept_view">
@@ -149,12 +148,14 @@
                         @if (isLoading_GetListKeyphrase)
                         {
                             <li><a>Loading...</a></li>
-                        } else
+                        }
+                        else
                         {
                             if (Keyphrases == null || Keyphrases.Count == 0)
                             {
                                 <a>Empty</a>
-                            } else
+                            }
+                            else
                             {
                                 foreach (var keyphrase in Keyphrases)
                                 {
@@ -172,7 +173,7 @@
 
 @* Băt đầu script *@
 <script type="text/javascript">
-    
+
 </script>
 @* Kết thúc script *@
 
@@ -182,9 +183,9 @@
     public Boolean isOpenForm_AddNewConcept = false;
     public Boolean isOpenForm_EditConcept = false;
     public Boolean isOpenForm_DeleteConcept = false;
-    public List<Concept>? Concepts;
-    public Concept? SelectedConcept;
-    public List<KeyPhrase>? Keyphrases;
+    public List<Concept> Concepts = new List<Concept>();
+    public Concept? SelectedConcept = new Concept();
+    public List<KeyPhrase> Keyphrases = new List<KeyPhrase>();
     string search_keyphrase = "";
     string Description_text = "A concept is defined as an abstract idea. It is understood to be a fundamental building block underlying principles, thoughts and beliefs. Concepts play an important role in all aspects of cognition. As such, concepts are studied within such disciplines as linguistics, psychology, and philosophy, and these disciplines are interested in the logical and psychological structure of concepts, and how they are put together to form thoughts and sentences. The study of concepts has served as an important flagship of an emerging interdisciplinary approach, cognitive science.";
     string new_concept = "";
@@ -192,24 +193,37 @@
     string warning_input_conecept = "";
     string warning_input_description = "";
 
-    protected override async Task OnInitializedAsync() 
+    protected override async Task OnInitializedAsync()
     {
         // fetch concept
         var data_concept = await conceptAdminService.GetListConcept();
         if (data_concept == null || data_concept.Count == 0)
         {
-            Concepts = null;
-            return;
+            Concepts.Clear();
+        }
+        else
+        {
+            Concepts = data_concept;
         }
 
-        Concepts = data_concept;
-        SelectedConcept = Concepts[0];
+        if (Concepts.Count() > 0)
+        {
+            SelectedConcept = Concepts[0];
+        }
+        else
+        {
+            SelectedConcept = null;
+        }
         isLoading_GetListConcept = false;
 
         // fetch keyphrase
-        if (Concepts[0] != null)
+        if (Concepts.Count() > 0)
         {
             await fetchKeyphrase(Concepts[0].ID);
+        }
+        else
+        {
+            isLoading_GetListKeyphrase = false;
         }
         // Re-render Method
         StateHasChanged();
@@ -267,7 +281,7 @@
 
     public async void AddNewConcept()
     {
-        if(new_concept == "")
+        if (new_concept == "")
         {
             warning_input_conecept = "Please fill in this field";
             // Re-render Method
@@ -283,7 +297,7 @@
             return;
         }
 
-        if(new_concept != "" && new_description != "")
+        if (new_concept != "" && new_description != "")
         {
             warning_input_conecept = "";
             warning_input_description = "";
@@ -293,11 +307,12 @@
             // Logic add here
             var rsAddConcept = await conceptAdminService.AddConcept(new_concept, new_description);
 
-            if(rsAddConcept != null)
+            if (rsAddConcept != null)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rsAddConcept);
                 CloseAddNewConceptForm();
-            } else
+            }
+            else
             {
                 // handler error
             }
@@ -322,7 +337,7 @@
 
     public async void EditConcept()
     {
-        if(SelectedConcept == null)
+        if (SelectedConcept == null)
         {
             await JsRuntime.InvokeVoidAsync("alert", "You have not selected yet!");
             return;
@@ -334,7 +349,7 @@
             return;
         }
 
-        if(new_concept == "" && new_description == "")
+        if (new_concept == "" && new_description == "")
         {
             CloseEditConceptForm();
             return;
@@ -358,11 +373,12 @@
         c.Content = new_description;
 
         var rs = testAPI_Edit_Concept(c);
-        if(rs)
+        if (rs)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Edit is success!");
             CloseEditConceptForm();
-        } else
+        }
+        else
         {
             await JsRuntime.InvokeVoidAsync("alert", "Edit is failed!");
             CloseEditConceptForm();
