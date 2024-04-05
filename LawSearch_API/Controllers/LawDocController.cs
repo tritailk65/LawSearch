@@ -52,5 +52,14 @@ namespace LawSearch_API.Controllers
 
             return rs.MessageSuccess("Import văn bản luật thành công");
         }
+
+        [HttpDelete]
+        public APIResult DeleteLawDocument([BindRequired] int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            lawDocService.DeleteLawDocument(id);
+            APIResult rs = new();
+            return rs.MessageSuccess("Delete law document success");
+        }
     }
 }

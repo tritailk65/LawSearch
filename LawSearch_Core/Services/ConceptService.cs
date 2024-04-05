@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -186,5 +188,42 @@ namespace LawSearch_Core.Services
                 _db.CloseConnection();
             }
         }
+
+        //Generate từ name và description
+        public async Task GenerateKeyPhrase()
+        {
+            try
+            {
+                _db.OpenConnection();
+
+                string sql = "select Name, ID, Description from concept";
+                DataTable ds = _db.ExecuteReaderCommand(sql, "");
+                if(ds.Rows.Count > 0)
+                {
+                    for(var i = 0; i < ds.Rows.Count; i++)
+                    {
+                        string concept = Globals.GetinDT_String(ds, i, "Name").ToLower();
+                        string description = Globals.GetinDT_String(ds, i, "Description").ToLower();
+                        int conceptID = Globals.GetIDinDT(ds, i, "ID");
+
+                        //Add name concept to keyphrase
+                        _db.ExecuteNonQueryCommand("exec GetKeyPhrase N'" + Globals.GetKeyJoin(concept) + "'");
+                        var data = await Globals.GetKeyPhraseFromPhoBERT(description);
+                        var keys = data;
+                        foreach(var key in keys)
+                        {
+                            int Count = Globals.CountTerm(description, key.Replace("_"," "));
+                            var rsKeyDT = _db.ExecuteReaderCommand("exec GetKeyPhrase N'" + key + "'","");
+                            int idKey = Globals.GetIDinDT(rsKeyDT, 0, "ID");
+                            _db.ExecuteNonQueryCommand("exec UpdateConcept_KeyPhrase " + conceptID + "," + Convert.ToInt32(idKey) + ",16," + Count);
+                        }
+                    }
+                }
+            } catch
+            {
+                throw;
+            } finally{ _db.CloseConnection(); }
+        }
+
     }
 }
