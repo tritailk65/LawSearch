@@ -30,7 +30,6 @@ namespace LawSearch_Admin.Services
             }
             return lst;
         }
-
         
         public async Task<List<LawHTML>> GetLawHTML(int id)
         {
@@ -89,6 +88,18 @@ namespace LawSearch_Admin.Services
                 return true;
             }
             else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteLaw(int id)
+        {
+            var rs = await _httpClient.DeleteAsync($"api/LawDoc?ID={id}");
+            if (rs.IsSuccessStatusCode)
+            {
+                return true;
+            }else
             {
                 return false;
             }

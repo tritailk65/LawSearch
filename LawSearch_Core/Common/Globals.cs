@@ -11,6 +11,24 @@ namespace LawSearch_Core.Common
 {
     public class Globals
     {
+        public static string KeyPhareAPIURL { get { return "http://127.0.0.1:5000/keyphrase"; } }
+
+        public static async Task<string[]> GetKeyPhraseFromPhoBERT(string body)
+        {
+            var httpClient = new HttpClient();
+            var request = new HttpRequestMessage();
+            request.Method = HttpMethod.Post;
+            request.RequestUri = new Uri(Globals.KeyPhareAPIURL);
+            request.Content = new StringContent(body);
+            request.Method = HttpMethod.Post;
+            var response = httpClient.SendAsync(request).Result;
+            response.EnsureSuccessStatusCode();
+            var buffer = await response.Content.ReadAsByteArrayAsync();
+            var byteArray = buffer.ToArray();
+            var responseString = Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
+            string s = responseString.Replace("[", " ").Replace("]", " ");
+            return s.Split(' ').ToList().Where(x => x.Contains("_")).Select(x => x.Replace("\"", "")).ToArray();
+        }
 
         //Hàm lấy giá trị cột ID theo tên v
         public static int GetIDinDT(DataTable dt, int row, string v)

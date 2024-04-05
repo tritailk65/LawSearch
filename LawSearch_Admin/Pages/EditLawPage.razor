@@ -1,4 +1,6 @@
 ﻿@page "/editlaw"
+@inject IJSRuntime JsRuntime;
+@inject NavigationManager NavigationManager
 
 @inject ILawDocAdminService lawDocAdminService;
 
@@ -7,12 +9,12 @@
         <div class="title">
             Select your document
         </div>
-        <select class="custom-select">
+        <select class="custom-select" @onchange="GetDataLaw" >
             @if(lstLawDoc != null)
             {
                 @foreach (var law in lstLawDoc)
                 {
-                    <option class="dropdown-item" value="@law.Name">@law.Name</option>
+                    <option class="dropdown-item" value="@law.ID">@law.Name</option>
                 }
             }
         </select>
@@ -20,11 +22,8 @@
             <Button ButtonStyle="add-button btn-custom" @onclick="() => {}">
                 Add New
             </Button>
-            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
-                Edit
-            </Button>
-            <Button ButtonStyle="delete-button btn-custom" @onclick="() => {}">
-                Delete
+            <Button ButtonStyle="delete-button btn-custom" @onclick="DeleteLaw">
+                Delete Law
             </Button>
         </div>
     </div>
@@ -85,14 +84,50 @@
 @code {
     public List<LawDoc> lstLawDoc = new List<LawDoc>();
     public List<Chapter> lstChapter = new List<Chapter>();
-
     public LawVM lawVM = new LawVM();
+    public int idLawSelect;
 
     protected override async Task OnInitializedAsync()
     {
         lawVM = null;
         var lstLawDocData = await lawDocAdminService.GetListLawDoc();
         lstLawDoc = lstLawDocData;
+        var data = await lawDocAdminService.GetDataLaw(lstLawDoc[0].ID);
+        idLawSelect = lstLawDoc[0].ID;
+        lawVM = data;
+    }
+
+    private async void GetDataLaw(ChangeEventArgs e)
+    {
+        lawVM = null;
+        int id = Convert.ToInt32(e.Value);
+        idLawSelect = id;
+        var data = await lawDocAdminService.GetDataLaw(id);
+        lawVM = data;
+        StateHasChanged();
+    }
+
+    public async void DeleteLaw()
+    {
+        var confirm = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure to delete this law ?");
+        if (confirm)
+        {
+            var rs = await lawDocAdminService.DeleteLaw(idLawSelect);
+            if (rs)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Delete success!");
+                ReloadPage();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Delete fail!");
+            }
+        }
+    }
+
+    public void ReloadPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 }
 

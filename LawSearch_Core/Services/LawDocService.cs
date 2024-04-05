@@ -382,5 +382,47 @@ namespace LawSearch_Core.Services
 
             return false;
         }
+
+        public void DeleteLawDocument(int id)
+        {
+            #region Transaction init
+            IDbConnection connection = db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = db.CreateCommand();
+            IDbTransaction transaction = db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                command.CommandText = "select * from law where id = " + id;
+                var rs = db.ExecuteReaderCommand(command,"");
+                if(rs.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found",400,400);
+                }
+
+                command.CommandText = "exec DeleteLaw " + id;
+                db.ExecuteNonQueryCommand(command);
+                transaction.Commit();   
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
     }
 }

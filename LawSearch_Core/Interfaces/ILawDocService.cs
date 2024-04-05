@@ -14,6 +14,7 @@ namespace LawSearch_Core.Interfaces
         List<LawDoc> GetListLawDoc();
         DataTable GetLawHTML(int ID);
         void ImportLaw(string name, string content);
+        void DeleteLawDocument(int id);
 
     }
 }
