@@ -9,5 +9,6 @@ namespace LawSearch_Admin.Interfaces
         Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id);
 
         Task<string> AddConcept(string name, string content);
+
     }
 }

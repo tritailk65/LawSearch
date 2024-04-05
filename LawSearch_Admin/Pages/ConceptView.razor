@@ -93,6 +93,7 @@
     }
     <div class="main_view">
         <div class="button_concept_view">
+            <div class="my_button" @onclick="ExtractKeyphrase"><a>Extract keyphrase</a></div>
             <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
             <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
             <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
@@ -196,6 +197,23 @@
     protected override async Task OnInitializedAsync()
     {
         // fetch concept
+        await fetchConcept();
+
+        // fetch keyphrase
+        if (Concepts.Count() > 0)
+        {
+            await fetchKeyphrase(Concepts[0].ID);
+        }
+        else
+        {
+            isLoading_GetListKeyphrase = false;
+        }
+        // Re-render Method
+        StateHasChanged();
+    }
+
+    public async Task fetchConcept()
+    {
         var data_concept = await conceptAdminService.GetListConcept();
         if (data_concept == null || data_concept.Count == 0)
         {
@@ -215,18 +233,6 @@
             SelectedConcept = null;
         }
         isLoading_GetListConcept = false;
-
-        // fetch keyphrase
-        if (Concepts.Count() > 0)
-        {
-            await fetchKeyphrase(Concepts[0].ID);
-        }
-        else
-        {
-            isLoading_GetListKeyphrase = false;
-        }
-        // Re-render Method
-        StateHasChanged();
     }
 
     public async Task fetchKeyphrase(int concept_id)
@@ -310,6 +316,7 @@
             if (rsAddConcept != null)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rsAddConcept);
+                await fetchConcept();
                 CloseAddNewConceptForm();
             }
             else
@@ -411,5 +418,10 @@
     public void CancelDeleteConcept()
     {
         CloseDeleteConceptForm();
+    }
+
+    public async Task ExtractKeyphrase()
+    {
+        if (SelectedConcept == null) return;
     }
 }
