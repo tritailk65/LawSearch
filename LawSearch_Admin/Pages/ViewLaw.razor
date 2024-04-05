@@ -38,7 +38,7 @@
                         {
                             <div class="chapter">
                                 <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                @c.Name @c.Title
+                                @c.Name @c.Title [@c.ID]
                             </div>
                             if (c.lstSections != null && c.lstSections.Count > 0)
                             {
@@ -48,7 +48,7 @@
                                     {
                                         <div class="section">
                                             <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                            @s.Name
+                                            @s.Name [@s.ID]
                                         </div>
                                     }
                                     if (s.lstArticals.Count > 0)
@@ -57,7 +57,7 @@
                                         {
                                             <div class="artical">
                                                 <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
-                                                @a.Name: @a.Title
+                                                @a.Name: @a.Title [@a.ID]
                                             </div>
                                         }
                                     }
@@ -1703,8 +1703,6 @@
     public List<LawDoc> lstLawDoc = new List<LawDoc>();
 
     public LawVM lawVM = new LawVM();
-
-    public int LawID;
 
     protected override async Task OnInitializedAsync()
     {

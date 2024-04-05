@@ -48,6 +48,8 @@ builder.Services.AddScoped<ILawDocService, LawDocService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IChapterService, ChapterService>();
 builder.Services.AddScoped<ISectionService, SectionService>();
+builder.Services.AddScoped<IClauseService, ClauseService>();
+builder.Services.AddScoped<IPointService, PointService>();
 
 
 builder.Services.AddControllers();

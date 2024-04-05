@@ -68,5 +68,14 @@ namespace LawSearch_API.Controllers
             APIResult rs = new();
             return rs.Success(lst);
         }
+
+        [HttpGet("[action]")]
+        public APIResult GenerateKeyPhrase()
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.GenerateKeyPhrase();
+            APIResult rs = new();
+            return rs.MessageSuccess("Generate success!");
+        }
     }
 }
