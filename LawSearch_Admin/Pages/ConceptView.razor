@@ -1,5 +1,6 @@
 ﻿@page "/concept"
-@inject IConceptAdminService conceptAdminService;
+@inject IConceptAdminService conceptAS;
+@inject IKeyPhraseAdminService keyphraseAS
 @inject IJSRuntime JsRuntime;
 
 @* Băt đầu web *@
@@ -93,7 +94,7 @@
     }
     <div class="main_view">
         <div class="button_concept_view">
-            <div class="my_button" @onclick="ExtractKeyphrase"><a>Extract keyphrase</a></div>
+            <div class="my_button" @onclick="MapKeyphrase"><a>Map keyphrase</a></div>
             <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
             <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
             <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
@@ -109,14 +110,17 @@
                     {
                         if (Concepts != null && Concepts.Count() > 0)
                         {
+                            int index = 1;
                             foreach (var concept in Concepts)
                             {
                                 <li>
                                     <div class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
                                          onclick="@(async Task() => {await SelectConceptFunction(concept);})">
-                                        <a>@concept.ID. @concept.Name</a>
+                                        <a>@index. @concept.Name</a>
                                     </div>
                                 </li>
+
+                                index += 1;
                             }
                         }
                         else
@@ -138,9 +142,11 @@
             <div class="list_keyphrase_of_concept_view">
                 <div class="keyphrase_buttons_view">
                     <div class="search_keyphrase_view">
-                        <input id="textInput" type="text" placeholder="new keyphrase" />
+                        <input id="textInput" type="text" placeholder="new keyphrase" @oninput="SetNewKeyphrase" value="@new_keyphrase" />
                     </div>
-                    <div class="my_button add_new_keyphrase_button">
+                    <div 
+                        class="my_button add_new_keyphrase_button"
+                         @onclick="AddNewKeyphrase">
                         <a>Add new keyphrase</a>
                     </div>
                 </div>
@@ -193,6 +199,7 @@
     string new_description = "";
     string warning_input_conecept = "";
     string warning_input_description = "";
+    string new_keyphrase = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -214,7 +221,7 @@
 
     public async Task fetchConcept()
     {
-        var data_concept = await conceptAdminService.GetListConcept();
+        var data_concept = await conceptAS.GetListConcept();
         if (data_concept == null || data_concept.Count == 0)
         {
             Concepts.Clear();
@@ -238,7 +245,7 @@
     public async Task fetchKeyphrase(int concept_id)
     {
         isLoading_GetListKeyphrase = true;
-        var data_keyphrase = await conceptAdminService.GetListKeyphraseByConceptID(concept_id);
+        var data_keyphrase = await conceptAS.GetListKeyphraseByConceptID(concept_id);
         if (Keyphrases != null) Keyphrases.Clear();
         Keyphrases = data_keyphrase;
         isLoading_GetListKeyphrase = false;
@@ -284,6 +291,14 @@
         }
     }
 
+    public void SetNewKeyphrase(ChangeEventArgs e)
+    {
+        if (e != null)
+        {
+            new_keyphrase = e.Value?.ToString() ?? "";
+        }
+    }
+
 
     public async void AddNewConcept()
     {
@@ -311,12 +326,18 @@
             StateHasChanged();
 
             // Logic add here
-            var rsAddConcept = await conceptAdminService.AddConcept(new_concept, new_description);
+            ResponceMessage rsAddConcept = await conceptAS.AddConcept(new_concept, new_description);
 
             if (rsAddConcept != null)
             {
-                await JsRuntime.InvokeVoidAsync("alert", rsAddConcept);
-                await fetchConcept();
+                if(rsAddConcept.Status)
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", rsAddConcept.Message);
+                    await fetchConcept();
+                } else
+                {
+                    await JsRuntime.InvokeVoidAsync("alert", rsAddConcept.Error);
+                }
                 CloseAddNewConceptForm();
             }
             else
@@ -328,7 +349,11 @@
 
     public void OpenEditConceptForm()
     {
+        if (SelectedConcept == null) return;
+
         isOpenForm_EditConcept = true;
+        new_concept = SelectedConcept.Name;
+        new_description = SelectedConcept.Content;
         // Re-render Method
         StateHasChanged();
     }
@@ -344,57 +369,45 @@
 
     public async void EditConcept()
     {
+        Concept c = new();
         if (SelectedConcept == null)
         {
             await JsRuntime.InvokeVoidAsync("alert", "You have not selected yet!");
             return;
-        }
-
-        if (new_concept == SelectedConcept?.Name && new_description == SelectedConcept.Content)
+        } else
         {
-            CloseEditConceptForm();
-            return;
+            c = SelectedConcept;
         }
 
-        if (new_concept == "" && new_description == "")
-        {
-            CloseEditConceptForm();
-            return;
-        }
-
-        if (new_concept == "" || new_description == "")
+        if (new_concept == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "Please fill in concept");
             return;
+        } else
+        {
+            c.Name = new_concept;
         }
-
         if (new_description == "")
         {
             await JsRuntime.InvokeVoidAsync("alert", "Please fill in description");
             return;
+        } else
+        {
+            c.Content = new_description;
         }
 
-        Concept c = new Concept();
-        c = SelectedConcept;
-        c.Name = new_concept;
-        c.Content = new_description;
-
-        var rs = testAPI_Edit_Concept(c);
-        if (rs)
+        ResponceMessage rs = await conceptAS.UpdateConcept(c);
+        if (rs.Status)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Edit is success!");
+            await JsRuntime.InvokeVoidAsync("alert", rs.Message);
             CloseEditConceptForm();
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Edit is failed!");
+            await JsRuntime.InvokeVoidAsync("alert", rs.Message);
+            await JsRuntime.InvokeVoidAsync("alert", "Error: " + rs.Error);
             CloseEditConceptForm();
         }
-    }
-
-    public Boolean testAPI_Edit_Concept(Concept c)
-    {
-        return true;
     }
 
     public void OpenDeleteConceptForm()
@@ -411,8 +424,9 @@
         StateHasChanged();
     }
 
-    public void ConfirmDeleteConcept()
+    public async Task ConfirmDeleteConcept()
     {
+        await fetchDeleteConcept();
         CloseDeleteConceptForm();
     }
     public void CancelDeleteConcept()
@@ -420,8 +434,63 @@
         CloseDeleteConceptForm();
     }
 
-    public async Task ExtractKeyphrase()
+    public async Task fetchDeleteConcept()
     {
         if (SelectedConcept == null) return;
+        ResponceMessage rs = await conceptAS.DeleteConcept(SelectedConcept.ID);
+
+        if (rs != null)
+        {
+            if (rs.Status)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Message);
+                await fetchConcept();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Error);
+            }
+        }
+    }
+
+    public void MapKeyphrase()
+    {
+        // Step 3 - Add [KeyphraseMapping]
+    }
+
+    public async Task AddNewKeyphrase()
+    {
+        // Step 1 - Add [Keyphrase]
+        ResponceMessage rs = await keyphraseAS.AddKeyphrase(new_keyphrase);
+        if(rs != null)
+        {
+            if (rs.Status)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Message);
+            } else 
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Error);
+                return;
+            }
+        }
+        // Step 2 - Add [ConceptKeyphrase]
+        if (SelectedConcept == null) return;
+        rs = await conceptAS.AddConceptKeyphrase(SelectedConcept.ID, new_keyphrase);
+        if (rs != null)
+        {
+            if (rs.Status)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Message);
+                await fetchKeyphrase(SelectedConcept.ID);
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Error);
+                return;
+            }
+        }
+
+        new_keyphrase = "";
+        StateHasChanged();
     }
 }

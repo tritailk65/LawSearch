@@ -10,7 +10,7 @@ namespace LawSearch_Core.Models
     {
         public int ID { get; set; }
         public string Keyphrase {  get; set; }
-        public string Key { get; set; }
+        public string? Key { get; set; }
         public KeyPhraseSource? Source { get; set; }
         public int? ConceptID { get; set; } = null;
         public int? NumberArtical { get; set; } = null;

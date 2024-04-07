@@ -17,7 +17,5 @@ namespace LawSearch_Core.Models
         public int type { get; set; }
         public double[] vector;
         public double distance;
-
-
     }
 }

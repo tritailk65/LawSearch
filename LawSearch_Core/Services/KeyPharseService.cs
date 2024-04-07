@@ -130,7 +130,7 @@ namespace LawSearch_Core.Services
                 {
                     throw new BadRequestException("Không tìm thấy ID Keyphrase !", 400, 400);
                 }
-                string sql = "exec DeleteKeyPhrase " + id;
+                string sql = "exec DeleteKeyPhrase " + Globals.GetIDinDT(checkID, 0, "KeyPhrase") + "'";
                 _db.ExecuteNonQueryCommand(sql);
 
             } catch

@@ -27,6 +27,10 @@ namespace LawSearch_Core.Models
         public string Content { get; set; }
         public string Title { get; set; }
         public string LawName { get; set; } 
+        public double Score { get; set; }
+        public double Distance { get; set; }
+        public double[] Vector { get; set; }
 
+        public List<KeyPhrase> KeyPhrases { get; set; }
     }
 }

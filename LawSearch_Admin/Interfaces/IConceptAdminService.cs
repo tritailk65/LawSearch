@@ -1,4 +1,5 @@
-﻿using LawSearch_Core.Models;
+﻿using LawSearch_Admin.ViewModels;
+using LawSearch_Core.Models;
 
 namespace LawSearch_Admin.Interfaces
 {
@@ -8,7 +9,12 @@ namespace LawSearch_Admin.Interfaces
 
         Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id);
 
-        Task<string> AddConcept(string name, string content);
+        Task<ResponceMessage> AddConcept(string name, string content);
 
+        Task<ResponceMessage> UpdateConcept(Concept newConcept);
+
+        Task<ResponceMessage> DeleteConcept(int id);
+
+        Task<ResponceMessage> AddConceptKeyphrase(int conceptid, string keyphrase);
     }
 }

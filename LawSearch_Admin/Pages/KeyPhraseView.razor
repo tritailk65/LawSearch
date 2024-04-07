@@ -532,10 +532,8 @@
     {
         if (NewKeyphrase == "") return;
 
-        KeyPhrase k = new KeyPhrase();
-        k.Keyphrase = NewKeyphrase;
         isLoadingAddNewKeyphrase = true;
-        var message = await keyphraseService.AddKeyphrase(k);
+        var message = await keyphraseService.AddKeyphrase(NewKeyphrase);
         await JsRuntime.InvokeVoidAsync("alert", message);
 
         NewKeyphrase = "";

@@ -63,29 +63,110 @@ namespace LawSearch_Admin.Services
             return ls;
         }
 
-        public async Task<string> AddConcept(string name, string content)
+        public async Task<ResponceMessage> AddConcept(string name, string content)
         {
-            Concept newConcept = new Concept()
+            Concept newConcept = new()
             {
                 Name = name,
                 Content = content
             };
 
+            ResponceMessage rm = new();
+
             var rs = await httpClient.PostAsJsonAsync($"api/concept", newConcept);
 
             if (rs.IsSuccessStatusCode)
             {
-                return "Thêm concept thành công !";
+                rm.Status = true;
+                rm.Message = "Add concept success";
             }
             else
             {
                 var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
-                    return resultPost.Message.ToString();
+                    rm.Message = "Update concept failed";
+                    rm.Error = resultPost.Message.ToString();
                 }
             }
-            return "Lỗi không xác định"; //Lỗi do logic bị sai
+            return rm;
+        }
+
+        public async Task<ResponceMessage> UpdateConcept(Concept newConcept)
+        {
+            ResponceMessage rm = new();
+
+            var rs = await httpClient.PutAsJsonAsync($"api/Concept", newConcept);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                rm.Status = true;
+                rm.Message = "Update concept success";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    rm.Message = "Update concept failed";
+                    rm.Error = resultPost.Message.ToString();
+                }
+            }
+
+            return rm;
+        }
+
+        public async Task<ResponceMessage> DeleteConcept(int id)
+        {
+            ResponceMessage rm = new();
+
+            var rs = await httpClient.DeleteAsync($"api/Concept?id=" + id);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                rm.Status = true;
+                rm.Message = "Delete concept success";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    rm.Message = "Delete concept failed";
+                    rm.Error = resultPost.Message.ToString();
+                }
+            }
+
+            return rm;
+        }
+
+        public async Task<ResponceMessage> AddConceptKeyphrase(int conceptid, string keyphrase)
+        {
+            ResponceMessage rm = new();
+
+            var body = new
+            {
+                conceptid = conceptid,
+                keyphrase = keyphrase
+            };
+            var rs = await httpClient.PostAsJsonAsync($"/api/Concept/AddConceptKeyphrase", body);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                rm.Status = true;
+                rm.Message = "Add concept keyphrase success";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    rm.Message = "Add concept keyphrase failed";
+                    rm.Error = resultPost.Message.ToString();
+                }
+            }
+
+            return rm;
         }
     }
 }

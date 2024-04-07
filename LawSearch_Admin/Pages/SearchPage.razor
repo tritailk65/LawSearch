@@ -17,7 +17,7 @@
     {
         <div class="result-container">
             <div class="result-total">
-                Khoảng (@lstResult.Count) kết quả - () giây
+                Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
             </div>
                 @for (int i = 0; i < lstResult.Count; i++)
                 {
@@ -35,6 +35,8 @@
     public List<ArticalResult> lstResult = null;
     public List<Artical> lstArtical;
 
+    public double timeDone = 0;
+
     protected override async Task OnInitializedAsync()
     {
         var data = await articalAdminService.GetListArtical();
@@ -44,7 +46,14 @@
     private async void SearchAction(){
         if(input.Length >= 12)
         {
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             var rs = await searchAdminService.GetResultSearchLaw(input);
+
+            stopwatch.Stop();
+            timeDone = stopwatch.Elapsed.TotalMilliseconds / 1000F;
+
             lstResult = rs;
             StateHasChanged();  //Re-render dom
         }

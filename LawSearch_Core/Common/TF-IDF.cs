@@ -11,38 +11,58 @@ namespace LawSearch_Core.Common
     {
         public static List<KeyPhraseResult> FindNearestNeighbors(List<KeyPhraseResult> lstResult, List<KeyPhrase> lstKeyPhrases_Searched, double minDis, int itop)
         {
+            // Thêm list keyphrase câu hỏi vào cuối danh sách các điều ứng viên
             lstResult.Add(new KeyPhraseResult { ID = -1, keys = lstKeyPhrases_Searched });
 
-            SortedDictionary<string, int> vocabulary = new SortedDictionary<string, int>();
+            // Tạo từ điển thể hiện tần suất hiện keyphrase trong toàn bộ văn bản
+            SortedDictionary<string, int> vocabulary = new();
             for (int i = 0; i < lstResult.Count; i++)
             {
                 for (int j = 0; j < lstResult[i].keys.Count; j++)
                 {
+                    // Keyphrase
                     string sKey = lstResult[i].keys[j].Key;
+
+                    // So sánh keyphrase có trong từ điển không -> Không, thêm vào với tần suất là 1 -> Có thì tăng tần suất lên 1
                     if (!vocabulary.ContainsKey(sKey))
                         vocabulary.Add(lstResult[i].keys[j].Key, 1);
                     else
                         vocabulary[sKey]++;
                 }
             }
-            Dictionary<string, double> _vocabularyIDF = new Dictionary<string, double>();
+
+            // Tạo từ điển chứa tần suất thể hiện IDF của 1 keyphrase
+            Dictionary<string, double> _vocabularyIDF = new();
             foreach (var term in vocabulary.Keys)
             {
-                double numberOfDocsContainingTerm = lstResult.Count(d => d.keys.Exists(x => string.Compare(x.Key, term, StringComparison.InvariantCultureIgnoreCase) == 0));
+                // Số tài liệu mà keyphrase xuất hiện trong đó
+                double numberOfDocsContainingTerm = lstResult.Count(
+                    d => d.keys.Exists(
+                        x => string.Compare(x.Key, term, StringComparison.InvariantCultureIgnoreCase) == 0)
+                );
+                // Công thức IDF:
                 _vocabularyIDF[term] = Math.Log((double)lstResult.Count / ((double)1 + numberOfDocsContainingTerm));
             }
-            // Transform each document into a vector of tfidf values.
-            List<List<double>> vectors = new List<List<double>>();
+
+            // Chuyển đổi các điều luật thành các vector tf-idf
+            List<List<double>> vectors = new();
             foreach (var myKey in lstResult)
             {
-                List<double> vector = new List<double>();
+                List<double> vector = new();
 
                 foreach (var vocab in _vocabularyIDF)
                 {
-                    // Term frequency = count how many times the term appears in this document.
+                    // TF - Term frequency: count how many times the term appears in this document.
 
-                    KeyPhrase key = myKey.keys.Where(d => string.Compare(d.Key, vocab.Key, StringComparison.InvariantCultureIgnoreCase) == 0).FirstOrDefault();
+                    // So sánh keyphrase trong từ điển có trong keyphrase danh sách các điều luật 
+                    KeyPhrase? key = myKey.keys.Where(
+                        d => string.Compare(
+                            d.Key, vocab.Key, StringComparison.InvariantCultureIgnoreCase) == 0
+                        ).FirstOrDefault();
+                    
+                    // TF
                     double tf = key == null ? 0 : key.Count;
+                    // Công thức TF-IDF
                     double tfidf = tf * vocab.Value;
 
                     vector.Add(tfidf);
@@ -50,20 +70,26 @@ namespace LawSearch_Core.Common
 
                 vectors.Add(vector);
             }
+
+            // Chuẩn hoá vector L2-Norm
             double[][] inputs = vectors.Select(v => v.ToArray()).ToArray();
             inputs = Normalize(inputs);
 
+            // Đưa các vector vào lại danh sách điều luật
             for (int i = 0; i < lstResult.Count; i++)
             {
                 lstResult[i].vector = inputs[i];
             }
 
+            // Vector cần search
             double[] search_vector = lstResult[lstResult.Count - 1].vector;
 
             for (int i = 0; i < lstResult.Count - 1; i++)
             {
+                // Tính độ tương đồng cosine
                 lstResult[i].distance = ComputeCosineSimilarity(search_vector, lstResult[i].vector);
             }
+            // Sắp xếp danh sách giảm dần độ tương đồng cosine với điều kiện độ tương đồng > minDis và chỉ lấy itop thành phần đầu tiên
             List<KeyPhraseResult> lstReturn = lstResult.OrderByDescending(x => x.distance).Where(x => x.distance > minDis).Take(itop).ToList();
             return lstReturn;
         }
@@ -73,7 +99,7 @@ namespace LawSearch_Core.Common
             if (vector1.Length != vector2.Length)
                 throw new Exception("DIFER LENGTH");
 
-
+            // Công thức độ tương đồng consine: cs(a, b) = tích vô hướng vector a và vector b / (length vector a * length vector b)
             double denom = (VectorLength(vector1) * VectorLength(vector2));
             if (denom == 0F)
                 return 0F;
@@ -84,11 +110,11 @@ namespace LawSearch_Core.Common
 
         public static double InnerProduct(double[] vector1, double[] vector2)
         {
-
+            // Trường hợp lỗi vì đã chuẩn hoá L2 Norm mà vẫn còn khác độ dài
             if (vector1.Length != vector2.Length)
                 throw new Exception("DIFFER LENGTH ARE NOT ALLOWED");
 
-
+            // Công thức tích vô hướng: A[1]*B[1] + A[2]*B[2] + ... + A[n]*B[n]
             double result = 0F;
             for (int i = 0; i < vector1.Length; i++)
                 result += vector1[i] * vector2[i];
@@ -120,7 +146,7 @@ namespace LawSearch_Core.Common
 
         public static double[] Normalize(double[] vector)
         {
-            List<double> result = new List<double>();
+            List<double> result = new();
 
             double sumSquared = 0;
             foreach (var value in vector)

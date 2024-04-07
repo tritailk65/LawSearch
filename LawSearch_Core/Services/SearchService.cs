@@ -105,8 +105,10 @@ namespace LawSearch_Core.Services
                         Title = item.Title,
                         Content = item.Content,
                         LawName = item.LawName,
-                      
                         ID = item.ID,
+                        Distance = item.distance,
+                        Vector = item.vector,
+                        KeyPhrases = lstKeyPhrases_Searched
                     });
                 }
 

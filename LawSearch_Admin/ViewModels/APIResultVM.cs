@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace LawSearch_Admin.ViewModels
+﻿namespace LawSearch_Admin.ViewModels
 {
     public class APIResultVM
     {

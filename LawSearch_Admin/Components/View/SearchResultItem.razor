@@ -5,6 +5,16 @@
     <div class="result-content">
         @Artical.Content
     </div>
+    <div>
+        <a>Score: @Math.Round(Artical.Distance, 6)</a>
+    </div>
+    <div>
+        <a>Detail: </a>
+        @for (int i = 0; i < Artical.KeyPhrases.Count(); i++)
+        {
+            <a style="margin-right: 20px">@Artical.KeyPhrases[i].Key: @Math.Round(Artical.Vector[i], 8)</a>
+        }
+    </div>
     <hr />
 </div>
 
