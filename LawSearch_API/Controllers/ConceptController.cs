@@ -69,11 +69,11 @@ namespace LawSearch_API.Controllers
             return rs.Success(lst);
         }
 
-        [HttpGet("[action]")]
-        public APIResult GenerateKeyPhrase()
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyPhrase([BindRequired] int lawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateKeyPhrase();
+            _conceptService.GenerateKeyPhrase(lawID);
             APIResult rs = new();
             return rs.MessageSuccess("Generate success!");
         }

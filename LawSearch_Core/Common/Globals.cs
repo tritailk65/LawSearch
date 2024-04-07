@@ -1,4 +1,5 @@
 ﻿using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;

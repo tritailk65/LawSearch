@@ -9,5 +9,6 @@ namespace LawSearch_Core.Interfaces
         List<KeyPhraseRelate> GetKeyPhraseRelateDetailsByID(int ID);
         KeyPhrase AddKeyPhrase(KeyPhrase keyPhrase);
         void DeleteKeyPhrase(int id);
+        void GenerateKeyPhraseMapping(int LawID);
     }
 }
