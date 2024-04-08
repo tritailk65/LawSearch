@@ -43,7 +43,7 @@ namespace LawSearch_Core.Common
                 // Công thức IDF:
                 _vocabularyIDF[term] = Math.Log((double)lstResult.Count / ((double)1 + numberOfDocsContainingTerm));
             }
-
+            var show = _vocabularyIDF;
             // Chuyển đổi các điều luật thành các vector tf-idf
             List<List<double>> vectors = new();
             foreach (var myKey in lstResult)
@@ -74,7 +74,7 @@ namespace LawSearch_Core.Common
             // Chuẩn hoá vector L2-Norm
             double[][] inputs = vectors.Select(v => v.ToArray()).ToArray();
             inputs = Normalize(inputs);
-
+            var show2 = inputs;
             // Đưa các vector vào lại danh sách điều luật
             for (int i = 0; i < lstResult.Count; i++)
             {

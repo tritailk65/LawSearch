@@ -280,5 +280,71 @@ namespace LawSearch_Core.Services
                 _db.CloseConnection();
             }
         }
+
+        public class ConceptMapLaw
+        {
+            public int ConceptID;
+            public int LawID;
+            public int ChapterID;
+            public int ChapterItemID;
+            public int ArticalID;
+        }
+
+        public void AddConceptMapping (int keyphrase_id)
+        {
+            try
+            {
+                _db.OpenConnection();
+
+                string sql = "select DISTINCT Concept_KeyPhrase.ConceptID, KeyPhraseMapping.LawID, " +
+                    "KeyPhraseMapping.ChapterID, KeyPhraseMapping.ChapterItemID, KeyPhraseMapping.ArticalID  " +
+                    "\r\nfrom KeyPhraseMapping\r\ninner join Concept_KeyPhrase on Concept_KeyPhrase.KeyPhraseID " +
+                    "= Concept_KeyPhrase.KeyPhraseID\r\n" +
+                    "where Concept_KeyPhrase.KeyPhraseID = " + keyphrase_id + "\r\nORDER BY ConceptID ASC";
+                DataTable ds = _db.ExecuteReaderCommand(sql, ""); // [ConceptID, LawID, ChapterID, ChapterItemID, ArticalID]
+
+                if(ds.Rows.Count == 0)
+                {
+                    throw new BadRequestException("This keyphrase is created in [Concept_Keyphrase] yet", 400);
+                }
+
+                List<ConceptMapLaw> lst = new();
+
+                for (int i = 0; i < ds.Rows.Count; i++)
+                {
+                    lst.Add(new ConceptMapLaw()
+                    {
+                        ConceptID = Globals.GetIDinDT(ds, i, "ConceptID"),
+                        LawID = Globals.GetIDinDT(ds, i, "LawID"),
+                        ChapterID = Globals.GetIDinDT(ds, i, "ChapterID"),
+                        ChapterItemID = Globals.GetIDinDT(ds, i, "ChapterItemID"),
+                        ArticalID = Globals.GetIDinDT(ds, i, "ArticalID")
+                    });
+                }
+
+                foreach(var cml in lst)
+                {
+                    sql = "select * from ConceptMapping " +
+                        "where ConceptID = " + cml.ConceptID + " and LawID = " + cml.LawID + " and ChapterID = " + cml.ChapterID +
+                        " and ChapterItemID = " + cml.ChapterItemID + " and ArticalID = " + cml.ArticalID;
+                    DataTable ds1 = _db.ExecuteReaderCommand(sql, "");
+
+                    if(ds1.Rows.Count == 0)
+                    {
+                        sql = "INSERT INTO [dbo].[ConceptMapping] ([ConceptID] ,[ArticalID] ,[ChapterID] ,[ChapterItemID] ,[ClaustID] ,[PointID] ,[LawID] ,[KeyPhraseID]) " +
+                            "VALUES ("+ cml.ConceptID + ","+ cml.ArticalID + " ,"+ cml.ChapterID + " ,"+ cml.ChapterItemID + " ,0 ,0 ,"+ cml.LawID + " , NULL)";
+                        _db.ExecuteReaderCommand(sql, "");
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
+        }
     }
 }

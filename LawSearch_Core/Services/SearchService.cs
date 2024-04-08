@@ -83,10 +83,10 @@ namespace LawSearch_Core.Services
                 double minScoreArtical = 0.01;
 
                 rs.lstConcepts = TF_IDF.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
-
+                
                 // expand concepts
                 List<KeyPhraseResult> lstCandidates = GetListArticalByConceptID(rs.lstConcepts.Select(x => x.ID).ToList());
-
+                var show = rs.lstConcepts.Select(x => x.ID).ToList();
                 rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
 
                 foreach (var artical in rs.lstArticals)
@@ -106,9 +106,7 @@ namespace LawSearch_Core.Services
                         Content = item.Content,
                         LawName = item.LawName,
                         ID = item.ID,
-                        Distance = item.distance,
-                        Vector = item.vector,
-                        KeyPhrases = lstKeyPhrases_Searched
+                        Distance = item.distance
                     });
                 }
 
@@ -146,6 +144,7 @@ namespace LawSearch_Core.Services
         {
             List<KeyPhraseResult> lstResult = new List<KeyPhraseResult>();
             DataTable dt = _db.ExecuteReaderCommand("Exec GetListArticalKeyPhraseByConceptID '" + string.Join(",", lst) + "'", "");
+            var show = dt;
             SortedDictionary<int, List<KeyPhrase>> dic = new SortedDictionary<int, List<KeyPhrase>>();
             int articalID = 0; KeyPhrase ph;
             for (int i = 0; i < Globals.DTCount(dt); i++)
@@ -157,16 +156,15 @@ namespace LawSearch_Core.Services
                     Key = Globals.GetinDT_String(dt, i, "KeyPhrase"),
                     Count = Math.Max(1, Globals.GetIDinDT(dt, i, "NumCount")),
                 };
+
                 if (!dic.ContainsKey(articalID))
                 {
-                    dic.Add(articalID, new List<KeyPhrase>
-                {
-                  ph
-                });
-
+                    dic.Add( articalID, new List<KeyPhrase> { ph } );
                 }
                 else
+                {
                     dic[articalID].Add(ph);
+                }
 
             }
             foreach (var item in dic.Keys)
