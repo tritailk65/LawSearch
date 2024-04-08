@@ -57,7 +57,7 @@ namespace LawSearch_API.Controllers
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             _conceptService.DeleteConcept(id);
             APIResult rs = new();
-            return rs.MessageSuccess("Xóa concept thành công !");
+            return rs.MessageSuccess("Delete Concept success !");
         }
 
         [HttpGet("[action]")]
@@ -69,13 +69,40 @@ namespace LawSearch_API.Controllers
             return rs.Success(lst);
         }
 
-        [HttpGet("[action]")]
-        public APIResult GenerateKeyPhrase()
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyPhrase([BindRequired] int lawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateKeyPhrase();
+            _conceptService.GenerateKeyPhrase(lawID);
             APIResult rs = new();
-            return rs.MessageSuccess("Generate success!");
+            return rs.MessageSuccess("Generate ConceptKeyphrase success!");
+        }
+
+        [HttpPost("[action]")]
+        public APIResult GenerateConceptMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.GenerateConceptMapping(LawID);
+            APIResult rs = new();
+            return rs.MessageSuccess("Generate ConceptMapping success!");
+        }
+
+        [HttpDelete("[action]")]
+        public APIResult DeleteAllMapping()
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.DeleteAllConceptMapping();
+            APIResult rs = new();
+            return rs.MessageSuccess("Delete all ConceptMapping success!");
+        }
+
+        [HttpDelete("[action]")]
+        public APIResult DeleteMapping([BindRequired] int ConceptID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.DeleteConceptMappingByConceptID(ConceptID);
+            APIResult rs = new();
+            return rs.MessageSuccess($"Delete mapping ConcetID: {ConceptID} success!");
         }
 
         public class dataConceptKeyphrase

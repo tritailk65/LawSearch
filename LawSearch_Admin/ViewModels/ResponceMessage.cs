@@ -2,8 +2,8 @@
 {
     public class ResponceMessage
     {
-        public Boolean Status = false;
-        public string Message = "";
-        public string Error = "";
+        public bool Status { get; set; } = false;
+        public string? Message { get; set; } = null;
+        public string? Error { get; set; } = null;
     }
 }

@@ -517,7 +517,7 @@
     {
         if (SelectedKeyphrase == null) return;
         var message = await keyphraseService.DeleteKeyphrase(SelectedKeyphrase.ID);
-        await JsRuntime.InvokeVoidAsync("alert", message);
+        await JsRuntime.InvokeVoidAsync("alert", message.Message);
 
         await fetchKeyphrase();
         CloseDeleteDialog();
@@ -534,7 +534,7 @@
 
         isLoadingAddNewKeyphrase = true;
         var message = await keyphraseService.AddKeyphrase(NewKeyphrase);
-        await JsRuntime.InvokeVoidAsync("alert", message);
+        await JsRuntime.InvokeVoidAsync("alert", message.Message);
 
         NewKeyphrase = "";
         isLoadingAddNewKeyphrase = false;

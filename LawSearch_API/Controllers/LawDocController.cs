@@ -61,5 +61,23 @@ namespace LawSearch_API.Controllers
             APIResult rs = new();
             return rs.MessageSuccess("Delete law document success");
         }
+
+        [HttpPost("[action]")]
+        public APIResult AddLawHTML([FromForm] LawHTML lawHTML)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            lawDocService.AddLawHTML(lawHTML.LawID, lawHTML.contentHTML);
+            APIResult rs = new();
+            return rs.MessageSuccess("Import LawHTML success !");
+        }
+
+        [HttpPost("[action]")]
+        public APIResult UpdateLawHTML([FromForm] LawHTML lawHTML)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            lawDocService.UpdateLawHTML(lawHTML.LawID, lawHTML.contentHTML);
+            APIResult rs = new();
+            return rs.MessageSuccess("Update LawHTML success !");
+        }
     }
 }

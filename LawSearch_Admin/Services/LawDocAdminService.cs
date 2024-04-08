@@ -31,9 +31,16 @@ namespace LawSearch_Admin.Services
             return lst;
         }
         
-        public async Task<List<LawHTML>> GetLawHTML(int id)
+        public async Task<LawHTML> GetLawHTML(int id)
         {
-            return await _httpClient.GetFromJsonAsync<List<LawHTML>>($"api/lawdoc/GetLawHTML?id={id}");
+            LawHTML l = new LawHTML();
+            var rs = await _httpClient.GetFromJsonAsync<APIResultVM<LawHTML>>($"api/lawdoc/GetLawHTML?id={id}");
+            if(rs != null && rs.Status == 200 && rs.Data.Count > 0)
+            {
+                l = rs.Data[0];
+            }
+
+            return l;
         }
 
         public async Task<LawVM> GetDataLaw(int id)

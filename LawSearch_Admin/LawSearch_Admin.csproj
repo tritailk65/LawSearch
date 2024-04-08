@@ -14,11 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pages\HistoryPage.razor.css" />
     <None Remove="Pages\ImportLaw.razor.css" />
     <None Remove="Pages\SearchPage.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\HistoryPage.razor.css" />
     <Content Include="Pages\ImportLaw.razor.css" />
     <Content Include="Pages\SearchPage.razor.css" />
   </ItemGroup>

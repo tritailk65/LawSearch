@@ -20,7 +20,7 @@ namespace LawSearch_Core.Models
 
     public class LawHTML
     {
-        public int? LawID { get; set; } = null;
+        public int LawID { get; set; } 
         public string contentHTML { get; set; }
     }
 

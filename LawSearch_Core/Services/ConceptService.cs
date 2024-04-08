@@ -2,6 +2,7 @@
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -25,44 +26,55 @@ namespace LawSearch_Core.Services
 
         public Concept AddConcept(Concept concept)
         {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
             try
             {
-                _db.OpenConnection();
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
 
+            try
+            { 
                 string name = concept.Name;
                 string content = concept.Content;
+                Concept conceptResult = new Concept();
+                
+                if(name == "" || content == "")
+                {
+                    throw new BadRequestException("Name or Content is null!", 400, 400);
+                }
 
-                string sql = string.Format("Exec GetConcept N'{0}',N'{1}'", name, content);
-                var rs = _db.ExecuteReaderCommand(sql,"");
-                int idNewConcept = 0;
-                if(rs.Rows.Count > 0)
+                command.CommandText = "select id from Concept where name = N'" + name + "'";
+                var checkConcept = _db.ExecuteReaderCommand(command, "");
+                if (checkConcept.Rows.Count > 0)
                 {
-                    idNewConcept = Globals.GetIDinDT(rs, 0, 0);
+                    throw new BadRequestException("Concept đã tồn tại!", 400, 400);
                 }
-                if(idNewConcept == -1)
-                {
-                    throw new BadRequestException("Name or content is null !", 400, 400);
-                }else if(idNewConcept != 0)
-                {
-                    string query = "select * from [Concept]  with(nolock) where id = " + idNewConcept;
-                    DataTable dt = _db.ExecuteReaderCommand(query, "");
-                    Concept c = new Concept
-                    {
-                        ID = Globals.GetIDinDT(dt, 0, "ID"),
-                        Name = Globals.GetinDT_String(dt, 0, "Name"),
-                        Content = Globals.GetinDT_String(dt, 0, "Description"),
-                    };
-                    return c;
-                }
-                return null;
+
+                command.CommandText = string.Format("insert into Concept(Name, Description) values (N'{0}', N'{1}')", name, content);
+                command.ExecuteNonQuery();
+
+                transaction.Commit();
+
+                return conceptResult;            
             }
             catch
             {
+                transaction.Rollback();
                 throw;
             }
             finally
             {
-                _db.CloseConnection();
+                connection.Close();
             }
         }
 
@@ -164,7 +176,6 @@ namespace LawSearch_Core.Services
                 _db.OpenConnection();
                 
                 //Check concept
-
                 string sql = "exec GetKeyPharesByConceptID " + id;
                 DataTable rs = _db.ExecuteReaderCommand(sql, "");
                 List<KeyPhrase> keyphraselst = new List<KeyPhrase>();
@@ -189,15 +200,40 @@ namespace LawSearch_Core.Services
             }
         }
 
-        //Generate từ name và description
-        public async Task GenerateKeyPhrase()
+        /// <summary>
+        /// Hàm tự sinh ConceptKeyphrase
+        /// </summary>
+        /// <param name="lawID">ID văn bản luật</param>
+        /// <returns></returns>
+        public async Task GenerateKeyPhrase(int lawID)
         {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
             try
             {
-                _db.OpenConnection();
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
 
-                string sql = "select Name, ID, Description from concept";
-                DataTable ds = _db.ExecuteReaderCommand(sql, "");
+            try
+            {
+                command.CommandText = $"select * from Law where ID = {lawID}";
+                var checkIDLaw = _db.ExecuteReaderCommand(command,"");
+                if(checkIDLaw.Rows.Count == 0)
+                {
+                    throw new BadRequestException("ID Law not found !", 400, 400);
+                }
+
+                command.CommandText = "select Name, ID, Description from concept";
+                DataTable ds = _db.ExecuteReaderCommand(command, "");
                 if(ds.Rows.Count > 0)
                 {
                     for(var i = 0; i < ds.Rows.Count; i++)
@@ -207,20 +243,25 @@ namespace LawSearch_Core.Services
                         int conceptID = Globals.GetIDinDT(ds, i, "ID");
 
                         //Add name concept to keyphrase
-                        _db.ExecuteNonQueryCommand("exec GetKeyPhrase N'" + Globals.GetKeyJoin(concept) + "'");
-                        var data = await Globals.GetKeyPhraseFromPhoBERT(description);
-                        var keys = data;
+                        command.CommandText = "exec GetKeyPhrase N'" + Globals.GetKeyJoin(concept) + "'";
+                        _db.ExecuteNonQueryCommand(command);
+                        var keys = await Globals.GetKeyPhraseFromPhoBERT(description);
+
                         foreach(var key in keys)
                         {
                             int Count = Globals.CountTerm(description, key.Replace("_"," "));
-                            var rsKeyDT = _db.ExecuteReaderCommand("exec GetKeyPhrase N'" + key + "'","");
+                            command.CommandText = "exec GetKeyPhrase N'" + key + "'";
+                            var rsKeyDT = _db.ExecuteReaderCommand(command,"");
                             int idKey = Globals.GetIDinDT(rsKeyDT, 0, "ID");
-                            _db.ExecuteNonQueryCommand("exec UpdateConcept_KeyPhrase " + conceptID + "," + Convert.ToInt32(idKey) + ",16," + Count);
+                            command.CommandText = "exec UpdateConcept_KeyPhrase " + conceptID + "," + Convert.ToInt32(idKey) + "," + lawID + "," + Count;
+                            _db.ExecuteNonQueryCommand(command);
                         }
                     }
                 }
+                transaction.Commit();
             } catch
             {
+                transaction.Rollback();
                 throw;
             } finally{ _db.CloseConnection(); }
         }
@@ -345,6 +386,174 @@ namespace LawSearch_Core.Services
             {
                 _db.CloseConnection();
             }
+        }
+
+        /// <summary>
+        /// Hàm tự sinh ConceptMapping (Multithreading task)
+        /// </summary>
+        /// <param name="LawID">ID văn bản luật</param>
+        /// <exception cref="BadRequestException"></exception>
+        public void GenerateConceptMapping(int LawID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                #region Check Data
+                command.CommandText = $"select * from Law where id = {LawID}";
+                var checkLawID = _db.ExecuteReaderCommand(command, "");
+                if(checkLawID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found!", 400, 400);
+                }
+                #endregion
+
+                #region Get List Concept
+                Console.WriteLine("Start load Concept...");
+                List<Concept> lstConcepts = new List<Concept>();
+                command.CommandText = "select dbo.getnormtext(Name) Name, ID from Concept";
+                var dtConcepts = _db.ExecuteReaderCommand(command, "");
+                if(dtConcepts.Rows.Count > 0)
+                {
+                    for (var i = 0;i< dtConcepts.Rows.Count; i++)
+                    {
+                        lstConcepts.Add(new Concept
+                        {
+                            ID = Globals.GetIDinDT(dtConcepts, i, "ID"),
+                            Name = Globals.GetinDT_String(dtConcepts, i, "Name"),
+                        });
+                    }
+                }
+                Console.WriteLine("Done load all Concept");
+                #endregion
+
+                #region Get List Artical
+                Console.WriteLine("Start load Artical...");
+                List<Artical> lstArticals = new List<Artical>();
+                command.CommandText = $"select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                var dtArtical = _db.ExecuteReaderCommand(command, "");               
+                if(dtArtical.Rows.Count > 0)
+                {
+                    for(var i = 0; i < dtArtical.Rows.Count; i++)
+                    {
+                        lstArticals.Add(new Artical
+                        {
+                            ID = Globals.GetIDinDT(dtArtical, i, "ID"),
+                            ChapterID = Globals.GetIDinDT(dtArtical, i, "ChapterID"),
+                            ChapterItemID = Globals.GetIDinDT(dtArtical, i, "ChapterItemID"),
+                            Content = Globals.GetinDT_String(dtArtical, i, "Content")
+                        });
+                    }
+                }
+                Console.WriteLine("Done load all artical\n");
+                #endregion
+
+                //thread-safe bag for load data in multithreading
+                ConcurrentBag<ConceptMapping> dataCollection = new ConcurrentBag<ConceptMapping>();
+
+                foreach (Concept concept in lstConcepts)
+                {
+                    command.CommandText = $"select top 1 id from ConceptMapping where ConceptID = {concept.ID} and LawID = {LawID}";
+                    var checkIfMapped = _db.ExecuteReaderCommand(command, "");
+                    if(checkIfMapped.Rows.Count > 0)
+                    {
+                        continue;
+                    }
+
+                    Parallel.ForEach(lstArticals, a =>
+                    {
+                        Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping Concept {concept.Name}");
+
+                        string Normtext = a.Content;
+                        int lenghtNormtext = Normtext.Length;
+                        string tmp = Normtext.Replace(concept.Name, "");
+                        int lengthTMP = tmp.Length;
+                        int total = (Normtext.Length - tmp.Length) / concept.Name.Length;
+                        if (total > 0)
+                        {
+                            dataCollection.Add(new ConceptMapping(concept.ID,a.ID,a.ChapterID,a.ChapterItemID,0,0,LawID));
+                        }
+                    });
+                }
+
+                Console.WriteLine("Total: " + dataCollection.Count);
+                foreach (ConceptMapping concept in dataCollection)
+                {
+                    Console.WriteLine(""+concept.ID+"/"+concept.ArticalID+"/"+concept.ChapterID+"/"+concept.ChapterItemID+"/");
+                }
+
+                foreach (var data in dataCollection)
+                {
+                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID) " +
+                                          $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
+                    _db.ExecuteNonQueryCommand(command);
+                }
+                transaction.Commit();
+            } catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Xóa tất cả ConceptMapping
+        /// </summary>
+        public void DeleteAllConceptMapping()
+        {
+            try
+            {
+                _db.OpenConnection();
+                string sql = $"delete ConceptMapping where id in (select id from ConceptMapping)";
+                _db.ExecuteNonQueryCommand(sql);           
+            }catch
+            {
+                throw;
+            } finally { _db.CloseConnection(); }
+        }
+
+        /// <summary>
+        /// Xóa ConceptMapping theo ID
+        /// </summary>
+        /// <param name="ConceptID"></param>
+        public void DeleteConceptMappingByConceptID(int ConceptID)
+        {
+            try
+            {
+                _db.OpenConnection();
+
+                var checkIDConcept = _db.ExecuteReaderCommand($"Select * from Concept where id = {ConceptID}","");
+                if(checkIDConcept.Rows.Count == 0)
+                {
+                    throw new BadRequestException("ConceptID not found!", 400, 400);
+                }
+
+                string sql = $"delete ConceptMapping where id in (select id from ConceptMapping where ConceptID = {ConceptID})";
+                _db.ExecuteNonQueryCommand(sql);
+            }
+            catch
+            {
+                throw;
+            }
+            finally { _db.CloseConnection(); }
         }
     }
 }
