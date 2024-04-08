@@ -10,5 +10,7 @@ namespace LawSearch_Core.Interfaces
         KeyPhrase AddKeyPhrase(KeyPhrase keyPhrase);
         void DeleteKeyPhrase(int id);
         void GenerateKeyPhraseMapping(int LawID);
+        void DeleteAllKeyphraseMapping();
+        void DelettKeyphraseMapping(int KeyphraseID);
     }
 }

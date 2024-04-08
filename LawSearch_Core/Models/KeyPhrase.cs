@@ -32,10 +32,6 @@ namespace LawSearch_Core.Models
             NumCount = numCount;
         }
     }
-
-
-
-
     public class KeyPhrase
     {
         public int ID { get; set; }
