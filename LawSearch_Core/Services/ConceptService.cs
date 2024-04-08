@@ -225,5 +225,126 @@ namespace LawSearch_Core.Services
             } finally{ _db.CloseConnection(); }
         }
 
+        public List<ConceptKeyphrase> AddConceptKeyphrase(int concept_id, string keyphrase)
+        {
+            List<ConceptKeyphrase> lst = new();
+            int defaultLawID = 16;
+            try
+            {
+                _db.OpenConnection();
+
+                string sql = "select Name, ID, Description from concept where ID = "+concept_id;
+                DataTable ds = _db.ExecuteReaderCommand(sql, "");
+
+                if (ds.Rows.Count == 0) return lst;
+
+                sql = "select top 1 KeyPhrase.ID \r\n\tfrom KeyPhrase \r\n\twhere KeyPhrase.KeyPhrase = N'" + keyphrase.Replace(" ", "_") + "'";
+                DataTable ds1 = _db.ExecuteReaderCommand(sql, "");
+                var keyphraseID = ds1.Rows[0]["ID"];
+
+                if (keyphraseID == null) return lst;
+
+                sql = "select top 1 Concept_KeyPhrase.KeyPhraseID from Concept_KeyPhrase where Concept_KeyPhrase.KeyPhraseID = " + keyphraseID;
+                DataTable ds2 = _db.ExecuteReaderCommand(sql, "");
+                var existKeyphraseID = Globals.GetIDinDT(ds2, 0, "KeyPhraseID");
+
+                if (existKeyphraseID >= 0) return lst;
+
+                string description = Globals.GetinDT_String(ds, 0, "Description").ToLower();
+                int count = Globals.CountTerm(description, keyphrase.Replace("_", " "));
+                _db.ExecuteNonQueryCommand("exec UpdateConcept_KeyPhrase " + concept_id + "," + Convert.ToInt32(keyphraseID) + ","+ defaultLawID + "," + count);
+
+                sql = "select * from Concept_KeyPhrase where KeyPhraseID = " + keyphraseID;
+                DataTable ds3 = _db.ExecuteReaderCommand(sql, "");
+
+                if (ds3.Rows.Count == 0) return lst;
+
+                lst.Add(
+                    new ConceptKeyphrase()
+                    {
+                        ID = Globals.GetIDinDT(ds3, 0, "ID"),
+                        ConceptID = Globals.GetIDinDT(ds3, 0, "ConceptID"),
+                        KeyPhraseID = Globals.GetIDinDT(ds3, 0, "KeyPhraseID"),
+                        LawID = Globals.GetIDinDT(ds3, 0, "LawID"),
+                        Count = Globals.GetIDinDT(ds3, 0, "Count"),
+                    }
+                );
+                return lst;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
+        }
+
+        public class ConceptMapLaw
+        {
+            public int ConceptID;
+            public int LawID;
+            public int ChapterID;
+            public int ChapterItemID;
+            public int ArticalID;
+        }
+
+        public void AddConceptMapping (int keyphrase_id)
+        {
+            try
+            {
+                _db.OpenConnection();
+
+                string sql = "select DISTINCT Concept_KeyPhrase.ConceptID, KeyPhraseMapping.LawID, " +
+                    "KeyPhraseMapping.ChapterID, KeyPhraseMapping.ChapterItemID, KeyPhraseMapping.ArticalID  " +
+                    "\r\nfrom KeyPhraseMapping\r\ninner join Concept_KeyPhrase on Concept_KeyPhrase.KeyPhraseID " +
+                    "= Concept_KeyPhrase.KeyPhraseID\r\n" +
+                    "where Concept_KeyPhrase.KeyPhraseID = " + keyphrase_id + "\r\nORDER BY ConceptID ASC";
+                DataTable ds = _db.ExecuteReaderCommand(sql, ""); // [ConceptID, LawID, ChapterID, ChapterItemID, ArticalID]
+
+                if(ds.Rows.Count == 0)
+                {
+                    throw new BadRequestException("This keyphrase is created in [Concept_Keyphrase] yet", 400);
+                }
+
+                List<ConceptMapLaw> lst = new();
+
+                for (int i = 0; i < ds.Rows.Count; i++)
+                {
+                    lst.Add(new ConceptMapLaw()
+                    {
+                        ConceptID = Globals.GetIDinDT(ds, i, "ConceptID"),
+                        LawID = Globals.GetIDinDT(ds, i, "LawID"),
+                        ChapterID = Globals.GetIDinDT(ds, i, "ChapterID"),
+                        ChapterItemID = Globals.GetIDinDT(ds, i, "ChapterItemID"),
+                        ArticalID = Globals.GetIDinDT(ds, i, "ArticalID")
+                    });
+                }
+
+                foreach(var cml in lst)
+                {
+                    sql = "select * from ConceptMapping " +
+                        "where ConceptID = " + cml.ConceptID + " and LawID = " + cml.LawID + " and ChapterID = " + cml.ChapterID +
+                        " and ChapterItemID = " + cml.ChapterItemID + " and ArticalID = " + cml.ArticalID;
+                    DataTable ds1 = _db.ExecuteReaderCommand(sql, "");
+
+                    if(ds1.Rows.Count == 0)
+                    {
+                        sql = "INSERT INTO [dbo].[ConceptMapping] ([ConceptID] ,[ArticalID] ,[ChapterID] ,[ChapterItemID] ,[ClaustID] ,[PointID] ,[LawID] ,[KeyPhraseID]) " +
+                            "VALUES ("+ cml.ConceptID + ","+ cml.ArticalID + " ,"+ cml.ChapterID + " ,"+ cml.ChapterItemID + " ,0 ,0 ,"+ cml.LawID + " , NULL)";
+                        _db.ExecuteReaderCommand(sql, "");
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
+        }
     }
 }

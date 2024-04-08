@@ -1,6 +1,7 @@
 ﻿using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
+using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace LawSearch_Admin.Services
@@ -37,48 +38,64 @@ namespace LawSearch_Admin.Services
             return lst;
         }
 
-        public async Task<string> AddKeyphrase(KeyPhrase keyphrase)
+        public async Task<ResponceMessage> AddKeyphrase(String keyphraseText)
         {
-            var body = new
+            KeyPhrase k = new()
             {
-                KeyPhrase = keyphrase.Keyphrase
+                Keyphrase = keyphraseText
             };
-
-
-            var rs = await httpClient.PostAsJsonAsync($"api/KeyPhrase", body);
-
+            HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/KeyPhrase", k);
+            ResponceMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
-                return "Add success!";
+                rm.Status = true;
+                rm.Message = "Add Keyphrase Success";
+                try
+                {
+                    APIResultVM apiResponse = await rs.Content.ReadAsAsync<APIResultVM>();
+                    var a = apiResponse;
+                    if (apiResponse.Data != null)
+                    {
+                        KeyPhrase rs_k = JsonConvert.DeserializeObject<KeyPhrase>(apiResponse.Data);
+                    }
+                } catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
             else
             {
                 var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                
                 if (resultPost != null && resultPost.Message != null)
                 {
-                    return resultPost.Message.ToString();
+                    rm.Message = "Add Keyphrase Failed";
+                    rm.Error = resultPost.Message.ToString();
                 }
+
             }
-            return "An unknown error"; //Lỗi do logic bị sai
+            return rm;
         }
 
-        public async Task<string> DeleteKeyphrase(int id)
+        public async Task<ResponceMessage> DeleteKeyphrase(int id)
         {
             var rs = await httpClient.DeleteAsync($"api/KeyPhrase?id=" + id);
-
+            ResponceMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
-                return "Delete success!";
+                rm.Status = true;
+                rm.Message = "Delete KeyPhrase Success";
             }
             else
             {
                 var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
-                    return resultPost.Message.ToString();
+                    rm.Message = "Delete Keyphrase Failed";
+                    rm.Error = resultPost.Message.ToString();
                 }
             }
-            return "An unknown error"; //Lỗi do logic bị sai
+            return rm;
         }
 
     }

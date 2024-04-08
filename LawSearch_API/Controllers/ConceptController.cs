@@ -77,5 +77,34 @@ namespace LawSearch_API.Controllers
             APIResult rs = new();
             return rs.MessageSuccess("Generate success!");
         }
+
+        public class dataConceptKeyphrase
+        {
+            public int conceptid;
+            public string keyphrase = "";
+        }
+
+        [HttpPost("[action]")]
+        public APIResult AddConceptKeyphrase([FromBody] dataConceptKeyphrase d)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            List<ConceptKeyphrase> lst = _conceptService.AddConceptKeyphrase(d.conceptid, d.keyphrase);
+            APIResult rs = new();
+            return rs.Success(lst);
+        }
+
+        public class dataConceptMapping
+        {
+            public int keyphraseid;
+        }
+
+        [HttpPost("[action]")]
+        public APIResult AddConceptMapping([FromBody] dataConceptMapping d)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.AddConceptMapping(d.keyphraseid);
+            APIResult rs = new();
+            return rs.Success();
+        }
     }
 }

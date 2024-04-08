@@ -1,4 +1,5 @@
-﻿using LawSearch_Core.Models;
+﻿using LawSearch_Admin.ViewModels;
+using LawSearch_Core.Models;
 
 namespace LawSearch_Admin.Interfaces
 {
@@ -8,9 +9,9 @@ namespace LawSearch_Admin.Interfaces
 
         Task<List<KeyPhraseRelate>> GetKeyPhraseRelates(int id);
 
-        Task<string> AddKeyphrase(KeyPhrase keyphrase);
+        Task<ResponceMessage> AddKeyphrase(String keyphrase);
 
-        Task<string> DeleteKeyphrase(int id);
+        Task<ResponceMessage> DeleteKeyphrase(int id);
 
     }
 }
