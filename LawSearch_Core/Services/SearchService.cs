@@ -46,7 +46,6 @@ namespace LawSearch_Core.Services
                 }
                 #endregion
 
-                //Loại bỏ dấu gạch giữa mỗi keyphrase
                 foreach (var item in lstKeyPhrases_Searched)
                 {
                     item.Count = Globals.CountTerm(searchInput, item.Key.Replace("_", " "));

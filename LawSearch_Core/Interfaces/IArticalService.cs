@@ -12,5 +12,6 @@ namespace LawSearch_Core.Interfaces
     {
         List<Artical> GetAllArtical();
         List<Artical> GetListArticalByLawID(int lawID);
+        Task GenerateKeyPhrase();
     }
 }

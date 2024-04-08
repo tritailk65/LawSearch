@@ -32,7 +32,7 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpGet("[action]")]
-        public APIResult GetKeyPhraseRelate([BindRequired]int ID)
+        public APIResult GetKeyPhraseRelate([BindRequired] int ID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             List<KeyPhraseRelate> dtResult = keyPhraseService.GetKeyPhraseRelateDetailsByID(ID);
@@ -51,11 +51,38 @@ namespace LawSearch_API.Controllers
 
         [HttpDelete]
         public APIResult DeleteKeyPhrase([BindRequired] int id)
-        { 
+        {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             keyPhraseService.DeleteKeyPhrase(id);
             APIResult result = new APIResult();
             return result.MessageSuccess("Xóa keyphrase thành công!");
+        }
+
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyphraseMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.GenerateKeyPhraseMapping(LawID);
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Generate keyphrase success!");
+        }
+
+        [HttpDelete("[action]")]
+        public APIResult DeleteAllMapping()
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.DeleteAllKeyphraseMapping();
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Delete all KeyphraseMapping success!");
+        }
+
+        [HttpDelete("[action]")]
+        public APIResult DeleteMapping([BindRequired] int KeyphraseID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.DelettKeyphraseMapping(KeyphraseID);
+            APIResult result = new APIResult();
+            return result.MessageSuccess($"Delete mapping KeyphraseID: {KeyphraseID} success!");
         }
     }
 }

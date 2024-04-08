@@ -67,7 +67,16 @@ namespace LawSearch_Admin.ViewModels
         public class ClauseVM
         {
             public int ID { get; set; }
+            public int ArticalID { get; set; }
+            public string Content { get; set; }
+        }
 
+        public class Point
+        {
+            public int ID { get; set; }
+            public int ClauseID { get; set; }
+            public string Content { get; set; }
+            public string Name { get; set; }
         }
     }
 }

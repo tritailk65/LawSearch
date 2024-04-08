@@ -39,5 +39,14 @@ namespace BlazorAppAPI.Controllers
             APIResult rs = new APIResult();
             return rs.Success(dtResult);
         }
+
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyphrase()
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _articalService.GenerateKeyPhrase();
+            APIResult rs = new APIResult();
+            return rs.MessageSuccess("Generate success!");
+        }
     }
 }

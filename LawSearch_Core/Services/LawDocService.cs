@@ -424,5 +424,54 @@ namespace LawSearch_Core.Services
                 connection.Close();
             }
         }
+
+        public void AddLawHTML(int LawID, string ContentHTML)
+        {
+            try
+            {
+                db.OpenConnection();
+
+                var checkLawID = db.ExecuteReaderCommand($"select * from Law where id = {LawID}", "");            
+                if(checkLawID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found!", 400, 400);
+                }
+                string sql = $"  insert into LawHTML(LawID,ContentHTML)\r\n  values ({LawID},N'{ContentHTML}')";
+                db.ExecuteNonQueryCommand(sql);
+            }
+            catch
+            {
+                throw;
+            } finally
+            {
+                db.CloseConnection();
+            }
+        }
+
+        public void UpdateLawHTML(int LawID, string ContentHTML)
+        {
+            try
+            {
+                db.OpenConnection();
+
+                var checkLawID = db.ExecuteReaderCommand($"select * from Law where id = {LawID}", "");
+                if (checkLawID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found!", 400, 400);
+                }
+                string sql = $"update LawHTML " +
+                            $" set ContentHTML = N'{ContentHTML}' " +
+                            $" where LawID = {LawID}";
+                db.ExecuteNonQueryCommand(sql);
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                db.CloseConnection();
+            }
+        }
     }
 }
