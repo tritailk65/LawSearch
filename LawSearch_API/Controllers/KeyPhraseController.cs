@@ -80,7 +80,7 @@ namespace LawSearch_API.Controllers
         public APIResult DeleteMapping([BindRequired] int KeyphraseID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            keyPhraseService.DelettKeyphraseMapping(KeyphraseID);
+            keyPhraseService.DeleteKeyphraseMapping(KeyphraseID);
             APIResult result = new APIResult();
             return result.MessageSuccess($"Delete mapping KeyphraseID: {KeyphraseID} success!");
         }

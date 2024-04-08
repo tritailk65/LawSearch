@@ -378,6 +378,14 @@ namespace LawSearch_Core.Services
                     }
                 }
             }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
         }
 
         /// <summary>

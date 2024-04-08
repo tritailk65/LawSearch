@@ -208,6 +208,7 @@ namespace LawSearch_Core.Services
                 Console.WriteLine("Done load all artical\n");
                 #endregion
 
+                //thread-safe bag for load data in multithreading
                 ConcurrentBag<KeyphraseMapping> dataCollection = new ConcurrentBag<KeyphraseMapping>();
 
                 foreach (var keyPhrase in keyPhrases)
@@ -344,7 +345,7 @@ namespace LawSearch_Core.Services
         /// Xóa KeyphraseMapping theo KeyphraseID
         /// </summary>
         /// <param name="KeyphraseID"></param>
-        public void DelettKeyphraseMapping(int KeyphraseID)
+        public void DeleteKeyphraseMapping(int KeyphraseID)
         {
             try
             {
