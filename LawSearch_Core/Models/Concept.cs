@@ -20,6 +20,12 @@ namespace LawSearch_Core.Models
         public double distance;
     }
 
+    public class AddConceptKeyphrase
+    {
+        public int ConceptID { get; set; }
+        public string Keyphrase { get; set; }
+    }
+
     public class ConceptMapping
     {
         public int ID { get; set; }

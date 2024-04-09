@@ -57,32 +57,5 @@ namespace LawSearch_API.Controllers
             APIResult result = new APIResult();
             return result.MessageSuccess("Xóa keyphrase thành công!");
         }
-
-        [HttpPost("[action]")]
-        public APIResult GenerateKeyphraseMapping([BindRequired] int LawID)
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            keyPhraseService.GenerateKeyPhraseMapping(LawID);
-            APIResult result = new APIResult();
-            return result.MessageSuccess("Generate keyphrase success!");
-        }
-
-        [HttpDelete("[action]")]
-        public APIResult DeleteAllMapping()
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            keyPhraseService.DeleteAllKeyphraseMapping();
-            APIResult result = new APIResult();
-            return result.MessageSuccess("Delete all KeyphraseMapping success!");
-        }
-
-        [HttpDelete("[action]")]
-        public APIResult DeleteMapping([BindRequired] int KeyphraseID)
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            keyPhraseService.DeleteKeyphraseMapping(KeyphraseID);
-            APIResult result = new APIResult();
-            return result.MessageSuccess($"Delete mapping KeyphraseID: {KeyphraseID} success!");
-        }
     }
 }

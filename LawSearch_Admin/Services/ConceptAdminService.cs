@@ -144,12 +144,13 @@ namespace LawSearch_Admin.Services
         {
             ResponceMessage rm = new();
 
-            var body = new
-            {
-                conceptid = conceptid,
-                keyphrase = keyphrase
-            };
-            var rs = await httpClient.PostAsJsonAsync($"/api/Concept/AddConceptKeyphrase", body);
+            var formContent = new FormUrlEncodedContent(new[]
+{
+                new KeyValuePair<string, string>("ConceptID", conceptid.ToString()),
+                new KeyValuePair<string, string>("Keyphrase",keyphrase)
+            });
+
+            var rs = await httpClient.PostAsync($"api/Concept/AddConceptKeyphrase", formContent);
 
             if (rs.IsSuccessStatusCode)
             {

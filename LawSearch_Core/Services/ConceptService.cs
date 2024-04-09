@@ -201,11 +201,11 @@ namespace LawSearch_Core.Services
         }
 
         /// <summary>
-        /// Hàm tự sinh ConceptKeyphrase
+        /// Hàm tự sinh keyphrase cơ bản từ Description trích xuất từ PhoBERT
         /// </summary>
         /// <param name="lawID">ID văn bản luật</param>
         /// <returns></returns>
-        public async Task GenerateKeyPhrase(int lawID)
+        public async Task GenerateKeyphraseDescript(int lawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -266,134 +266,12 @@ namespace LawSearch_Core.Services
             } finally{ _db.CloseConnection(); }
         }
 
-        public List<ConceptKeyphrase> AddConceptKeyphrase(int concept_id, string keyphrase)
-        {
-            List<ConceptKeyphrase> lst = new();
-            int defaultLawID = 16;
-            try
-            {
-                _db.OpenConnection();
-
-                string sql = "select Name, ID, Description from concept where ID = "+concept_id;
-                DataTable ds = _db.ExecuteReaderCommand(sql, "");
-
-                if (ds.Rows.Count == 0) return lst;
-
-                sql = "select top 1 KeyPhrase.ID \r\n\tfrom KeyPhrase \r\n\twhere KeyPhrase.KeyPhrase = N'" + keyphrase.Replace(" ", "_") + "'";
-                DataTable ds1 = _db.ExecuteReaderCommand(sql, "");
-                var keyphraseID = ds1.Rows[0]["ID"];
-
-                if (keyphraseID == null) return lst;
-
-                sql = "select top 1 Concept_KeyPhrase.KeyPhraseID from Concept_KeyPhrase where Concept_KeyPhrase.KeyPhraseID = " + keyphraseID;
-                DataTable ds2 = _db.ExecuteReaderCommand(sql, "");
-                var existKeyphraseID = Globals.GetIDinDT(ds2, 0, "KeyPhraseID");
-
-                if (existKeyphraseID >= 0) return lst;
-
-                string description = Globals.GetinDT_String(ds, 0, "Description").ToLower();
-                int count = Globals.CountTerm(description, keyphrase.Replace("_", " "));
-                _db.ExecuteNonQueryCommand("exec UpdateConcept_KeyPhrase " + concept_id + "," + Convert.ToInt32(keyphraseID) + ","+ defaultLawID + "," + count);
-
-                sql = "select * from Concept_KeyPhrase where KeyPhraseID = " + keyphraseID;
-                DataTable ds3 = _db.ExecuteReaderCommand(sql, "");
-
-                if (ds3.Rows.Count == 0) return lst;
-
-                lst.Add(
-                    new ConceptKeyphrase()
-                    {
-                        ID = Globals.GetIDinDT(ds3, 0, "ID"),
-                        ConceptID = Globals.GetIDinDT(ds3, 0, "ConceptID"),
-                        KeyPhraseID = Globals.GetIDinDT(ds3, 0, "KeyPhraseID"),
-                        LawID = Globals.GetIDinDT(ds3, 0, "LawID"),
-                        Count = Globals.GetIDinDT(ds3, 0, "Count"),
-                    }
-                );
-                return lst;
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                _db.CloseConnection();
-            }
-        }
-
-        public class ConceptMapLaw
-        {
-            public int ConceptID;
-            public int LawID;
-            public int ChapterID;
-            public int ChapterItemID;
-            public int ArticalID;
-        }
-
-        public void AddConceptMapping (int keyphrase_id)
-        {
-            try
-            {
-                _db.OpenConnection();
-
-                string sql = "select DISTINCT Concept_KeyPhrase.ConceptID, KeyPhraseMapping.LawID, " +
-                    "KeyPhraseMapping.ChapterID, KeyPhraseMapping.ChapterItemID, KeyPhraseMapping.ArticalID  " +
-                    "\r\nfrom KeyPhraseMapping\r\ninner join Concept_KeyPhrase on Concept_KeyPhrase.KeyPhraseID " +
-                    "= Concept_KeyPhrase.KeyPhraseID\r\n" +
-                    "where Concept_KeyPhrase.KeyPhraseID = " + keyphrase_id + "\r\nORDER BY ConceptID ASC";
-                DataTable ds = _db.ExecuteReaderCommand(sql, ""); // [ConceptID, LawID, ChapterID, ChapterItemID, ArticalID]
-
-                if(ds.Rows.Count == 0)
-                {
-                    throw new BadRequestException("This keyphrase is created in [Concept_Keyphrase] yet", 400);
-                }
-
-                List<ConceptMapLaw> lst = new();
-
-                for (int i = 0; i < ds.Rows.Count; i++)
-                {
-                    lst.Add(new ConceptMapLaw()
-                    {
-                        ConceptID = Globals.GetIDinDT(ds, i, "ConceptID"),
-                        LawID = Globals.GetIDinDT(ds, i, "LawID"),
-                        ChapterID = Globals.GetIDinDT(ds, i, "ChapterID"),
-                        ChapterItemID = Globals.GetIDinDT(ds, i, "ChapterItemID"),
-                        ArticalID = Globals.GetIDinDT(ds, i, "ArticalID")
-                    });
-                }
-
-                foreach(var cml in lst)
-                {
-                    sql = "select * from ConceptMapping " +
-                        "where ConceptID = " + cml.ConceptID + " and LawID = " + cml.LawID + " and ChapterID = " + cml.ChapterID +
-                        " and ChapterItemID = " + cml.ChapterItemID + " and ArticalID = " + cml.ArticalID;
-                    DataTable ds1 = _db.ExecuteReaderCommand(sql, "");
-
-                    if(ds1.Rows.Count == 0)
-                    {
-                        sql = "INSERT INTO [dbo].[ConceptMapping] ([ConceptID] ,[ArticalID] ,[ChapterID] ,[ChapterItemID] ,[ClaustID] ,[PointID] ,[LawID] ,[KeyPhraseID]) " +
-                            "VALUES ("+ cml.ConceptID + ","+ cml.ArticalID + " ,"+ cml.ChapterID + " ,"+ cml.ChapterItemID + " ,0 ,0 ,"+ cml.LawID + " , NULL)";
-                        _db.ExecuteReaderCommand(sql, "");
-                    }
-                }
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                _db.CloseConnection();
-            }
-        }
-
         /// <summary>
-        /// Hàm tự sinh ConceptMapping (Multithreading task)
+        /// Hàm tự sinh ConceptMapping từ tên Concept
         /// </summary>
         /// <param name="LawID">ID văn bản luật</param>
         /// <exception cref="BadRequestException"></exception>
-        public void GenerateConceptMapping(int LawID)
+        public void GenerateMappingFromName(int LawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -444,7 +322,7 @@ namespace LawSearch_Core.Services
                 #region Get List Artical
                 Console.WriteLine("Start load Artical...");
                 List<Artical> lstArticals = new List<Artical>();
-                command.CommandText = $"select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                command.CommandText = $"select Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
                 var dtArtical = _db.ExecuteReaderCommand(command, "");               
                 if(dtArtical.Rows.Count > 0)
                 {
@@ -469,7 +347,7 @@ namespace LawSearch_Core.Services
                 {
                     command.CommandText = $"select top 1 id from ConceptMapping where ConceptID = {concept.ID} and LawID = {LawID}";
                     var checkIfMapped = _db.ExecuteReaderCommand(command, "");
-                    if(checkIfMapped.Rows.Count > 0)
+                    if (checkIfMapped.Rows.Count > 0)
                     {
                         continue;
                     }
@@ -485,7 +363,7 @@ namespace LawSearch_Core.Services
                         int total = (Normtext.Length - tmp.Length) / concept.Name.Length;
                         if (total > 0)
                         {
-                            dataCollection.Add(new ConceptMapping(concept.ID,a.ID,a.ChapterID,a.ChapterItemID,0,0,LawID));
+                            dataCollection.Add(new ConceptMapping(concept.ID, a.ID, a.ChapterID, a.ChapterItemID, 0, 0, LawID));
                         }
                     });
                 }
@@ -493,12 +371,12 @@ namespace LawSearch_Core.Services
                 Console.WriteLine("Total: " + dataCollection.Count);
                 foreach (ConceptMapping concept in dataCollection)
                 {
-                    Console.WriteLine(""+concept.ID+"/"+concept.ArticalID+"/"+concept.ChapterID+"/"+concept.ChapterItemID+"/");
+                    Console.WriteLine("" + concept.ID + "/" + concept.ArticalID + "/" + concept.ChapterID + "/" + concept.ChapterItemID + "/");
                 }
 
                 foreach (var data in dataCollection)
                 {
-                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID) " +
+                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID ) " +
                                           $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
                     _db.ExecuteNonQueryCommand(command);
                 }
@@ -515,45 +393,193 @@ namespace LawSearch_Core.Services
         }
 
         /// <summary>
-        /// Xóa tất cả ConceptMapping
-        /// </summary>
-        public void DeleteAllConceptMapping()
-        {
-            try
-            {
-                _db.OpenConnection();
-                string sql = $"delete ConceptMapping where id in (select id from ConceptMapping)";
-                _db.ExecuteNonQueryCommand(sql);           
-            }catch
-            {
-                throw;
-            } finally { _db.CloseConnection(); }
-        }
-
-        /// <summary>
-        /// Xóa ConceptMapping theo ID
+        /// Add keyphrase, add concept_keyphrase, auto generate keyphrasemapping and conceptmapping
         /// </summary>
         /// <param name="ConceptID"></param>
-        public void DeleteConceptMappingByConceptID(int ConceptID)
+        /// <param name="Keyphrase"></param>
+        /// <exception cref="BadRequestException"></exception>
+        public void AddConceptKeyphrase(int ConceptID, string Keyphrase)
         {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
             try
             {
-                _db.OpenConnection();
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
 
-                var checkIDConcept = _db.ExecuteReaderCommand($"Select * from Concept where id = {ConceptID}","");
-                if(checkIDConcept.Rows.Count == 0)
+            try
+            {
+                int LawID = 16;
+
+                //Check ID concept 
+                command.CommandText = $"select * from concept where id = {ConceptID}";
+                var checkConceptID = _db.ExecuteReaderCommand(command, "");
+                if (checkConceptID.Rows.Count == 0)
                 {
                     throw new BadRequestException("ConceptID not found!", 400, 400);
                 }
 
-                string sql = $"delete ConceptMapping where id in (select id from ConceptMapping where ConceptID = {ConceptID})";
-                _db.ExecuteNonQueryCommand(sql);
+                string key = Keyphrase.Replace(" ", "_").ToLower();
+                command.CommandText = $"select * from keyphrase where keyphrase like N'{key}'";
+                var checkKeyphrase = _db.ExecuteReaderCommand(command, "");
+                if(checkKeyphrase.Rows.Count > 0)
+                {
+                    throw new BadRequestException("Keyphrase đã tồn tại !", 400, 400);
+                }
+
+                #region Step 1: Add KeyPhrase
+                if (Keyphrase == null || Keyphrase == "")
+                {
+                    throw new BadRequestException("KeyPhrase is null or empty", 400, 400);
+                }
+                command.CommandText = string.Format("exec GetKeyPhrase N'{0}'", Keyphrase);
+                int id = _db.ExecuteScalarCommand<int>(command);
+
+                command.CommandText = $"select * from [KeyPhrase] where id = {id}";
+                DataTable dt = _db.ExecuteReaderCommand(command, "");
+                KeyPhrase rsAddKeyphrase = new KeyPhrase
+                {
+                    ID = Globals.GetIDinDT(dt, 0, "ID"),
+                    Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
+                    NumberArtical = Globals.GetIDinDT(dt, 0, "NumberArtical"),
+                    KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
+                    LawID = Globals.GetIDinDT(dt, 0, "LawID")
+                };
+                #endregion
+
+                #region Step 2: Add ConceptKeyphrase
+                command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, 16, 1";
+                _db.ExecuteNonQueryCommand(command);
+                #endregion
+
+                #region Step 3: Generate KeyphraseMapping and ConceptMapping
+
+                #region Get List Artical
+                List<Artical> lstArtical = new List<Artical>();
+                command.CommandText = $"select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                Console.WriteLine("Start load all artical...\n");
+                var dtArticals = _db.ExecuteReaderCommand(command, "");
+                for (var i = 0; i < dtArticals.Rows.Count; i++)
+                {
+                    lstArtical.Add(new Artical
+                    {
+                        ID = Globals.GetIDinDT(dtArticals, i, "ID"),
+                        ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
+                        ChapterItemID = Globals.GetIDinDT(dtArticals, i, "ChapterItemID"),
+                        Content = Globals.GetinDT_String(dtArticals, i, "Content")
+                    });
+                }
+                Console.WriteLine("Done load all artical\n");
+                #endregion
+
+                ConcurrentBag<KeyphraseMapping> dataCollection = new ConcurrentBag<KeyphraseMapping>();
+
+                Parallel.ForEach(lstArtical, a =>
+                {
+                    Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping keyphrase {rsAddKeyphrase.KeyNorm}");
+
+                    string Normtext = a.Content;
+                    int lenghtNormtext = Normtext.Length;
+                    string tmp = Normtext.Replace(rsAddKeyphrase.KeyNorm, "");
+                    int lengthTMP = tmp.Length;
+                    int total = (Normtext.Length - tmp.Length) / rsAddKeyphrase.KeyNorm.Length;
+                    if (total > 0)
+                    {
+                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total));
+                    }
+                });
+
+                Console.WriteLine("Total: " + dataCollection.Count);
+
+                foreach (var data in dataCollection)
+                {
+                    command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
+                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount})";
+                    _db.ExecuteNonQueryCommand(command);
+
+                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID, KeyphraseID) " +
+                                          $"values ({ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0, {rsAddKeyphrase.ID})";
+                    _db.ExecuteNonQueryCommand(command);
+                }
+                #endregion
+
+                transaction.Commit();
             }
             catch
             {
+                transaction.Rollback();
                 throw;
             }
-            finally { _db.CloseConnection(); }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Delete ConceptKephrase, Keyphrase, KeyphraseMapping, ConceptMapping theo KeyphraseID
+        /// </summary>
+        /// <param name="KeyphraseID"></param>
+        /// <exception cref="BadRequestException"></exception>
+        public void DeleteConceptKeyphrase(int KeyphraseID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check KeyphraseID
+                command.CommandText = $"Select * from Keyphrase where id = {KeyphraseID}";
+                var checkKeyphraseID = _db.ExecuteReaderCommand(command,"");
+                if(checkKeyphraseID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("KeyphraseID not found!", 400, 400);
+                }
+
+                command.CommandText = $"delete Keyphrase where id = {KeyphraseID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                command.CommandText = $"delete Concept_Keyphrase where keyphraseID = {KeyphraseID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                command.CommandText = $"delete KeyphraseMapping where keyphraseID = {KeyphraseID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                command.CommandText = $"delete ConceptMapping where keyphraseID = {KeyphraseID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            } finally
+            {
+                connection.Close(); 
+            }
         }
     }
 }

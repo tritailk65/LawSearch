@@ -15,11 +15,11 @@ namespace LawSearch_Admin.Services
             this.httpClient = httpClient;
         }
 
-        public async Task<List<ArticalResult>> GetResultSearchLaw(string input)
+        public async Task<SearchResult> GetResultSearchLaw(string input)
         {
-            List<ArticalResult> lst = new List<ArticalResult>();
+            SearchResult lst = new SearchResult();
 
-            var rs = await httpClient.GetFromJsonAsync<APIResultVM<ArticalResult>>($"api/Search?input={input}");
+            var rs = await httpClient.GetFromJsonAsync<APIResultSingleVM<SearchResult>>($"api/Search?input={input}");
 
             if (rs != null && rs.Status == 200 && rs.Data != null)
             {

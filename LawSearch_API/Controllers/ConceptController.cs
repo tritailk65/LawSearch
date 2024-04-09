@@ -70,68 +70,39 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpPost("[action]")]
-        public APIResult GenerateKeyPhrase([BindRequired] int lawID)
+        public APIResult GenerateKeyphraseDescript([BindRequired] int lawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateKeyPhrase(lawID);
+            _conceptService.GenerateKeyphraseDescript(lawID);
             APIResult rs = new();
             return rs.MessageSuccess("Generate ConceptKeyphrase success!");
         }
 
         [HttpPost("[action]")]
-        public APIResult GenerateConceptMapping([BindRequired] int LawID)
+        public APIResult GenerateMappingFromName([BindRequired] int LawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateConceptMapping(LawID);
+            _conceptService.GenerateMappingFromName(LawID);
             APIResult rs = new();
-            return rs.MessageSuccess("Generate ConceptMapping success!");
+            return rs.MessageSuccess("Generate ConceptMapping from name success!");
         }
 
         [HttpDelete("[action]")]
-        public APIResult DeleteAllMapping()
+        public APIResult DeleteConceptKeyphrase([BindRequired] int KeyphraseID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.DeleteAllConceptMapping();
+            _conceptService.DeleteConceptKeyphrase(KeyphraseID);
             APIResult rs = new();
-            return rs.MessageSuccess("Delete all ConceptMapping success!");
-        }
-
-        [HttpDelete("[action]")]
-        public APIResult DeleteMapping([BindRequired] int ConceptID)
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.DeleteConceptMappingByConceptID(ConceptID);
-            APIResult rs = new();
-            return rs.MessageSuccess($"Delete mapping ConcetID: {ConceptID} success!");
-        }
-
-        public class dataConceptKeyphrase
-        {
-            public int conceptid;
-            public string keyphrase = "";
+            return rs.MessageSuccess("Delete ConceptKeyphrase success!");
         }
 
         [HttpPost("[action]")]
-        public APIResult AddConceptKeyphrase([FromBody] dataConceptKeyphrase d)
+        public APIResult AddConceptKeyphrase([FromForm] AddConceptKeyphrase addConceptKeyphrase)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            List<ConceptKeyphrase> lst = _conceptService.AddConceptKeyphrase(d.conceptid, d.keyphrase);
+             _conceptService.AddConceptKeyphrase(addConceptKeyphrase.ConceptID, addConceptKeyphrase.Keyphrase);
             APIResult rs = new();
-            return rs.Success(lst);
-        }
-
-        public class dataConceptMapping
-        {
-            public int keyphraseid;
-        }
-
-        [HttpPost("[action]")]
-        public APIResult AddConceptMapping([FromBody] dataConceptMapping d)
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.AddConceptMapping(d.keyphraseid);
-            APIResult rs = new();
-            return rs.Success();
+            return rs.MessageSuccess("Add success !");
         }
     }
 }

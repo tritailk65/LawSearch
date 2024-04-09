@@ -460,22 +460,14 @@
 
     public async Task AddNewKeyphrase()
     {
-        // Step 1 - Add [Keyphrase]
-        ResponceMessage rs = await keyphraseAS.AddKeyphrase(new_keyphrase);
-        if(rs != null)
+        // Đã gộp lại thành một api
+        ResponceMessage rs = new();
+
+        if (new_keyphrase != null && SelectedConcept != null)
         {
-            if (rs.Status)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", rs.Message);
-            } else 
-            {
-                await JsRuntime.InvokeVoidAsync("alert", rs.Error);
-                return;
-            }
+            rs = await conceptAS.AddConceptKeyphrase(SelectedConcept.ID, new_keyphrase);
         }
-        // Step 2 - Add [ConceptKeyphrase]
-        if (SelectedConcept == null) return;
-        rs = await conceptAS.AddConceptKeyphrase(SelectedConcept.ID, new_keyphrase);
+
         if (rs != null)
         {
             if (rs.Status)
