@@ -19,7 +19,7 @@ namespace LawSearch_Core.Services
             _db = db;
         }
 
-        public List<ArticalResult> SearchLawByText(string searchInput)
+        public SearchResult SearchLawByText(string searchInput)
         {
             try
             {
@@ -105,11 +105,32 @@ namespace LawSearch_Core.Services
                         Content = item.Content,
                         LawName = item.LawName,
                         ID = item.ID,
-                        Distance = item.distance
+                        Distance = item.distance,
                     });
                 }
 
-                return aRS;
+                List<Concept> cRS = new List<Concept>();             
+                foreach(var item in rs.lstConcepts)
+                {
+                    Concept concept = new Concept();
+                    var dt = _db.ExecuteReaderCommand("select * from concept where id = " + item.ID, "");
+                    if(dt.Rows.Count > 0)
+                    {
+                        concept = new Concept
+                        {
+                            ID = Globals.GetIDinDT(dt,0,"ID"),
+                            Name = Globals.GetinDT_String(dt,0,"Name")
+                        };
+                        cRS.Add(concept);
+                    }
+                }
+
+                SearchResult sr = new SearchResult();
+                sr.keyphraseSearch = rs.KeyPhrases;
+                sr.conceptTop = cRS;
+                sr.articalResults = aRS;
+
+                return sr;
 
             } catch
             {

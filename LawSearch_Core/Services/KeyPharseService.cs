@@ -87,19 +87,46 @@ namespace LawSearch_Core.Services
 
         public KeyPhrase AddKeyPhrase(KeyPhrase keyPhrase)
         {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
             try
             {
-                _db.OpenConnection();
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
 
+            try
+            {
+                int LawID = 16; //Default
+
+                //Check input
                 if (keyPhrase.Keyphrase == null || keyPhrase.Keyphrase == "")
                 {
                     throw new BadRequestException("KeyPhrase không được bỏ trống", 400, 400);
                 }
-                string sql = string.Format("exec GetKeyPhrase N'{0}'", keyPhrase.Keyphrase);
-                int id = _db.ExecuteScalarCommand<int>(sql);
 
-                DataTable dt = _db.ExecuteReaderCommand("select * from [KeyPhrase] where id = "+id, "");
-                KeyPhrase rs = new KeyPhrase
+                command.CommandText = $"select * from keyphrase where keyphrase = {keyPhrase.Keyphrase}";
+                var checkKeyphrase = _db.ExecuteReaderCommand(command, "");
+                if (checkKeyphrase.Rows.Count > 0)
+                {
+                    throw new BadRequestException("Keyphrase đã tồn tại!", 400, 400);
+                }
+
+                #region Step 1: Add Keyphrase
+                command.CommandText = string.Format("exec GetKeyPhrase N'{0}'", keyPhrase.Keyphrase);
+                int id = _db.ExecuteScalarCommand<int>(command);
+
+                command.CommandText = $"select * from [KeyPhrase] where id = {id}";
+                DataTable dt = _db.ExecuteReaderCommand(command, "");
+                KeyPhrase rsAddKeyphrase = new KeyPhrase
                 {
                     ID = Globals.GetIDinDT(dt, 0, "ID"),
                     Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
@@ -107,43 +134,121 @@ namespace LawSearch_Core.Services
                     KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
                     LawID = Globals.GetIDinDT(dt, 0, "LawID")
                 };
+                #endregion
 
-                return rs;
+                #region Step 2: Mapping Keyphrase
+
+                #region Get List Artical
+                List<Artical> lstArtical = new List<Artical>();
+                command.CommandText = "select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = " + LawID;
+                Console.WriteLine("Start load all artical...\n");
+                var dtArticals = _db.ExecuteReaderCommand(command, "");
+                for (var i = 0; i < dtArticals.Rows.Count; i++)
+                {
+                    lstArtical.Add(new Artical
+                    {
+                        ID = Globals.GetIDinDT(dtArticals, i, "ID"),
+                        ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
+                        ChapterItemID = Globals.GetIDinDT(dtArticals, i, "ChapterItemID"),
+                        Content = Globals.GetinDT_String(dtArticals, i, "Content")
+                    });
+                }
+                Console.WriteLine("Done load all artical\n");
+                #endregion
+
+                //thread-safe bag for load data in multithreading
+                ConcurrentBag<KeyphraseMapping> dataCollection = new ConcurrentBag<KeyphraseMapping>();
+
+                Parallel.ForEach(lstArtical, a =>
+                {
+                    Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping keyphrase {rsAddKeyphrase.KeyNorm}");
+
+                    string Normtext = a.Content;
+                    int lenghtNormtext = Normtext.Length;
+                    string tmp = Normtext.Replace(rsAddKeyphrase.KeyNorm, "");
+                    int lengthTMP = tmp.Length;
+                    int total = (Normtext.Length - tmp.Length) / rsAddKeyphrase.KeyNorm.Length;
+                    if (total > 0)
+                    {
+                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total));
+                    }
+                });
+
+                Console.WriteLine("Total: " + dataCollection.Count);
+
+                foreach (var data in dataCollection)
+                {
+                    command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
+                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, {data.NumCount})";
+                    _db.ExecuteNonQueryCommand(command);
+                }
+
+                #endregion
+
+                transaction.Commit();
+
+                return rsAddKeyphrase;
+
             } catch
             {
+                transaction.Rollback();
                 throw;
             }
             finally
             {
-                _db.CloseConnection();
+                connection.Close();
             }
         }
 
         public void DeleteKeyPhrase(int id)
         {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
             try
             {
-                _db.OpenConnection();
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
 
+            try
+            {
                 //Check ID
-                var checkID = _db.ExecuteReaderCommand("Select * from keyphrase where id = " + id, "");
+                command.CommandText = $"Select * from keyphrase where id = {id}";
+                var checkID = _db.ExecuteReaderCommand(command, "");
                 if (checkID.Rows.Count == 0 )
                 {
                     throw new BadRequestException("Không tìm thấy ID Keyphrase !", 400, 400);
                 }
-                string sql = "exec DeleteKeyPhrase N'" + Globals.GetinDT_String(checkID,0,"KeyPhrase") + "'";
-                _db.ExecuteNonQueryCommand(sql);
+
+                //Delete key
+                command.CommandText = $"exec DeleteKeyPhrase N'{Globals.GetinDT_String(checkID, 0, "KeyPhrase")}'";
+                _db.ExecuteNonQueryCommand(command);
+
+                //Delete mapping
+                command.CommandText = $"delete KeyphraseMapping where KeyphraseID = {id}";
+                _db.ExecuteNonQueryCommand(command);
+
+                transaction.Commit();
 
             } catch
             {
+                transaction.Rollback() ; 
                 throw;
             } finally
             {
-                _db.CloseConnection(); 
+                connection.Close() ;
             }
         }
 
-        public void GenerateKeyPhraseMapping(int LawID)
+        /*public void GenerateKeyPhraseMapping(int LawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -174,7 +279,7 @@ namespace LawSearch_Core.Services
 
                 #region Get List KeyPhrase
                 List<KeyPhrase> keyPhrases = new List<KeyPhrase>();               
-                command.CommandText = "Select * from keyphrase where id <= 1543  ";
+                command.CommandText = "Select * from keyphrase";
                 var dtKeyPhrase = _db.ExecuteReaderCommand(command,"");
                 if(dtKeyPhrase.Rows.Count > 0)
                 {
@@ -244,73 +349,6 @@ namespace LawSearch_Core.Services
                     _db.ExecuteNonQueryCommand(command);
                 }
 
-
-                /*  #region Tested
-                    int KeyID = generateKeyphrase.KeyID;
-                    int LawID = generateKeyphrase.LawID;
-
-                    command.CommandText = $"select top 1 ID from KeyPhraseMapping where KeyPhraseID = {KeyID} and LawID = {LawID}";
-                    var checkIfKeyMapped = _db.ExecuteReaderCommand(command, "");
-                    if(checkIfKeyMapped.Rows.Count > 0)
-                    {
-                        return;
-                    }
-
-                    #region Get Keyphrase
-                    KeyPhrase keyphrase = new KeyPhrase();
-
-                    command.CommandText = "select * from Keyphrase where id = " + KeyID;
-                    var dtKeyPhrase = _db.ExecuteReaderCommand(command,"");
-                    if (dtKeyPhrase.Rows.Count == 0)
-                    {
-                        throw new BadRequestException("KeyphraseID not found!", 400, 400);
-                    }
-                    keyphrase = new KeyPhrase
-                    {
-                        ID = Globals.GetIDinDT(dtKeyPhrase, 0, "ID"),
-                        Keyphrase = Globals.GetinDT_String(dtKeyPhrase, 0, "Keyphrase"),
-                        KeyNorm = Globals.GetinDT_String(dtKeyPhrase, 0, "KeyNorm")
-                    };
-                    #endregion
-
-                    #region Get List Artical
-                    List<Artical> lstArtical = new List<Artical>();
-                    command.CommandText = "select * from Artical where LawID = " + LawID;
-                    var dtArticals = _db.ExecuteReaderCommand(command, "");
-                    if(dtArticals.Rows.Count == 0)
-                    {
-                        throw new BadRequestException("LawID not found!", 400, 400);
-                    }
-                    for(var i = 0; i < dtArticals.Rows.Count; i++)
-                    {
-                        lstArtical.Add(new Artical
-                        {
-                            ID = Globals.GetIDinDT(dtArticals, i, "ID"),
-                            ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
-                            ChapterItemID = Globals.GetIDinDT(dtArticals,i,"ChapterItemID"),
-                            Content = Globals.GetinDT_String(dtArticals,i, "Content")
-                        });
-                    }
-                    #endregion
-
-                    foreach(var a in lstArtical)
-                    {
-                        command.CommandText = "select dbo.getnormtext(N'" + a.Content + "') normtext";
-                        string Normtext = Globals.GetinDT_String(_db.ExecuteReaderCommand(command, ""), 0, "normtext");
-                        int lenghtNormtext = Normtext.Length;
-
-                        string tmp = Normtext.Replace(keyphrase.KeyNorm, "");
-                        int lengthTMP = tmp.Length;
-                        int total = (Normtext.Length - tmp.Length) / keyphrase.KeyNorm.Length;
-                        if(total > 0)
-                        {
-                            command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
-                                                    $"values ({keyphrase.ID},  {a.ChapterID},  {a.ChapterItemID}, {a.ID}, {LawID}, {total})";
-                            _db.ExecuteNonQueryCommand(command) ;
-                        }
-                    }
-                    #endregion */
-
                 transaction.Commit(); 
             }
             catch
@@ -321,50 +359,7 @@ namespace LawSearch_Core.Services
             {
                 connection.Close();
             }
-        }
+        }*/
 
-        /// <summary>
-        /// Xóa tất cả KeyphraseMapping
-        /// </summary>
-        public void DeleteAllKeyphraseMapping()
-        {
-            try
-            {
-                _db.OpenConnection();
-                string sql = $"delete KeyphraseMapping where id in (select id from KeyphraseMapping)";
-                _db.ExecuteNonQueryCommand(sql);
-            }
-            catch
-            {
-                throw;
-            }
-            finally { _db.CloseConnection(); }
-        }
-
-        /// <summary>
-        /// Xóa KeyphraseMapping theo KeyphraseID
-        /// </summary>
-        /// <param name="KeyphraseID"></param>
-        public void DeleteKeyphraseMapping(int KeyphraseID)
-        {
-            try
-            {
-                _db.OpenConnection();
-
-                var checkIDConcept = _db.ExecuteReaderCommand($"Select * from Keyphrase where id = {KeyphraseID}", "");
-                if (checkIDConcept.Rows.Count == 0)
-                {
-                    throw new BadRequestException("KeyphraseID not found!", 400, 400);
-                }
-
-                string sql = $"delete KeyphraseMapping where id in (select id from KeyphraseMapping where KeyphraseID = {KeyphraseID})";
-                _db.ExecuteNonQueryCommand(sql);
-            }
-            catch
-            {
-                throw;
-            }
-            finally { _db.CloseConnection(); }
-        }
     }
 }

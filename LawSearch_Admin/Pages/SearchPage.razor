@@ -15,6 +15,10 @@
 
     @if (lstResult != null)
     {
+        <div class="info">
+            Keyphrases search: @keySearch <br />
+            Concept: @conceptTop
+        </div>
         <div class="result-container">
             <div class="result-total">
                 Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
@@ -30,9 +34,12 @@
 @code{
     public string rank = "Rank #1";
     public string title = "Điều 83 | Chương 6 | Luật đất đai 2013";
+    public string keySearch = "";
+    public string conceptTop = "";
 
     public string input ;
     public List<ArticalResult> lstResult = null;
+    public SearchResult searchResult { get; set; }
     public List<Artical> lstArtical;
 
     public double timeDone = 0;
@@ -54,7 +61,17 @@
             stopwatch.Stop();
             timeDone = stopwatch.Elapsed.TotalMilliseconds / 1000F;
 
-            lstResult = rs;
+            searchResult = rs;
+            lstResult = searchResult.articalResults;
+
+            foreach (var key in searchResult.keyphraseSearch)
+            {
+                keySearch = keySearch + key.Key + " / ";
+            }
+            foreach (var con in searchResult.conceptTop)
+            {
+                conceptTop = conceptTop + con.Name + " / ";
+            }
             StateHasChanged();  //Re-render dom
         }
     }

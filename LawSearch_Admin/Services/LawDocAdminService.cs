@@ -77,11 +77,6 @@ namespace LawSearch_Admin.Services
 
         public async Task<bool> ImportLaw(string name, string content)
         {
-            ImportLawVM importLawVM = new ImportLawVM{
-                Name = name,
-                Content = content
-            };
-
             var formContent = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("Name", name),
