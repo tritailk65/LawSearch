@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LawSearch_Core.Common
@@ -156,5 +157,38 @@ namespace LawSearch_Core.Common
             return content == null || Name == null ? "" : content.IndexOf(Name + ".", StringComparison.InvariantCultureIgnoreCase) < 0 && content.IndexOf(Name + ":", StringComparison.InvariantCultureIgnoreCase) > 0 ? ":" : ".";
         }
 
+        public static string GetNormText(string input)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            string rs = input;
+
+            //Loại bỏ khoảng trắng đầu chuỗi và cuối chuỗi
+            rs = rs.Trim().TrimEnd().ToLower();
+
+            if(rs == null) { return rs; }
+            if(rs == "") { return rs; }
+
+            string text = "-''`~!@#$%^&*()?><:|}{,./\"''='';–";
+            char[] chars = text.ToCharArray();
+
+            //Dò vị trí ký tự đặc biệt
+            int i = rs.IndexOfAny(chars);
+
+            //Loại bỏ ký tự đặc biệt
+            while(i != -1)
+            {
+                rs = rs.Replace(rs[i].ToString(), "");
+                i = rs.IndexOfAny(chars);
+            };
+
+            //Đổi space x2 thành x1
+            rs = rs.Replace("  "," ");
+
+            //Đổi thành tiếng việt không dấu
+            rs = NormalizeVietnamese(rs);
+            rs = rs.Replace(" ","_");
+
+            return rs;
+        }
     }
 }

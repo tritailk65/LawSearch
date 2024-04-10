@@ -113,7 +113,7 @@ namespace LawSearch_Core.Services
                     throw new BadRequestException("KeyPhrase không được bỏ trống", 400, 400);
                 }
 
-                command.CommandText = $"select * from keyphrase where keyphrase = {keyPhrase.Keyphrase}";
+                command.CommandText = $"select * from keyphrase where keyphrase = N'{keyPhrase.Keyphrase}'";
                 var checkKeyphrase = _db.ExecuteReaderCommand(command, "");
                 if (checkKeyphrase.Rows.Count > 0)
                 {
@@ -140,7 +140,7 @@ namespace LawSearch_Core.Services
 
                 #region Get List Artical
                 List<Artical> lstArtical = new List<Artical>();
-                command.CommandText = "select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = " + LawID;
+                command.CommandText = "select Content, Content, ID, ChapterID, ChapterItemID from Artical where LawID = " + LawID;
                 Console.WriteLine("Start load all artical...\n");
                 var dtArticals = _db.ExecuteReaderCommand(command, "");
                 for (var i = 0; i < dtArticals.Rows.Count; i++)
@@ -150,7 +150,7 @@ namespace LawSearch_Core.Services
                         ID = Globals.GetIDinDT(dtArticals, i, "ID"),
                         ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
                         ChapterItemID = Globals.GetIDinDT(dtArticals, i, "ChapterItemID"),
-                        Content = Globals.GetinDT_String(dtArticals, i, "Content")
+                        Content = Globals.GetNormText(Globals.GetinDT_String(dtArticals, i, "Content"))
                     });
                 }
                 Console.WriteLine("Done load all artical\n");
@@ -176,7 +176,10 @@ namespace LawSearch_Core.Services
 
                 Console.WriteLine("Total: " + dataCollection.Count);
 
-                foreach (var data in dataCollection)
+                List<KeyphraseMapping> keyphraseMappings = new List<KeyphraseMapping>();
+                keyphraseMappings = keyphraseMappings.OrderBy(x => x.KeyPhraseID).ToList();
+
+                foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
                                           $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, {data.NumCount})";

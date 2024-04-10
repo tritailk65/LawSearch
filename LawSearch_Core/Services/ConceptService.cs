@@ -323,6 +323,7 @@ namespace LawSearch_Core.Services
                 Console.WriteLine("Start load Artical...");
                 List<Artical> lstArticals = new List<Artical>();
                 command.CommandText = $"select Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+               
                 var dtArtical = _db.ExecuteReaderCommand(command, "");               
                 if(dtArtical.Rows.Count > 0)
                 {
@@ -333,7 +334,7 @@ namespace LawSearch_Core.Services
                             ID = Globals.GetIDinDT(dtArtical, i, "ID"),
                             ChapterID = Globals.GetIDinDT(dtArtical, i, "ChapterID"),
                             ChapterItemID = Globals.GetIDinDT(dtArtical, i, "ChapterItemID"),
-                            Content = Globals.GetinDT_String(dtArtical, i, "Content")
+                            Content = Globals.GetNormText(Globals.GetinDT_String(dtArtical, i, "Content"))
                         });
                     }
                 }
@@ -368,10 +369,16 @@ namespace LawSearch_Core.Services
                     });
                 }
 
-                Console.WriteLine("Total: " + dataCollection.Count);
-                foreach (ConceptMapping concept in dataCollection)
+                Console.WriteLine("Total data collection: " + dataCollection.Count);
+
+                List<ConceptMapping> conceptMappings = new List<ConceptMapping>();
+
+                conceptMappings = dataCollection.ToList();
+                conceptMappings = conceptMappings.OrderBy(x => x.ConceptID).ToList();
+
+                foreach (ConceptMapping concept in conceptMappings)
                 {
-                    Console.WriteLine("" + concept.ID + "/" + concept.ArticalID + "/" + concept.ChapterID + "/" + concept.ChapterItemID + "/");
+                    Console.WriteLine("" + concept.ConceptID + "/" + concept.ArticalID + "/" + concept.ChapterID + "/" + concept.ChapterItemID + "/" + concept.LawID);
                 }
 
                 foreach (var data in dataCollection)
@@ -380,6 +387,7 @@ namespace LawSearch_Core.Services
                                           $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
                     _db.ExecuteNonQueryCommand(command);
                 }
+
                 transaction.Commit();
             } catch
             {
@@ -428,14 +436,6 @@ namespace LawSearch_Core.Services
                     throw new BadRequestException("ConceptID not found!", 400, 400);
                 }
 
-                string key = Keyphrase.Replace(" ", "_").ToLower();
-                command.CommandText = $"select * from keyphrase where keyphrase like N'{key}'";
-                var checkKeyphrase = _db.ExecuteReaderCommand(command, "");
-                if(checkKeyphrase.Rows.Count > 0)
-                {
-                    throw new BadRequestException("Keyphrase đã tồn tại !", 400, 400);
-                }
-
                 #region Step 1: Add KeyPhrase
                 if (Keyphrase == null || Keyphrase == "")
                 {
@@ -457,15 +457,23 @@ namespace LawSearch_Core.Services
                 #endregion
 
                 #region Step 2: Add ConceptKeyphrase
-                command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, 16, 1";
+                command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, {LawID}, 1";
                 _db.ExecuteNonQueryCommand(command);
                 #endregion
 
                 #region Step 3: Generate KeyphraseMapping and ConceptMapping
 
+                command.CommandText = $"select * from KeyphraseMapping where keyphraseID = {rsAddKeyphrase.ID}";
+                var checkKeyphrase = _db.ExecuteReaderCommand(command, "");
+                if (checkKeyphrase.Rows.Count > 0)
+                {
+                    transaction.Commit();
+                    return;
+                }
+
                 #region Get List Artical
                 List<Artical> lstArtical = new List<Artical>();
-                command.CommandText = $"select dbo.getnormtext(Content) Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                command.CommandText = $"select Content, Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
                 Console.WriteLine("Start load all artical...\n");
                 var dtArticals = _db.ExecuteReaderCommand(command, "");
                 for (var i = 0; i < dtArticals.Rows.Count; i++)
@@ -475,7 +483,7 @@ namespace LawSearch_Core.Services
                         ID = Globals.GetIDinDT(dtArticals, i, "ID"),
                         ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
                         ChapterItemID = Globals.GetIDinDT(dtArticals, i, "ChapterItemID"),
-                        Content = Globals.GetinDT_String(dtArticals, i, "Content")
+                        Content = Globals.GetNormText(Globals.GetinDT_String(dtArticals, i, "Content"))
                     });
                 }
                 Console.WriteLine("Done load all artical\n");
@@ -500,7 +508,10 @@ namespace LawSearch_Core.Services
 
                 Console.WriteLine("Total: " + dataCollection.Count);
 
-                foreach (var data in dataCollection)
+                List<KeyphraseMapping> keyphraseMappings = new List<KeyphraseMapping>();
+                keyphraseMappings = dataCollection.OrderBy(x => x.KeyPhraseID).ToList();
+
+                foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
                                           $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount})";
