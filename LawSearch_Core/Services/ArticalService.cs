@@ -85,53 +85,5 @@ namespace LawSearch_Core.Services
             }
         }        
 
-        public async Task GenerateKeyPhrase()
-        {
-            #region Transaction init
-            IDbConnection connection = db.GetDbConnection();
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception ex)
-            {
-                throw new BadRequestException(ex.Message.ToString(), 500);
-            }
-            IDbCommand command = db.CreateCommand();
-            IDbTransaction transaction = db.BeginTransaction();
-            command.Connection = connection;
-            command.Transaction = transaction;
-            #endregion
-
-            try
-            {
-                command.CommandText = "Select Content from [Artical] with(nolock)";
-                DataTable articalContent = db.ExecuteReaderCommand(command, "");
-                if(articalContent.Rows.Count > 0)
-                {
-                    for (int i = 0; i < articalContent.Rows.Count; i++)
-                    {
-                        string content = Globals.GetinDT_String(articalContent, i, "Content").ToLower();
-                        var keyPhrases = await Globals.GetKeyPhraseFromPhoBERT(content);
-
-                        foreach (var key in keyPhrases)
-                        {
-                            int Count = Globals.CountTerm(content, key.Replace("_", " "));
-                            command.CommandText = "exec GetKeyPhrase N'" + key +"'";
-                            command.ExecuteNonQuery();
-                        }
-                    }
-                }
-                transaction.Commit();
-
-            }catch
-            {
-                transaction.Rollback();
-                throw;
-            } finally
-            {
-                connection.Close();
-            }
-        }
     }
 }

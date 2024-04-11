@@ -87,6 +87,15 @@ namespace LawSearch_API.Controllers
             return rs.MessageSuccess("Generate ConceptMapping from name success!");
         }
 
+        [HttpPost("[action]")]
+        public APIResult GenerateConceptMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.GenerateConceptMapping(LawID);
+            APIResult rs = new();
+            return rs.MessageSuccess("Generate ConceptMapping success!");
+        }
+
         [HttpDelete("[action]")]
         public APIResult DeleteConceptKeyphrase([BindRequired] int KeyphraseID)
         {

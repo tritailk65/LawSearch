@@ -286,7 +286,16 @@
                                 foreach(KeyPhraseRelate kr in KeyphraseRelates)
                                 {
                                     <tr>
-                                        <td>...</td>
+                                        @if (kr.LawName == "")
+                                        {
+
+                                            <td>...</td>
+                                        }
+                                        else
+                                        {
+
+                                            <td>@kr.LawName</td>
+                                        }
                                         @if (kr.ChapterName == "")
                                         {
 

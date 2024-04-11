@@ -159,7 +159,6 @@ namespace LawSearch_Core.Common
 
         public static string GetNormText(string input)
         {
-            Console.OutputEncoding = Encoding.UTF8;
             string rs = input;
 
             //Loại bỏ khoảng trắng đầu chuỗi và cuối chuỗi

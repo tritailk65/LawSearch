@@ -57,5 +57,24 @@ namespace LawSearch_API.Controllers
             APIResult result = new APIResult();
             return result.MessageSuccess("Xóa keyphrase thành công!");
         }
+
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyphrasePhoBERT()
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            var dt = keyPhraseService.GenerateKeyphrasePhoBERT();
+            APIResult rs = new APIResult();
+            return rs.MessageSuccess("Generate success!");
+        }
+
+        [HttpPost("[action]")]
+        public APIResult GenerateKeyphraseMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.GenerateKeyphraseMapping(LawID);
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Generate keyphrase mapping success!");
+        }
+
     }
 }
