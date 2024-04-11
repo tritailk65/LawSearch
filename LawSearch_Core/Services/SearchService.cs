@@ -77,7 +77,7 @@ namespace LawSearch_Core.Services
                 }
 
                 int itopConcept = 3;
-                int itopArticals = 10;
+                int itopArticals = 20;
                 double minScoreConcept = 0.01;
                 double minScoreArtical = 0.01;
 

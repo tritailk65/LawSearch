@@ -54,6 +54,7 @@ namespace LawSearch_Core.Models
         public int ArticalID { get; set; }
         public int NumCount { get; set; }
         public string ChapterName { get; set; }
+        public string LawName { get; set; }
     }
 
     public enum KeyPhraseSource
