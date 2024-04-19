@@ -21,6 +21,7 @@ namespace LawSearch_Core.Models
         public int ChapterItemID { get; set; }
         public int LawID { get; set; }
         public int NumCount { get; set; }
+        public float PositionWeight { get; set; }
 
         public KeyphraseMapping(int keyPhraseID, int chapterID, int articalID, int chapterItemID, int lawID, int numCount)
         {
@@ -30,6 +31,11 @@ namespace LawSearch_Core.Models
             ChapterItemID = chapterItemID;
             LawID = lawID;
             NumCount = numCount;
+        }
+
+        public KeyphraseMapping(int keyPhraseID, int chapterID, int articalID, int chapterItemID, int lawID, int numCount, float positionWeight) : this(keyPhraseID, chapterID, articalID, chapterItemID, lawID, numCount)
+        {
+            PositionWeight = positionWeight;
         }
     }
     public class KeyPhrase

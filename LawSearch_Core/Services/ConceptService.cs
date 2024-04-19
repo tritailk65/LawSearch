@@ -477,17 +477,20 @@ namespace LawSearch_Core.Services
 
                 #region Get List Artical
                 List<Artical> lstArtical = new List<Artical>();
-                command.CommandText = $"select Content, Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                command.CommandText = $"select Name, Title, Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
                 Console.WriteLine("Start load all artical...\n");
                 var dtArticals = _db.ExecuteReaderCommand(command, "");
                 for (var i = 0; i < dtArticals.Rows.Count; i++)
                 {
+                    string title = Globals.GetinDT_String(dtArticals, i, "Name") + " " + Globals.GetinDT_String(dtArticals, i, "Title");
+
                     lstArtical.Add(new Artical
                     {
                         ID = Globals.GetIDinDT(dtArticals, i, "ID"),
                         ChapterID = Globals.GetIDinDT(dtArticals, i, "ChapterID"),
                         ChapterItemID = Globals.GetIDinDT(dtArticals, i, "ChapterItemID"),
-                        Content = Globals.GetNormText(Globals.GetinDT_String(dtArticals, i, "Content"))
+                        Content = Globals.GetNormText(Globals.GetinDT_String(dtArticals, i, "Content")),
+                        Title = Globals.GetNormText(title)
                     });
                 }
                 Console.WriteLine("Done load all artical\n");
@@ -506,6 +509,12 @@ namespace LawSearch_Core.Services
                     int total = (Normtext.Length - tmp.Length) / rsAddKeyphrase.KeyNorm.Length;
                     if (total > 0)
                     {
+                        //Calculate bt
+                        string contentTMP = a.Content.Replace(a.Title, "");
+                        int countTermTitle = Globals.CountTerm(a.Title, rsAddKeyphrase.KeyNorm);
+                        int countTermContent = Globals.CountTerm(contentTMP, rsAddKeyphrase.KeyNorm);
+                        float positionWeight = (countTermTitle + (countTermContent * 0.5F)) / total;
+
                         dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total));
                     }
                 });
@@ -517,8 +526,8 @@ namespace LawSearch_Core.Services
 
                 foreach (var data in keyphraseMappings)
                 {
-                    command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID,ChapterItemID,ArticalID, LawID,NumCount) " +
-                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount})";
+                    command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID, ChapterItemID, ArticalID, LawID, NumCount, PositionWeight) " +
+                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
                     _db.ExecuteNonQueryCommand(command);
 
                     command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID, KeyphraseID) " +
