@@ -31,7 +31,10 @@ namespace LawSearch_Core.Services
                 string sKey = Globals.GetKeyJoin(searchInput);
                 string sqlGetKeyPhrases = "exec GetKeyPharesFromText N'" + sKey + "'";
                 DataTable dtKeyPhrases = _db.ExecuteReaderCommand(sqlGetKeyPhrases, "");
-                if(dtKeyPhrases.Rows != null && dtKeyPhrases.Rows.Count > 0)
+
+                var show = dtKeyPhrases;
+
+                if (dtKeyPhrases.Rows != null && dtKeyPhrases.Rows.Count > 0)
                 {
                     for (int i = 0; i < dtKeyPhrases.Rows.Count; i++)
                     {
@@ -47,6 +50,7 @@ namespace LawSearch_Core.Services
                         });
                     }
                 }
+
 
                 foreach (var item in lstKeyPhrases_Searched)
                 {
