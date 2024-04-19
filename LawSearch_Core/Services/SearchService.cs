@@ -24,11 +24,11 @@ namespace LawSearch_Core.Services
             try
             {
                 _db.OpenConnection();
-                SearchArticalResult rs = new SearchArticalResult();
+                SearchArticalResult rs = new();
 
-                #region Get List KeyPhrase form input
-                List<KeyPhrase> lstKeyPhrases_Searched = new List<KeyPhrase>();
-                String sKey = Globals.GetKeyJoin(searchInput);
+                #region Get List KeyPhrase form query
+                List<KeyPhrase> lstKeyPhrases_Searched = new();
+                string sKey = Globals.GetKeyJoin(searchInput);
                 string sqlGetKeyPhrases = "exec GetKeyPharesFromText N'" + sKey + "'";
                 DataTable dtKeyPhrases = _db.ExecuteReaderCommand(sqlGetKeyPhrases, "");
                 if(dtKeyPhrases.Rows != null && dtKeyPhrases.Rows.Count > 0)
@@ -40,17 +40,20 @@ namespace LawSearch_Core.Services
                             ID = Globals.GetIDinDT(dtKeyPhrases, i, "ID"),
                             Key = Globals.GetinDT_String(dtKeyPhrases, i, "KeyPhrase"),
                             Source = (KeyPhraseSource)(Globals.GetIDinDT(dtKeyPhrases, i, "source")),
-                            NumberArtical = Globals.GetIDinDT(dtKeyPhrases, i, "NumberArtical")
+                            NumberArtical = Globals.GetIDinDT(dtKeyPhrases, i, "NumberArtical"),
+                            PosTag = Globals.GetinDT_String(dtKeyPhrases, i, "PosTag"),
+                            WordClassWeight = Globals.GetIDinDT(dtKeyPhrases, i, "WordClassWeight"),
+                            PositionWeight = 1 // title postion
                         });
                     }
                 }
-                #endregion
 
                 foreach (var item in lstKeyPhrases_Searched)
                 {
-                    item.Count = Globals.CountTerm(searchInput, item.Key.Replace("_", " "));
+                    item.Count = Globals.CountTerm(searchInput, item.Key == null ? "" : item.Key.Replace("_", " "));
                 }
                 rs.KeyPhrases = lstKeyPhrases_Searched;
+                #endregion
 
                 #region Get List Concepts
                 List<Concept> lstAllConcept = new List<Concept>();
@@ -67,7 +70,8 @@ namespace LawSearch_Core.Services
                 }
                 #endregion
 
-                List<KeyPhraseResult> lstCandidate_Concepts = new List<KeyPhraseResult>();
+                #region Create candidate concepts
+                List<KeyPhraseResult> lstCandidate_Concepts = new();
                 for (int i = 0; i < lstAllConcept.Count; i++)
                 {
                     lstCandidate_Concepts.Add(new KeyPhraseResult { 
@@ -75,18 +79,27 @@ namespace LawSearch_Core.Services
                         keys = GetKeyPhrasesByConceptID(lstAllConcept[i].ID) 
                     });
                 }
+                #endregion
 
+                #region Set i top
                 int itopConcept = 3;
                 int itopArticals = 10;
                 double minScoreConcept = 0.01;
                 double minScoreArtical = 0.01;
+                #endregion
 
-                rs.lstConcepts = TF_IDF.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
-                
-                // expand concepts
+                #region Get concepts relate to query
+                // rs.lstConcepts = TF_IDF.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
+                rs.lstConcepts = TF_IDF_Improved.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
+                #endregion
+
+                #region Create candidate articles
                 List<KeyPhraseResult> lstCandidates = GetListArticalByConceptID(rs.lstConcepts.Select(x => x.ID).ToList());
-                var show = rs.lstConcepts.Select(x => x.ID).ToList();
-                rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
+                #endregion
+
+                #region Get articles relate to query
+                // rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
+                rs.lstArticals = TF_IDF_Improved.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
 
                 foreach (var artical in rs.lstArticals)
                 {
@@ -95,8 +108,10 @@ namespace LawSearch_Core.Services
                     artical.Content = Globals.GetinDT_String(dsDetail, 0, "Title");
                     artical.LawName = Globals.GetinDT_String(dsDetail, 0, "LawName");
                 }
+                #endregion
 
-                List<ArticalResult> aRS = new List<ArticalResult>();
+                #region Return keyphrases, concepts, articles relate to query
+                List<ArticalResult> aRS = new();
                 foreach (var item in rs.lstArticals)
                 {
                     aRS.Add(new ArticalResult
@@ -109,10 +124,10 @@ namespace LawSearch_Core.Services
                     });
                 }
 
-                List<Concept> cRS = new List<Concept>();             
+                List<Concept> cRS = new();             
                 foreach(var item in rs.lstConcepts)
                 {
-                    Concept concept = new Concept();
+                    Concept concept = new();
                     var dt = _db.ExecuteReaderCommand("select * from concept where id = " + item.ID, "");
                     if(dt.Rows.Count > 0)
                     {
@@ -125,10 +140,13 @@ namespace LawSearch_Core.Services
                     }
                 }
 
-                SearchResult sr = new SearchResult();
-                sr.keyphraseSearch = rs.KeyPhrases;
-                sr.conceptTop = cRS;
-                sr.articalResults = aRS;
+                SearchResult sr = new()
+                {
+                    keyphraseSearch = rs.KeyPhrases,
+                    conceptTop = cRS,
+                    articalResults = aRS
+                };
+                #endregion
 
                 return sr;
 
@@ -144,17 +162,20 @@ namespace LawSearch_Core.Services
 
         private List<KeyPhrase> GetKeyPhrasesByConceptID(int conceptID)
         {
-            List<KeyPhrase> lst = new List<KeyPhrase> ();
+            List<KeyPhrase> lst = new();
             DataTable dt = _db.ExecuteReaderCommand("exec GetKeyPharesByConceptID " + conceptID, "");
-            string key = "";
+            
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                key = Globals.GetinDT_String(dt, i, "KeyPhrase");
+                string key = Globals.GetinDT_String(dt, i, "KeyPhrase");
                 lst.Add(new KeyPhrase
                 {
                     ID = Globals.GetIDinDT(dt, i, "ID"),
                     Key = key,
                     Count = Globals.GetIDinDT(dt, i, "Count"),
+                    PosTag = Globals.GetinDT_String(dt, i, "PosTag"),
+                    PositionWeight = 1, // title position
+                    WordClassWeight = Globals.GetIDinDT(dt, i, "WordClassWeight")
                 });
             }
             return lst;
@@ -162,21 +183,22 @@ namespace LawSearch_Core.Services
 
         private List<KeyPhraseResult> GetListArticalByConceptID(List<int> lst)
         {
-            List<KeyPhraseResult> lstResult = new List<KeyPhraseResult>();
+            List<KeyPhraseResult> lstResult = new();
             DataTable dt = _db.ExecuteReaderCommand("Exec GetListArticalKeyPhraseByConceptID '" + string.Join(",", lst) + "'", "");
-            var show = dt;
-            SortedDictionary<int, List<KeyPhrase>> dic = new SortedDictionary<int, List<KeyPhrase>>();
-            int articalID = 0; KeyPhrase ph;
+            
+            SortedDictionary<int, List<KeyPhrase>> dic = new();
+            KeyPhrase ph;
             for (int i = 0; i < Globals.DTCount(dt); i++)
             {
-                articalID = Globals.GetIDinDT(dt, i, "ArticalID");
+                int articalID = Globals.GetIDinDT(dt, i, "ArticalID");
                 ph = new KeyPhrase
                 {
                     ID = Globals.GetIDinDT(dt, i, "KeyPhraseID"),
                     Key = Globals.GetinDT_String(dt, i, "KeyPhrase"),
                     Count = Math.Max(1, Globals.GetIDinDT(dt, i, "NumCount")),
-                    //Word class weight
-                    //Postion weight
+                    PosTag = Globals.GetinDT_String(dt, i, "PosTag"),
+                    PositionWeight = Globals.GetIDinDT(dt, i, "PositionWeight"),
+                    WordClassWeight = Globals.GetIDinDT(dt, i, "WordClassWeight")
                 };
 
                 if (!dic.ContainsKey(articalID))
