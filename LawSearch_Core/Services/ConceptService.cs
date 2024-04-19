@@ -243,17 +243,21 @@ namespace LawSearch_Core.Services
                         int conceptID = Globals.GetIDinDT(ds, i, "ID");
 
                         //Add name concept to keyphrase
-                        command.CommandText = "exec GetKeyPhrase N'" + Globals.GetKeyJoin(concept) + "'";
+                        command.CommandText = $"exec GetKeyPhrase N'{Globals.GetKeyJoin(concept)}', 'N'";
                         _db.ExecuteNonQueryCommand(command);
-                        var keys = await Globals.GetKeyPhraseFromPhoBERT(description);
 
-                        foreach(var key in keys)
+                        //Get keyphrase from VNCoreNLP
+                        List<KeyphraseGenerateResponse> keyphraseGenerateResponses = new List<KeyphraseGenerateResponse>();
+                        var keys = await Globals.GetKeyPhraseFromPhoBERT(description);
+                        keyphraseGenerateResponses = keys;
+
+                        foreach (var key in keyphraseGenerateResponses)
                         {
-                            int Count = Globals.CountTerm(description, key.Replace("_"," "));
-                            command.CommandText = "exec GetKeyPhrase N'" + key + "'";
+                            int Count = Globals.CountTerm(description, key.Key.Replace("_", " "));
+                            command.CommandText = $"exec GetKeyPhrase N'{key.Key}', '{key.Pos}'";
                             var rsKeyDT = _db.ExecuteReaderCommand(command,"");
                             int idKey = Globals.GetIDinDT(rsKeyDT, 0, "ID");
-                            command.CommandText = "exec UpdateConcept_KeyPhrase " + conceptID + "," + Convert.ToInt32(idKey) + "," + lawID + "," + Count;
+                            command.CommandText = $"exec UpdateConcept_KeyPhrase {conceptID}, {Convert.ToInt32(idKey)}, {lawID}, {Count}";
                             _db.ExecuteNonQueryCommand(command);
                         }
                     }
@@ -263,7 +267,7 @@ namespace LawSearch_Core.Services
             {
                 transaction.Rollback();
                 throw;
-            } finally{ _db.CloseConnection(); }
+            } finally{ connection.Close(); }
         }
 
         /// <summary>
@@ -271,7 +275,7 @@ namespace LawSearch_Core.Services
         /// </summary>
         /// <param name="LawID">ID văn bản luật</param>
         /// <exception cref="BadRequestException"></exception>
-        public void GenerateMappingFromName(int LawID)
+/*        public void GenerateMappingFromName(int LawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -398,7 +402,7 @@ namespace LawSearch_Core.Services
             {
                 connection.Close();
             }
-        }
+        }*/
 
         /// <summary>
         /// Add keyphrase, add concept_keyphrase, auto generate keyphrasemapping and conceptmapping

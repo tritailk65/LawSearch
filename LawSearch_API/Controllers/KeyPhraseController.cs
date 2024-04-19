@@ -59,10 +59,10 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpPost("[action]")]
-        public APIResult GenerateKeyphrasePhoBERT()
+        public  async Task<APIResult> GenerateKeyphraseVNCoreNLP([BindRequired] int LawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            var dt = keyPhraseService.GenerateKeyphrasePhoBERT();
+            await keyPhraseService.GenerateKeyphraseVNCoreNLP(LawID);
             APIResult rs = new APIResult();
             return rs.MessageSuccess("Generate success!");
         }

@@ -254,7 +254,7 @@ namespace LawSearch_Core.Services
             }
         }
 
-        public async Task GenerateKeyphrasePhoBERT()
+        public async Task GenerateKeyphraseVNCoreNLP(int LawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -274,27 +274,59 @@ namespace LawSearch_Core.Services
 
             try
             {
-                int LawID = 16; //Default
+                #region Check Data
+                command.CommandText = $"select * from Law where id = {LawID}";
+                var checkLawID = _db.ExecuteReaderCommand(command, "");
+                if (checkLawID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found!", 400, 400);
+                }
+                #endregion
 
-                command.CommandText = "Select Content from [Artical] with(nolock)";
+                command.CommandText = "Select Content from [Artical] with(nolock) where LawID = " + LawID;
                 DataTable articalContent = _db.ExecuteReaderCommand(command, "");
                 if (articalContent.Rows.Count > 0)
                 {
                     for (int i = 0; i < articalContent.Rows.Count; i++)
                     {
                         string content = Globals.GetinDT_String(articalContent, i, "Content").ToLower();
+                        List<KeyphraseGenerateResponse> keyphraseGenerateResponses = new List<KeyphraseGenerateResponse>();
                         var keyPhrases = await Globals.GetKeyPhraseFromPhoBERT(content);
+                        keyphraseGenerateResponses = keyPhrases;
 
-                        foreach (var key in keyPhrases)
+                        foreach (var key in keyphraseGenerateResponses)
                         {
-                            int Count = Globals.CountTerm(content, key.Replace("_", " "));
-                            command.CommandText = "exec GetKeyPhrase N'" + key + "'";
+                            int Count = Globals.CountTerm(content, key.Key.Replace("_", " "));
+                            command.CommandText = $"exec GetKeyPhrase N'{key.Key}', '{key.Pos}'";
                             _db.ExecuteNonQueryCommand(command);
                         }
                     }
                 }
 
-                GenerateMapping(command, LawID);
+                //Calc word class weight
+/*                List<KeyPhrase> keyPhrases = new List<KeyPhrase>();
+                command.CommandText = "select * from keyphrase";
+                var dt = _db.ExecuteReaderCommand(command, "");
+                if(dt.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        keyPhrases.Add(new KeyPhrase
+                        {
+                            ID = Globals.GetIDinDT(dt,i,"ID"),
+                            PosTag = Globals.GetinDT_String(dt,i,"PosTag")
+                        });
+                    }
+                }
+
+                foreach (var keyPhrase in keyPhrases)
+                {
+                    var weight = Globals.GetWordClassWeight(keyPhrase.PosTag);
+                    command.CommandText = $"Update keyphrase set WordClassWeight = {weight} where id = {keyPhrase.ID}";
+                    _db.ExecuteNonQueryCommand(command);
+                }*/
+
+                //GenerateMapping(command, LawID);
 
                 transaction.Commit();
             }
