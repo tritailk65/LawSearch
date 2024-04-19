@@ -197,7 +197,7 @@ namespace LawSearch_Core.Common
             return rs;
         }
 
-        public static float GetWordClassWeight(string posTag)
+        public static double GetWordClassWeight(string posTag)
         {
             return posTag switch
             {

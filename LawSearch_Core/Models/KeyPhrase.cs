@@ -50,8 +50,8 @@ namespace LawSearch_Core.Models
         public int? LawID { get; set; } = null;
         public int Count { get; set; }
         public string PosTag { get; set; }
-        public float PositionWeight { get; set; }
-        public float WordClassWeight { get; set; }
+        public double PositionWeight { get; set; }
+        public double WordClassWeight { get; set; }
     }
 
     public class KeyPhraseRelate
