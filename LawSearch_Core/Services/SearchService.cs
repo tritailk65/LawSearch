@@ -42,7 +42,7 @@ namespace LawSearch_Core.Services
                             Source = (KeyPhraseSource)(Globals.GetIDinDT(dtKeyPhrases, i, "source")),
                             NumberArtical = Globals.GetIDinDT(dtKeyPhrases, i, "NumberArtical"),
                             PosTag = Globals.GetinDT_String(dtKeyPhrases, i, "PosTag"),
-                            WordClassWeight = Globals.GetIDinDT(dtKeyPhrases, i, "WordClassWeight"),
+                            WordClassWeight = Globals.GetWordClassWeight(Globals.GetinDT_String(dtKeyPhrases, i, "PosTag")),
                             PositionWeight = 1 // title postion
                         });
                     }
@@ -175,8 +175,8 @@ namespace LawSearch_Core.Services
                     Count = Globals.GetIDinDT(dt, i, "Count"),
                     PosTag = Globals.GetinDT_String(dt, i, "PosTag"),
                     PositionWeight = 1, // title position
-                    WordClassWeight = Globals.GetIDinDT(dt, i, "WordClassWeight")
-                });
+                    WordClassWeight = Globals.GetWordClassWeight(Globals.GetinDT_String(dt, i, "PosTag"))
+                }) ;
             }
             return lst;
         }
@@ -191,14 +191,16 @@ namespace LawSearch_Core.Services
             for (int i = 0; i < Globals.DTCount(dt); i++)
             {
                 int articalID = Globals.GetIDinDT(dt, i, "ArticalID");
+                var positionWeight = dt.Rows[i]["PositionWeight"];
+
                 ph = new KeyPhrase
                 {
                     ID = Globals.GetIDinDT(dt, i, "KeyPhraseID"),
                     Key = Globals.GetinDT_String(dt, i, "KeyPhrase"),
                     Count = Math.Max(1, Globals.GetIDinDT(dt, i, "NumCount")),
                     PosTag = Globals.GetinDT_String(dt, i, "PosTag"),
-                    PositionWeight = Globals.GetIDinDT(dt, i, "PositionWeight"),
-                    WordClassWeight = Globals.GetIDinDT(dt, i, "WordClassWeight")
+                    PositionWeight = (double)positionWeight,
+                    WordClassWeight = Globals.GetWordClassWeight(Globals.GetinDT_String(dt, i, "PosTag"))
                 };
 
                 if (!dic.ContainsKey(articalID))
