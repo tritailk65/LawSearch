@@ -199,16 +199,12 @@ namespace LawSearch_Core.Common
 
         public static float GetWordClassWeight(string posTag)
         {
-            switch(posTag)
+            return posTag switch
             {
-                case "N":
-                    return 2.5F;
-                case "A":  
-                case "V":
-                    return 1;
-                default:
-                    return 0;
-            }
+                "N" => 2.5F,
+                "A" or "V" => 1,
+                _ => 0,
+            };
         }
     }
 }
