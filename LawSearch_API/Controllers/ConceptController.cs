@@ -70,21 +70,12 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpPost("[action]")]
-        public APIResult GenerateKeyphraseDescript([BindRequired] int lawID)
+        public async Task<APIResult> GenerateKeyphraseDescript([BindRequired] int lawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateKeyphraseDescript(lawID);
+            await _conceptService.GenerateKeyphraseDescript(lawID);
             APIResult rs = new();
-            return rs.MessageSuccess("Generate ConceptKeyphrase success!");
-        }
-
-        [HttpPost("[action]")]
-        public APIResult GenerateMappingFromName([BindRequired] int LawID)
-        {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.GenerateMappingFromName(LawID);
-            APIResult rs = new();
-            return rs.MessageSuccess("Generate ConceptMapping from name success!");
+            return  rs.MessageSuccess("Generate ConceptKeyphrase success!");
         }
 
         [HttpPost("[action]")]

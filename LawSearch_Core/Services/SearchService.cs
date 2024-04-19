@@ -77,7 +77,7 @@ namespace LawSearch_Core.Services
                 }
 
                 int itopConcept = 3;
-                int itopArticals = 20;
+                int itopArticals = 10;
                 double minScoreConcept = 0.01;
                 double minScoreArtical = 0.01;
 
@@ -175,6 +175,8 @@ namespace LawSearch_Core.Services
                     ID = Globals.GetIDinDT(dt, i, "KeyPhraseID"),
                     Key = Globals.GetinDT_String(dt, i, "KeyPhrase"),
                     Count = Math.Max(1, Globals.GetIDinDT(dt, i, "NumCount")),
+                    //Word class weight
+                    //Postion weight
                 };
 
                 if (!dic.ContainsKey(articalID))

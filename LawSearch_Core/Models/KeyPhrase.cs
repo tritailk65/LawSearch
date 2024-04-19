@@ -43,7 +43,9 @@ namespace LawSearch_Core.Models
         public string? KeyNorm { get; set; }
         public int? LawID { get; set; } = null;
         public int Count { get; set; }
-
+        public string PosTag { get; set; }
+        public float PostionWeight { get; set; }
+        public float WordClassWeight { get; set; }
     }
 
     public class KeyPhraseRelate
@@ -55,6 +57,17 @@ namespace LawSearch_Core.Models
         public int NumCount { get; set; }
         public string ChapterName { get; set; }
         public string LawName { get; set; }
+    }
+
+    public class KeyphraseGenerateResponse
+    {
+        public string Key { get; set; }
+        public string Pos { get; set; }
+    }
+
+    public class KeyphraseGenerateRequest
+    {
+        public string Text { get; set; }
     }
 
     public enum KeyPhraseSource

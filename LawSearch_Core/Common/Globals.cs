@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -13,23 +15,28 @@ namespace LawSearch_Core.Common
 {
     public class Globals
     {
-        public static string KeyPhareAPIURL { get { return "http://127.0.0.1:5000/keyphrase"; } }
+        public static string KeyPhareAPIURL { get { return "http://127.0.0.1:5000/postag"; } }
 
-        public static async Task<string[]> GetKeyPhraseFromPhoBERT(string body)
+        public static async Task<List<KeyphraseGenerateResponse>> GetKeyPhraseFromPhoBERT(string body)
         {
+ 
+            List<KeyphraseGenerateResponse> lst = new List<KeyphraseGenerateResponse> ();
             var httpClient = new HttpClient();
-            var request = new HttpRequestMessage();
-            request.Method = HttpMethod.Post;
-            request.RequestUri = new Uri(Globals.KeyPhareAPIURL);
-            request.Content = new StringContent(body);
-            request.Method = HttpMethod.Post;
-            var response = httpClient.SendAsync(request).Result;
-            response.EnsureSuccessStatusCode();
-            var buffer = await response.Content.ReadAsByteArrayAsync();
-            var byteArray = buffer.ToArray();
-            var responseString = Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
-            string s = responseString.Replace("[", " ").Replace("]", " ");
-            return s.Split(' ').ToList().Where(x => x.Contains("_")).Select(x => x.Replace("\"", "")).ToArray();
+
+            KeyphraseGenerateRequest request = new KeyphraseGenerateRequest
+            {
+                Text = body
+            };
+
+            var data = await httpClient.PostAsJsonAsync($"{KeyPhareAPIURL}", request);
+            data.EnsureSuccessStatusCode();
+            var result = data.Content.ReadFromJsonAsync<KeyphraseGenerateResponse[]>().Result;
+            if (result != null)
+            {
+                lst = result.ToList();
+            }
+            
+            return lst;
         }
 
         //Hàm lấy giá trị cột ID theo tên v
@@ -188,6 +195,20 @@ namespace LawSearch_Core.Common
             rs = rs.Replace(" ","_");
 
             return rs;
+        }
+
+        public static float GetWordClassWeight(string posTag)
+        {
+            switch(posTag)
+            {
+                case "N":
+                    return 2.5F;
+                case "A":  
+                case "V":
+                    return 1;
+                default:
+                    return 0;
+            }
         }
     }
 }
