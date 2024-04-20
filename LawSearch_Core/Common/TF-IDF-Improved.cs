@@ -63,7 +63,7 @@ namespace LawSearch_Core.Common
 
                     // Prepare
                     // TF
-                    double n = 3;
+                    double n = 2;
                     double tf = Math.Pow(key == null ? 0 : key.Count, 1.0 / n);
                     // IDF
                     double idf = vocab.Value;

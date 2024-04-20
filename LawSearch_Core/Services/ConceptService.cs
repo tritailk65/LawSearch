@@ -445,7 +445,8 @@ namespace LawSearch_Core.Services
                 {
                     throw new BadRequestException("KeyPhrase is null or empty", 400, 400);
                 }
-                command.CommandText = string.Format("exec GetKeyPhrase N'{0}'", Keyphrase);
+
+                command.CommandText = $"exec GetKeyPhrase N'{Keyphrase}', 'N'";
                 int id = _db.ExecuteScalarCommand<int>(command);
 
                 command.CommandText = $"select * from [KeyPhrase] where id = {id}";

@@ -49,7 +49,7 @@ namespace LawSearch_Core.Models
         public string? KeyNorm { get; set; }
         public int? LawID { get; set; } = null;
         public int Count { get; set; }
-        public string PosTag { get; set; }
+        public string? PosTag { get; set; }
         public double PositionWeight { get; set; }
         public double WordClassWeight { get; set; }
     }
