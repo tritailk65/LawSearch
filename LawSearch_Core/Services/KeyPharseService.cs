@@ -124,7 +124,7 @@ namespace LawSearch_Core.Services
                 }
 
                 #region Step 1: Add Keyphrase
-                command.CommandText = string.Format("exec GetKeyPhrase N'{0}'", keyPhrase.Keyphrase);
+                command.CommandText = $"exec GetKeyPhrase N'{keyPhrase.Keyphrase}', 'N'";
                 int id = _db.ExecuteScalarCommand<int>(command);
 
                 command.CommandText = $"select * from [KeyPhrase] where id = {id}";
@@ -165,26 +165,31 @@ namespace LawSearch_Core.Services
                 //thread-safe bag for load data in multithreading
                 ConcurrentBag<KeyphraseMapping> dataCollection = new ConcurrentBag<KeyphraseMapping>();
 
-                Parallel.ForEach(lstArtical, a =>
+                command.CommandText = $"Select top 1 id from KeyPhraseMapping where KeyPhraseID = {rsAddKeyphrase.ID} and LawID = {LawID}";
+                var checkIfKeyMapped = _db.ExecuteReaderCommand(command, "");
+                if (checkIfKeyMapped.Rows.Count == 0)
                 {
-                    Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping keyphrase {rsAddKeyphrase.KeyNorm}");
-
-                    string Normtext = a.Content;
-                    int lenghtNormtext = Normtext.Length;
-                    string tmp = Normtext.Replace(rsAddKeyphrase.KeyNorm, "");
-                    int lengthTMP = tmp.Length;
-                    int total = (Normtext.Length - tmp.Length) / rsAddKeyphrase.KeyNorm.Length;
-                    if (total > 0)
+                    Parallel.ForEach(lstArtical, a =>
                     {
-                        //Calculate bt
-                        string contentTMP = a.Content.Replace(a.Title, "");
-                        int countTermTitle = Globals.CountTerm(a.Title, keyPhrase.KeyNorm);
-                        int countTermContent = Globals.CountTerm(contentTMP, keyPhrase.KeyNorm);
-                        float positionWeight = (countTermTitle + (countTermContent * 0.5F)) / total;
+                        Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping keyphrase {rsAddKeyphrase.KeyNorm}");
 
-                        dataCollection.Add(new KeyphraseMapping(keyPhrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total, positionWeight));
-                    }
-                });
+                        string Normtext = a.Content;
+                        int lenghtNormtext = Normtext.Length;
+                        string tmp = Normtext.Replace(rsAddKeyphrase.KeyNorm, "");
+                        int lengthTMP = tmp.Length;
+                        int total = (Normtext.Length - tmp.Length) / rsAddKeyphrase.KeyNorm.Length;
+                        if (total > 0)
+                        {
+                            //Calculate bt
+                            string contentTMP = a.Content.Replace(a.Title, "");
+                            int countTermTitle = Globals.CountTerm(a.Title, rsAddKeyphrase.KeyNorm);
+                            int countTermContent = Globals.CountTerm(contentTMP, rsAddKeyphrase.KeyNorm);
+                            float positionWeight = (countTermTitle + (countTermContent * 0.5F)) / total;
+
+                            dataCollection.Add(new KeyphraseMapping(keyPhrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total, positionWeight));
+                        }
+                    });
+                }
 
                 Console.WriteLine("Total: " + dataCollection.Count);
 

@@ -93,7 +93,7 @@ namespace LawSearch_Core.Services
                 #endregion
 
                 #region Get concepts relate to query
-                // rs.lstConcepts = TF_IDF.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
+                //rs.lstConcepts = TF_IDF.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
                 rs.lstConcepts = TF_IDF_Improved.FindNearestNeighbors(lstCandidate_Concepts, lstKeyPhrases_Searched, minScoreConcept, itopConcept);
                 #endregion
 
@@ -102,7 +102,7 @@ namespace LawSearch_Core.Services
                 #endregion
 
                 #region Get articles relate to query
-                // rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
+                //rs.lstArticals = TF_IDF.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
                 rs.lstArticals = TF_IDF_Improved.FindNearestNeighbors(lstCandidates, lstKeyPhrases_Searched, minScoreArtical, itopArticals);
 
                 foreach (var artical in rs.lstArticals)
