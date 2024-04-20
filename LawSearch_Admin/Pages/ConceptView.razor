@@ -166,7 +166,39 @@
                             {
                                 foreach (var keyphrase in Keyphrases)
                                 {
-                                    <li><div class="keyphrase_not_selected"><a>@keyphrase.Keyphrase</a></div></li>
+                                    string text = keyphrase.KeyPhrase;
+                                    if(text.Length >= 24)
+                                    {
+                                        List<string> splitText = SplitString(text, 24);
+
+                                        <li>
+                                            <div class="keyphrase_multiline">
+                                                <div>
+                                                    @foreach (var chunk in splitText)
+                                                    {
+                                                        <a>@chunk</a>
+
+                                                        <br>
+                                                    }
+                                                </div>
+
+                                                <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
+                                                    <a>Xoá</a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    } else
+                                    {
+                                        <li>
+                                            <div class="keyphrase_not_selected">
+                                                <a>@keyphrase.KeyPhrase</a>
+
+                                                <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
+                                                    <a>Xoá</a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
                                 }
                             }
                         }
@@ -192,7 +224,7 @@
     public Boolean isOpenForm_DeleteConcept = false;
     public List<Concept> Concepts = new List<Concept>();
     public Concept? SelectedConcept = new Concept();
-    public List<KeyPhrase> Keyphrases = new List<KeyPhrase>();
+    public List<ConceptKeyphraseShow> Keyphrases = new List<ConceptKeyphraseShow>();
     string search_keyphrase = "";
     string Description_text = "A concept is defined as an abstract idea. It is understood to be a fundamental building block underlying principles, thoughts and beliefs. Concepts play an important role in all aspects of cognition. As such, concepts are studied within such disciplines as linguistics, psychology, and philosophy, and these disciplines are interested in the logical and psychological structure of concepts, and how they are put together to form thoughts and sentences. The study of concepts has served as an important flagship of an emerging interdisciplinary approach, cognitive science.";
     string new_concept = "";
@@ -460,7 +492,6 @@
 
     public async Task AddNewKeyphrase()
     {
-        // Đã gộp lại thành một api
         ResponceMessage rs = new();
 
         if (new_keyphrase != null && SelectedConcept != null)
@@ -483,6 +514,45 @@
         }
 
         new_keyphrase = "";
+        StateHasChanged();
+    }
+
+    static List<string> SplitString(string text, int chunkSize)
+    {
+        List<string> chunks = new List<string>();
+
+        for (int i = 0; i < text.Length; i += chunkSize)
+        {
+            int length = Math.Min(chunkSize, text.Length - i);
+            chunks.Add(text.Substring(i, length));
+        }
+
+        return chunks;
+    }
+
+    public async Task DeleteConceptKeyphrase(ConceptKeyphraseShow k)
+    {
+        ResponceMessage rs = new();
+
+        rs = await conceptAS.DeleteConceptKeyphrase(k);
+
+        if (rs != null)
+        {
+            if (rs.Status)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Message);
+                if (SelectedConcept != null)
+                {
+                    await fetchKeyphrase(SelectedConcept.ID);
+                }
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rs.Error);
+                return;
+            }
+        }
+
         StateHasChanged();
     }
 }

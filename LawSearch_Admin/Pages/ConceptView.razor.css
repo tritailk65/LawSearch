@@ -185,8 +185,37 @@ input[type="text"] {
         }
 
     .keyphrase_not_selected {
+        width: 100%;
         padding: 15px 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     }
+
+        .keyphrase_not_selected div {
+            cursor: pointer;
+        }
+
+        .keyphrase_not_selected div a {
+            text-decoration: underline;
+            color: red;
+        }
+
+    .keyphrase_multiline {
+        width: 100%;
+        padding: 15px 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+        .keyphrase_multiline div:nth-child(2) {
+            cursor: pointer;
+        }
+
+        .keyphrase_multiline div:nth-child(2) a {
+            text-decoration: underline;
+            color: red;
+        }
 
     .form_add_new_concept_background_view {
         width: 100%;

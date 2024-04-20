@@ -14,4 +14,11 @@ namespace LawSearch_Core.Models
         public int LawID;
         public int Count;
     }
+
+    public class ConceptKeyphraseShow
+    {
+        public int ID;
+        public string KeyPhrase;
+        public string KeyNorm;
+    }
 }

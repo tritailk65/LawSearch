@@ -7,7 +7,7 @@ namespace LawSearch_Admin.Interfaces
     {
         Task<List<Concept>> GetListConcept();
 
-        Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id);
+        Task<List<ConceptKeyphraseShow>> GetListKeyphraseByConceptID(int concept_id);
 
         Task<ResponceMessage> AddConcept(string name, string content);
 
@@ -16,5 +16,7 @@ namespace LawSearch_Admin.Interfaces
         Task<ResponceMessage> DeleteConcept(int id);
 
         Task<ResponceMessage> AddConceptKeyphrase(int conceptid, string keyphrase);
+
+        Task<ResponceMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k);
     }
 }

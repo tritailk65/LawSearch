@@ -2,6 +2,7 @@
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -39,26 +40,38 @@ namespace LawSearch_Admin.Services
             return lst;
         }
 
-        public async Task<List<KeyPhrase>> GetListKeyphraseByConceptID(int concept_id)
+        public async Task<List<ConceptKeyphraseShow>> GetListKeyphraseByConceptID(int concept_id)
         {
-            List<KeyPhrase> ls = new();
-            var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/Concept/GetListKeyPhrases?id=" + concept_id);
+            List<ConceptKeyphraseShow> ls = new();
+            var rs_client = await httpClient.GetAsync($"api/Concept/GetConceptKeyphrase?ConceptID=" + concept_id);
+            var _ = await rs_client.Content.ReadAsStringAsync();
 
-            if (rs != null && rs.Status == 200)
+            try
             {
-                if (rs.Data.Count > 0)
+                APIResultVM<ConceptKeyphraseShow> rs = JsonConvert.DeserializeObject<APIResultVM<ConceptKeyphraseShow>>(_);
+
+                if (rs != null && rs.Status == 200)
                 {
-                    ls = rs.Data.ToList();
+                    if (rs.Data.Count > 0)
+                    {
+                        ls = rs.Data;
+                    }
+                    else
+                    {
+                        // Handle error here
+                    }
                 }
                 else
                 {
                     // Handle error here
                 }
-            }
-            else
+
+            } catch (Exception ex)
             {
-                // Handle error here
+                Console.WriteLine(ex.Message);
             }
+
+            
 
             return ls;
         }
@@ -163,6 +176,30 @@ namespace LawSearch_Admin.Services
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Add concept keyphrase failed";
+                    rm.Error = resultPost.Message.ToString();
+                }
+            }
+
+            return rm;
+        }
+
+        public async Task<ResponceMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k)
+        {
+            ResponceMessage rm = new();
+
+            var rs = await httpClient.DeleteAsync($"api/Concept/DeleteConceptKeyphrase?ConceptKeyphraseID=" +k.ID);
+
+            if (rs.IsSuccessStatusCode)
+            {
+                rm.Status = true;
+                rm.Message = "Delete concept keyphrase success";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    rm.Message = "Delete concept keyphrase failed";
                     rm.Error = resultPost.Message.ToString();
                 }
             }
