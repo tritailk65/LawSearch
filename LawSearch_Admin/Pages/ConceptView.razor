@@ -94,7 +94,6 @@
     }
     <div class="main_view">
         <div class="button_concept_view">
-            <div class="my_button" @onclick="MapKeyphrase"><a>Map keyphrase</a></div>
             <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
             <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
             <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
@@ -166,39 +165,15 @@
                             {
                                 foreach (var keyphrase in Keyphrases)
                                 {
-                                    string text = keyphrase.KeyPhrase;
-                                    if(text.Length >= 24)
-                                    {
-                                        List<string> splitText = SplitString(text, 24);
+                                    <li>
+                                        <div class="keyphrase_not_selected">
+                                            <a>@keyphrase.KeyPhrase</a>
 
-                                        <li>
-                                            <div class="keyphrase_multiline">
-                                                <div>
-                                                    @foreach (var chunk in splitText)
-                                                    {
-                                                        <a>@chunk</a>
-
-                                                        <br>
-                                                    }
-                                                </div>
-
-                                                <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
-                                                    <a>Xoá</a>
-                                                </div>
+                                            <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
+                                                <a>Xoá</a>
                                             </div>
-                                        </li>
-                                    } else
-                                    {
-                                        <li>
-                                            <div class="keyphrase_not_selected">
-                                                <a>@keyphrase.KeyPhrase</a>
-
-                                                <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
-                                                    <a>Xoá</a>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    }
+                                        </div>
+                                    </li>
                                 }
                             }
                         }
