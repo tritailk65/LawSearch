@@ -1,5 +1,6 @@
 ﻿using LawSearch_Core.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,9 @@ namespace LawSearch_Core.Common
 
             // Tạo từ điển thể hiện tần suất hiện keyphrase trong toàn bộ văn bản
             SortedDictionary<string, int> vocabulary = new();
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
             for (int i = 0; i < lstResult.Count; i++)
             {
                 for (int j = 0; j < lstResult[i].keys.Count; j++)
@@ -36,20 +40,29 @@ namespace LawSearch_Core.Common
 
             // Tạo từ điển chứa tần suất thể hiện IDF của 1 keyphrase
             Dictionary<string, double> _vocabularyIDF = new();
-            foreach (var term in vocabulary.Keys)
+
+            ConcurrentDictionary<string, double> _vocabularyIDFSafetyDict = new ConcurrentDictionary<string, double>();
+
+            Parallel.ForEach(vocabulary.Keys, v =>
             {
-                // Số tài liệu mà keyphrase xuất hiện trong đó
                 double numberOfDocsContainingTerm = lstResult.Count(
                     d => d.keys.Exists(
-                        x => string.Compare(x.Key, term, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        x => string.Compare(x.Key, v, StringComparison.InvariantCultureIgnoreCase) == 0)
                 );
-                // IDF:
-                _vocabularyIDF[term] = Math.Log((double)lstResult.Count / ((double)1 + numberOfDocsContainingTerm));
+                var idf = Math.Log((double)lstResult.Count / ((double)1 + numberOfDocsContainingTerm));
+                _vocabularyIDFSafetyDict.TryAdd(v,idf);
+            });
+
+            _vocabularyIDF = _vocabularyIDFSafetyDict.ToDictionary(x => x.Key, x => x.Value);
+
+            List<List<double>> vectors = new List<List<double>>();
+
+            for (int i = 0; i < lstResult.Count; i++)
+            {
+                vectors.Add(null);
             }
 
-            // Chuyển đổi các điều luật thành các vector tf-idf
-            List<List<double>> vectors = new();
-            foreach (var myKey in lstResult)
+            Parallel.ForEach(lstResult, (myKey, state, index) =>
             {
                 List<double> vector = new();
 
@@ -77,14 +90,15 @@ namespace LawSearch_Core.Common
                     vector.Add(tfidf);
                 }
 
-                vectors.Add(vector);
-            }
+                vectors[(int)index] = vector;
+            });
 
             // Chuẩn hoá vector L2-Norm
             double[][] inputs = vectors.Select(v => v.ToArray()).ToArray();
             inputs = Normalize(inputs);
             var show2 = inputs;
             // Đưa các vector vào lại danh sách điều luật
+
             for (int i = 0; i < lstResult.Count; i++)
             {
                 lstResult[i].vector = inputs[i];
@@ -98,6 +112,7 @@ namespace LawSearch_Core.Common
                 // Tính độ tương đồng cosine
                 lstResult[i].distance = ComputeCosineSimilarity(search_vector, lstResult[i].vector);
             }
+
             // Sắp xếp danh sách giảm dần độ tương đồng cosine với điều kiện độ tương đồng > minDis và chỉ lấy itop thành phần đầu tiên
             List<KeyPhraseResult> lstReturn = lstResult.OrderByDescending(x => x.distance).Where(x => x.distance > minDis).Take(itop).ToList();
             return lstReturn;
