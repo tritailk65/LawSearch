@@ -69,6 +69,15 @@ namespace LawSearch_API.Controllers
             return rs.Success(lst);
         }
 
+        [HttpGet("[action]")]
+        public APIResult GetConceptKeyphrase([BindRequired] int ConceptID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            List<ConceptKeyphraseShow> lst = _conceptService.GetConceptKeyphraseByConceptID(ConceptID);
+            APIResult rs = new();
+            return rs.Success(lst);
+        }
+
         [HttpPost("[action]")]
         public async Task<APIResult> GenerateKeyphraseDescript([BindRequired] int lawID)
         {
@@ -88,10 +97,10 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpDelete("[action]")]
-        public APIResult DeleteConceptKeyphrase([BindRequired] int KeyphraseID)
+        public APIResult DeleteConceptKeyphrase([BindRequired] int ConceptKeyphraseID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            _conceptService.DeleteConceptKeyphrase(KeyphraseID);
+            _conceptService.DeleteConceptKeyphrase(ConceptKeyphraseID);
             APIResult rs = new();
             return rs.MessageSuccess("Delete ConceptKeyphrase success!");
         }

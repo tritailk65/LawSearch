@@ -200,11 +200,37 @@ namespace LawSearch_Core.Services
             }
         }
 
-        /// <summary>
-        /// Hàm tự sinh keyphrase cơ bản từ Description trích xuất từ PhoBERT
-        /// </summary>
-        /// <param name="lawID">ID văn bản luật</param>
-        /// <returns></returns>
+        public List<ConceptKeyphraseShow> GetConceptKeyphraseByConceptID(int id)
+        {
+            try
+            {
+                _db.OpenConnection();
+
+                string sql = "select Concept_KeyPhrase.ID, KeyPhrase.KeyPhrase, KeyPhrase.KeyNorm from Concept_KeyPhrase inner join KeyPhrase on Concept_KeyPhrase.KeyPhraseID = KeyPhrase.ID where Concept_KeyPhrase.ConceptID = " + id;
+                DataTable rs = _db.ExecuteReaderCommand(sql, "");
+                List<ConceptKeyphraseShow> lst = new List<ConceptKeyphraseShow>();
+                for (int i = 0; i < Globals.DTCount(rs); i++)
+                {
+                    lst.Add(new ConceptKeyphraseShow
+                    {
+                        ID = Globals.GetIDinDT(rs, i, "ID"),
+                        KeyPhrase = Globals.GetinDT_String(rs, i, "KeyPhrase"),
+                        KeyNorm = Globals.GetinDT_String(rs, i, "KeyNorm")
+                    });
+                }
+                return lst;
+
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
+        }
+
         public async Task GenerateKeyphraseDescript(int lawID)
         {
             #region Transaction init
@@ -404,13 +430,7 @@ namespace LawSearch_Core.Services
             }
         }*/
 
-        /// <summary>
-        /// Add keyphrase, add concept_keyphrase, auto generate keyphrasemapping and conceptmapping
-        /// </summary>
-        /// <param name="ConceptID"></param>
-        /// <param name="Keyphrase"></param>
-        /// <exception cref="BadRequestException"></exception>
-        public void AddConceptKeyphrase(int ConceptID, string Keyphrase)
+        public async void AddConceptKeyphrase(int ConceptID, string Keyphrase)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -445,12 +465,12 @@ namespace LawSearch_Core.Services
                 {
                     throw new BadRequestException("KeyPhrase is null or empty", 400, 400);
                 }
-
-                command.CommandText = $"exec GetKeyPhrase N'{Keyphrase}', 'N'";
-                int id = _db.ExecuteScalarCommand<int>(command);
+                command.CommandText = string.Format("exec GetKeyPhrase N'"+ Keyphrase + "', 'N'");
+                DataTable dt = _db.ExecuteReaderCommand(command, "");
+                int id = Globals.GetIDinDT(dt, 0, 0);
 
                 command.CommandText = $"select * from [KeyPhrase] where id = {id}";
-                DataTable dt = _db.ExecuteReaderCommand(command, "");
+                dt = _db.ExecuteReaderCommand(command, "");
                 KeyPhrase rsAddKeyphrase = new KeyPhrase
                 {
                     ID = Globals.GetIDinDT(dt, 0, "ID"),
@@ -539,8 +559,9 @@ namespace LawSearch_Core.Services
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("Error: " + ex.Message);
                 transaction.Rollback();
                 throw;
             }
@@ -550,12 +571,42 @@ namespace LawSearch_Core.Services
             }
         }
 
-        /// <summary>
-        /// Delete ConceptKephrase, Keyphrase, KeyphraseMapping, ConceptMapping theo KeyphraseID
-        /// </summary>
-        /// <param name="KeyphraseID"></param>
-        /// <exception cref="BadRequestException"></exception>
-        public void DeleteConceptKeyphrase(int KeyphraseID)
+        public void DeleteConceptKeyphrase(int ConceptKeyphraseID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                command.CommandText = $"delete Concept_Keyphrase where ID = {ConceptKeyphraseID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            } finally
+            {
+                connection.Close(); 
+            }
+        }
+
+        public void DeleteAllInfoRelateToConceptKeyphrase(int KeyphraseID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -577,8 +628,8 @@ namespace LawSearch_Core.Services
             {
                 //Check KeyphraseID
                 command.CommandText = $"Select * from Keyphrase where id = {KeyphraseID}";
-                var checkKeyphraseID = _db.ExecuteReaderCommand(command,"");
-                if(checkKeyphraseID.Rows.Count == 0)
+                var checkKeyphraseID = _db.ExecuteReaderCommand(command, "");
+                if (checkKeyphraseID.Rows.Count == 0)
                 {
                     throw new BadRequestException("KeyphraseID not found!", 400, 400);
                 }
@@ -601,9 +652,10 @@ namespace LawSearch_Core.Services
             {
                 transaction.Rollback();
                 throw;
-            } finally
+            }
+            finally
             {
-                connection.Close(); 
+                connection.Close();
             }
         }
 
