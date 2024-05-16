@@ -341,53 +341,6 @@
 </div>
 @* Kết thúc web *@
 
-
-@* <div>
-    <Button ButtonStyle="add-button" @onclick="() => {}">
-        Add
-    </Button>
-    <Button ButtonStyle="delete-button" @onclick="() => {}">
-        Delete
-    </Button>
-    <Button ButtonStyle="reset-button" @onclick="() => {}">
-        Reset
-    </Button>
-</div>
-
-<div class="content">
-    <div class="left-content">
-        <div class="search-container">
-            <input type="text" placeholder="Tìm kiếm..." @bind="@searchKeyword" @oninput="HandleSearchInputChange">
-        </div>
-        <div class="list-keyphrase">
-            @if (keyPhrases != null && keyPhrases.Any() && filterKeyPhrase == null)
-            {
-                <ol>
-                    @foreach (var item in keyPhrases)
-                    {
-                        <li @onclick="@(()=> ShowDetail(item.ID))" style="cursor: pointer">@item.Keyphrase</li>
-                    }
-                </ol>
-            } else if (filterKeyPhrase != null){
-            <ol>
-                @foreach (var item in filterKeyPhrase)
-                {
-                    <li @onclick="@(()=> ShowDetail(item.ID))" style="cursor: pointer">@item.Keyphrase</li>
-                }
-            </ol>
-            }
-            else
-            {
-                <p>Loading...</p>
-            }
-        </div>
-    </div>
-
-    <div class="keyphrase-detail">
-        <KeyPhraseRelateDetail  keyPhrasesRelates="@keyPhraseRelates"/>
-    </div>
-</div> *@
-
 @code {
     public Boolean isLoadingKeyphrase = true;
     public Boolean isLoadingKeyphraseRelates = true;

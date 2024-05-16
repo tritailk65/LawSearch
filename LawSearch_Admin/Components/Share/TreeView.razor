@@ -1,0 +1,59 @@
+﻿@if (Items != null)
+{
+    foreach (var item in Items)
+    {
+        <li class="item@(item.IsSelected ? " selected" : "")"
+            style="padding-left: @(Level * 16)px"
+            @onclick="() => ItemSelected(item)">
+            @if (item.HasChildren)
+            {
+                <span class="arrow"
+                      @onclick="() => item.IsCollapsed = !item.IsCollapsed"
+                @onclick:stopPropagation>
+                    <img class="icon" src="@(item.IsCollapsed ? "assests/icon/item_up.png" : "assests/icon/item_down.png")" aria-hidden="true" />
+                </span>
+            }
+            else
+            {
+                <span class="arrow-placeholder"></span>
+            }
+            <span class="text" style="width: fit-content;">@item.Text</span>
+        </li>
+        @if (item.HasChildren && !item.IsCollapsed)
+        {
+            <TreeView Items="@item.Children"
+                      Level="@(Level + 1)"
+                      OnSelect="ItemSelected">
+            </TreeView>
+        }
+    }
+}
+
+
+@code {
+    [Parameter]
+    public List<TreeViewItem>? Items { get; set; } 
+
+    [Parameter]
+    public int Level { get; set; }
+
+    [Parameter]
+    public EventCallback<TreeViewItem> OnSelect { get; set; }
+
+    public async Task ItemSelected(TreeViewItem selectedItem)
+    {
+        if(Level == 1)
+            UpdateSelection(Items!, selectedItem);
+        await OnSelect.InvokeAsync(selectedItem);
+    }
+
+    private void UpdateSelection(List<TreeViewItem> items, TreeViewItem selectedItem)
+    {
+        foreach(var item in items)
+        {
+            item.IsSelected = item == selectedItem;
+            if (item.HasChildren)
+                UpdateSelection(item.Children!, selectedItem);
+        }
+    }
+}

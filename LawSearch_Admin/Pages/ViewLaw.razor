@@ -15,11 +15,10 @@
                 }
             }
         </select>
-        <div class="btn">
-            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
+            <button class="btn-view-full" data-toggle="modal" data-target="#exampleModal">
                 View full document
-            </Button>
-        </div>
+            </button>
+
     </div>
 
     <div class="main-content">
@@ -32,47 +31,42 @@
         {
             <div class="left-content">
                 <div class="index">
-                    @if (lawVM.lstChapters.Count > 0)
-                    {
-                        foreach (var c in lawVM.lstChapters)
-                        {
-                            <div class="chapter">
-                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                @c.Name @c.Title [@c.ID]
-                            </div>
-                            if (c.lstSections != null && c.lstSections.Count > 0)
-                            {
-                                foreach (var s in c.lstSections)
-                                {
-                                    if(s.Name != "")
-                                    {
-                                        <div class="section">
-                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                            @s.Name [@s.ID]
-                                        </div>
-                                    }
-                                    if (s.lstArticals.Count > 0)
-                                    {
-                                        foreach (var a in s.lstArticals)
-                                        {
-                                            <div class="artical">
-                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
-                                                @a.Name: @a.Title [@a.ID]
-                                            </div>
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                     <TreeView Items = "@dataIndex" OnSelect="item => Console.WriteLine(item.Text)"/>
                 </div>
-            </div>
+            </div> 
         }
         <div class="right-content">
-            @if(lawHTML != null)
+            @if (lawHTML != null)
             {
-                @((MarkupString)lawHTML.contentHTML);
-            }   
+                <div class="document-view">
+                        @((MarkupString)lawHTML.contentHTML);
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="full-right-content">
+                    @if (lawHTML != null)
+                    {
+                        <div class="full-document-view">
+                            @((MarkupString)lawHTML.contentHTML);
+                        </div>
+                    }
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -82,6 +76,7 @@
 
     public LawVM lawVM = new LawVM();
     public LawHTML lawHTML = new LawHTML();
+    public List<TreeViewItem> dataIndex;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,7 +88,10 @@
         lawHTML = loadHTML;
         var data = await lawDocAdminService.GetDataLaw(lstLawDoc[0].ID);
         lawVM = data;
-
+        if (lawVM != null)
+        {
+            dataIndex = getDataIndex();
+        }
     }
 
     private async void GetDataLaw(ChangeEventArgs e)
@@ -106,5 +104,41 @@
         var data = await lawDocAdminService.GetDataLaw(id);
         lawVM = data;
         StateHasChanged();
+    }
+
+    private List<TreeViewItem> getDataIndex()
+    {
+        List<TreeViewItem> treeChapters = new List<TreeViewItem>();
+        foreach (var c in lawVM.lstChapters)
+        {
+            TreeViewItem treeChapter = new TreeViewItem(c.Name + ": " + c.Title);
+            if (c.lstSections != null && c.lstSections.Count > 0)
+            {
+                List<TreeViewItem> treeSections = new List<TreeViewItem>();
+                var sections = c.lstSections
+                       .Where(x => x.ChapterID == c.ID)
+                       .OrderBy(x => x.ID);
+                foreach (var s in sections)
+                {
+                    TreeViewItem treeSection = new TreeViewItem(s.Name != "" ? s.Name:"");
+                    if(s.lstArticals != null && s.lstArticals.Count > 0)
+                    {
+                        List<TreeViewItem> treeArticals = new List<TreeViewItem>();
+                        var articals = s.lstArticals
+                                        .Where(x => x.ChapterItemID == s.ID)
+                                        .OrderBy(x => x.ID);
+                        foreach(var a in articals)
+                        {
+                            treeArticals.Add(new TreeViewItem(a.Name + ": " + a.Title));
+                        }
+                        treeSection.Children = treeArticals;
+                    }
+                    treeSections.Add(treeSection);
+                }
+                treeChapter.Children = treeSections; 
+            }
+            treeChapters.Add(treeChapter);
+        }
+        return treeChapters;
     }
 }

@@ -19,11 +19,18 @@
             }
         </select>
         <div class="btn">
-            <Button ButtonStyle="add-button btn-custom" @onclick="() => {}">
-                Add New
-            </Button>
-            <Button ButtonStyle="delete-button btn-custom" @onclick="DeleteLaw">
+            <NavLink href="importlaw">
+                <Button ButtonStyle="add-button btn-custom">
+                    Add New
+                </Button>
+            </NavLink>
+
+            <Button ButtonStyle="delete-button btn-custom" data-toggle="modal" data-target="#exampleModal">
                 Delete Law
+            </Button>
+
+            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
+                Edit Law
             </Button>
         </div>
     </div>
@@ -39,44 +46,38 @@
         {
             <div class="left-content">
                 <div class="index">
-                    @if (lawVM.lstChapters.Count > 0)
-                    {
-                        foreach (var c in lawVM.lstChapters)
-                        {
-                            <div class="chapter">
-                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                @c.Name @c.Title
-                            </div>
-                            if (c.lstSections != null && c.lstSections.Count > 0)
-                            {
-                                foreach (var s in c.lstSections)
-                                {
-                                    if (s.Name != "")
-                                    {
-                                        <div class="section">
-                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
-                                            @s.Name
-                                        </div>
-                                    }
-                                    if (s.lstArticals.Count > 0)
-                                    {
-                                        foreach (var a in s.lstArticals)
-                                        {
-                                            <div class="artical">
-                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
-                                                @a.Name: @a.Title
-                                            </div>
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    <TreeView Items="@dataIndex" OnSelect="item => showContentEdit(item)" />
                 </div>
             </div>
         }
-        <div class="right-content">
+        @if(contentEdit != null)
+        {
+            <div class="right-content">
+                <div class="document-view">
+                    @contentEdit
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Law</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc muốn xóa văn bản luật khỏi cơ sở dữ liệu ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+                <button type="button" class="btn btn-primary" @onclick="DeleteLaw">OK</button>
+            </div>
         </div>
     </div>
 </div>
@@ -86,6 +87,11 @@
     public List<Chapter> lstChapter = new List<Chapter>();
     public LawVM lawVM = new LawVM();
     public int idLawSelect;
+    public List<TreeViewItem> dataIndex;
+    public string contentEdit = null;
+
+    public bool showModal = false;
+    public bool confirmed = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,6 +101,10 @@
         var data = await lawDocAdminService.GetDataLaw(lstLawDoc[0].ID);
         idLawSelect = lstLawDoc[0].ID;
         lawVM = data;
+        if (lawVM != null)
+        {
+            dataIndex = getDataIndex();
+        }
     }
 
     private async void GetDataLaw(ChangeEventArgs e)
@@ -109,25 +119,87 @@
 
     public async void DeleteLaw()
     {
-        var confirm = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure to delete this law ?");
-        if (confirm)
+        var rs = await lawDocAdminService.DeleteLaw(idLawSelect);
+        if (rs)
         {
-            var rs = await lawDocAdminService.DeleteLaw(idLawSelect);
-            if (rs)
-            {
-                await JsRuntime.InvokeVoidAsync("alert", "Delete success!");
-                ReloadPage();
-            }
-            else
-            {
-                await JsRuntime.InvokeVoidAsync("alert", "Delete fail!");
-            }
+            await JsRuntime.InvokeVoidAsync("alert", "Delete success!");
+            ReloadPage();
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Delete fail!");
         }
     }
 
     public void ReloadPage()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    private List<TreeViewItem> getDataIndex()
+    {
+        List<TreeViewItem> treeChapters = new List<TreeViewItem>();
+        foreach (var c in lawVM.lstChapters)
+        {
+            TreeViewItem treeChapter = new TreeViewItem(c.Name + ": " + c.Title,"Chapter",c.ID);
+            if (c.lstSections != null && c.lstSections.Count > 0)
+            {
+                List<TreeViewItem> treeSections = new List<TreeViewItem>();
+                var sections = c.lstSections
+                       .Where(x => x.ChapterID == c.ID)
+                       .OrderBy(x => x.ID);
+                foreach (var s in sections)
+                {
+                    TreeViewItem treeSection = new TreeViewItem(s.Name != "" ? s.Name : "","Section",s.ID);
+                    if (s.lstArticals != null && s.lstArticals.Count > 0)
+                    {
+                        List<TreeViewItem> treeArticals = new List<TreeViewItem>();
+                        var articals = s.lstArticals
+                                        .Where(x => x.ChapterItemID == s.ID)
+                                        .OrderBy(x => x.ID);
+                        foreach (var a in articals)
+                        {
+                            treeArticals.Add(new TreeViewItem(a.Name + ": " + a.Title,"Artical",a.ID));
+                        }
+                        treeSection.Children = treeArticals;
+                    }
+                    treeSections.Add(treeSection);
+                }
+                treeChapter.Children = treeSections;
+            }
+            treeChapters.Add(treeChapter);
+        }
+        return treeChapters;
+    }
+
+    private void showContentEdit(TreeViewItem item)
+    {
+        if(item.Type == "Chapter")
+        {
+            var c = lawVM.lstChapters.FirstOrDefault(x => x.ID == item.ID);
+            if(c != null)
+            {
+                contentEdit = c.Name + ": " + c.Title;
+            }
+        }if(item.Type == "Section" && item.Text != "")
+        {
+            var s = lawVM.lstChapters
+                        .SelectMany(x => x.lstSections)
+                        .FirstOrDefault(x => x.ID == item.ID);
+            if (s != null)
+            {
+                contentEdit = s.Name;
+            }
+        }if(item.Type == "Artical")
+        {
+            var a = lawVM.lstChapters
+                        .SelectMany(c => c.lstSections.SelectMany(s => s.lstArticals))
+                        .FirstOrDefault(x => x.ID == item.ID);
+            if (a != null)
+            {
+                contentEdit = a.Content;
+            }
+        }
     }
 }
 

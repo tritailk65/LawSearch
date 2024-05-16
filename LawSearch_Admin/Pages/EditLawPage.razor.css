@@ -1,5 +1,6 @@
 ﻿.body-container {
     min-height: 88vh;
+    padding: 0 80px;
 }
 
 .header-content{
@@ -24,6 +25,7 @@
     background-color: #25293C;
     border: 1px solid #434968;
     color: white;
+    padding-left: 10px;
 }
 
 .dropdown-item{
@@ -38,6 +40,7 @@
     background-color: #303348;
     border-radius: 20px;
     padding: 26px;
+    margin-bottom: 20px;
 }
 
 .left-content {
@@ -152,5 +155,37 @@
     100% {
         transform: rotate(-360deg);
     }
+}
+
+.right-content {
+    display: flex;
+    justify-content: center;
+    width: 60%;
+    height: 100%;
+    padding: 10px;
+    overflow-y: auto;
+    border-left: 3px solid #434968;
+    font-size: 1rem;
+    padding: 0 0 0 10px;
+}
+
+.document-view {
+    padding: 30px 50px;
+    background-color: white;
+    white-space: pre-line;
+    width: 100%;
+    height: fit-content;
+    min-height: 100%;
+    color: black;
+}
+
+.modal-header {
+    color: #303348;
+    font-weight: 1000;
+}
+
+.modal-body {
+    color: black;
+    margin: 30px;
 }
 

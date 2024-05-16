@@ -3,6 +3,7 @@
     min-height: 88vh;
     background-color: #303348;
     border-radius: 20px;
+    margin-bottom: 20px;
 }
 
 .title-container{
@@ -13,14 +14,17 @@
 }
 
 .title {
-    width: 10%
+    width: 18%;
+    font-weight: 600;
+    margin-left: 10px;
 }
 
 .input {
-    width: 90%;
     background-color: #303348;
     border: 1px solid #434968;
-    color: white
+    color: white;
+    width: 90%;
+    height: 39px;
 }
 
 .content-container {
@@ -28,8 +32,16 @@
     height: 400px;
     margin: 20px;
     padding-top: 20px;
+    height: 65vh;
 }
 
-.import-btn{
-    float:right;
+.import-btn {
+    display:flex;
+    float: right;
+    margin-right:20px;
 }
+
+.btn-custom{
+    width: 200px;
+}
+
