@@ -1,5 +1,6 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
@@ -28,6 +29,15 @@ namespace LawSearch_API.Controllers
             var data = sectionService.GetByLawID(id);
             APIResult rs = new();
             return rs.Success(data);
+        }
+
+        [HttpPut]
+        public APIResult EditContentSection([FromBody] Section section)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            sectionService.EditContentSection(section);
+            APIResult rs = new();
+            return rs.MessageSuccess("Chỉnh sửa nội dung section thành công!");
         }
 
     }

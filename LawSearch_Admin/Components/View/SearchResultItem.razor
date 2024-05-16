@@ -1,7 +1,9 @@
-﻿﻿<div class="result-item">
-    <div class="result-info">
-        [Rank #@Rank] - [@Artical.Title] - [@Artical.LawName]
-    </div>
+﻿@inject IArticalAdminService articalAdminService;﻿
+
+<div class="result-item">
+    <label class="result-info" data-toggle="modal" data-target="#exampleModal" @onclick="() => {}">
+            [Rank #@Rank] - [@Artical.Title] - [@Artical.LawName] 
+    </label>
     <div class="result-content">
         @Artical.Content
     </div><br />
@@ -11,10 +13,48 @@
     <hr />
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Thông tin chi tiết</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if(articalDetail != null)
+                {
+                    <div>
+                        @articalDetail.Content
+                    </div>
+                     
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public int Rank { get; set; } 
 
     [Parameter]
-    public ArticalResult Artical { get; set; } 
+    public ArticalResult Artical { get; set; }
+
+    public ArticalDetail articalDetail = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rs = await articalAdminService.GetArticalDetail(Artical.ID);
+        if (rs != null)
+        {
+            articalDetail = rs;
+            Console.WriteLine(articalDetail.Content);
+        }
+    }
 }

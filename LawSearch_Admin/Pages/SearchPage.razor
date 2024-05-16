@@ -15,10 +15,10 @@
 
     @if (lstResult != null)
     {
-        <div class="info">
+@*         <div class="info">
             Keyphrases search: @keySearch <br />
             Concept: @conceptTop
-        </div>
+        </div> *@
         <div class="result-container">
             <div class="result-total">
                 Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
@@ -32,8 +32,6 @@
 </div>
 
 @code{
-    public string rank = "Rank #1";
-    public string title = "Điều 83 | Chương 6 | Luật đất đai 2013";
     public string keySearch = "";
     public string conceptTop = "";
 

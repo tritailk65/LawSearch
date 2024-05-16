@@ -25,12 +25,12 @@
                 </Button>
             </NavLink>
 
-            <Button ButtonStyle="delete-button btn-custom" data-toggle="modal" data-target="#exampleModal">
+            <Button ButtonStyle="delete-button btn-custom" data-toggle="modal" data-target="#modal-delete">
                 Delete Law
             </Button>
 
-            <Button ButtonStyle="reset-button btn-custom" @onclick="() => {}">
-                Edit Law
+            <Button ButtonStyle="reset-button btn-custom" data-toggle="modal" data-target="#modal-edit" data-backdrop="static" data-keyboard="false" disabled="@string.IsNullOrEmpty(contentEdit)">
+                Edit Content
             </Button>
         </div>
     </div>
@@ -45,28 +45,31 @@
         else if (lawVM != null)
         {
             <div class="left-content">
-                <div class="index">
-                    <TreeView Items="@dataIndex" OnSelect="item => showContentEdit(item)" />
-                </div>
+                    <div class="index">
+                        <TreeView Items="@dataIndex" OnSelect="item => showContentEdit(item)" />
+                    </div>
             </div>
         }
         @if(contentEdit != null)
         {
             <div class="right-content">
-                <div class="document-view">
-                    @contentEdit
-                </div>
+                @if (dataIndex != null)
+                {
+                    <div class="document-view">
+                        @contentEdit
+                    </div>
+                }
             </div>
         }
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal delete law -->
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog"  aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Delete Law</h5>
+                <h5 class="modal-title">Delete Law</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -82,6 +85,84 @@
     </div>
 </div>
 
+<!-- Modal edit law  -->
+@if (dataToEdit != null)
+{
+    <div class="modal fade" id="modal-edit" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                @if(dataToEdit.Type == "Chapter")
+                {
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form spellcheck="false">
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold">Name:</label>
+                                <input type="text" class="form-control" @bind="dataToEdit.Chapter.Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold mt-2">Title:</label>
+                                <textarea class="form-control" @bind="dataToEdit.Chapter.Title"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="() => ChapterContentEditRequest(dataToEdit)">Save change</button>
+                    </div>
+                }
+                @if(dataToEdit.Type == "Section")
+                {
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form spellcheck="false">
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold">Name:</label>
+                                <input type="text" class="form-control" @bind="dataToEdit.Section.Name">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="() => SectionContentEditRequest(dataToEdit)">Save change</button>
+                    </div>
+                }
+                @if(dataToEdit.Type == "Artical")
+                {
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form spellcheck="false">
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold">Name:</label>
+                                <input type="text" class="form-control" @bind="dataToEdit.Artical.Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold mt-2">Title:</label>
+                                <textarea class="form-control" @bind="dataToEdit.Artical.Title"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label fw-bold mt-2">Content:</label>
+                                <textarea class="form-control" @bind="dataToEdit.Artical.Content"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="() => ArticalContentEditRequest(dataToEdit)">Save change</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+
 @code {
     public List<LawDoc> lstLawDoc = new List<LawDoc>();
     public List<Chapter> lstChapter = new List<Chapter>();
@@ -89,13 +170,15 @@
     public int idLawSelect;
     public List<TreeViewItem> dataIndex;
     public string contentEdit = null;
-
+    public TreeViewItem dataToEdit = null;
     public bool showModal = false;
     public bool confirmed = false;
 
     protected override async Task OnInitializedAsync()
     {
         lawVM = null;
+        dataIndex = null;
+        dataToEdit = null;
         var lstLawDocData = await lawDocAdminService.GetListLawDoc();
         lstLawDoc = lstLawDocData;
         var data = await lawDocAdminService.GetDataLaw(lstLawDoc[0].ID);
@@ -110,10 +193,16 @@
     private async void GetDataLaw(ChangeEventArgs e)
     {
         lawVM = null;
+        dataIndex = null;
         int id = Convert.ToInt32(e.Value);
         idLawSelect = id;
         var data = await lawDocAdminService.GetDataLaw(id);
         lawVM = data;
+        if (lawVM != null)
+        {
+            dataIndex = getDataIndex();
+        }
+        contentEdit = null;
         StateHasChanged();
     }
 
@@ -142,6 +231,7 @@
         foreach (var c in lawVM.lstChapters)
         {
             TreeViewItem treeChapter = new TreeViewItem(c.Name + ": " + c.Title,"Chapter",c.ID);
+            treeChapter.Chapter = new Chapter{ ID = c.ID, Name = c.Name,Title = c.Title};
             if (c.lstSections != null && c.lstSections.Count > 0)
             {
                 List<TreeViewItem> treeSections = new List<TreeViewItem>();
@@ -151,6 +241,7 @@
                 foreach (var s in sections)
                 {
                     TreeViewItem treeSection = new TreeViewItem(s.Name != "" ? s.Name : "","Section",s.ID);
+                    treeSection.Section = new Section { ID = s.ID, Name = s.Name };
                     if (s.lstArticals != null && s.lstArticals.Count > 0)
                     {
                         List<TreeViewItem> treeArticals = new List<TreeViewItem>();
@@ -159,7 +250,9 @@
                                         .OrderBy(x => x.ID);
                         foreach (var a in articals)
                         {
-                            treeArticals.Add(new TreeViewItem(a.Name + ": " + a.Title,"Artical",a.ID));
+                            TreeViewItem treeArtical = new TreeViewItem(a.Name + ": " + a.Title, "Artical", a.ID);
+                            treeArtical.Artical = new Artical { ID = a.ID, Name = a.Name, Title = a.Title, Content = a.Content };
+                            treeArticals.Add(treeArtical);                            
                         }
                         treeSection.Children = treeArticals;
                     }
@@ -174,6 +267,7 @@
 
     private void showContentEdit(TreeViewItem item)
     {
+        dataToEdit = item;
         if(item.Type == "Chapter")
         {
             var c = lawVM.lstChapters.FirstOrDefault(x => x.ID == item.ID);
@@ -198,6 +292,57 @@
             if (a != null)
             {
                 contentEdit = a.Content;
+            }
+        }
+    }
+
+    private async void ChapterContentEditRequest(TreeViewItem item)
+    {
+        if (item.Chapter.Name != "" && item.Chapter.Title != "")
+        {
+            var rs = await lawDocAdminService.EditContentChapter(item.Chapter.ID, item.Chapter.Name, item.Chapter.Title);
+            if (rs)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit success!");
+                StateHasChanged();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit fail!");
+            }
+        }   
+    }
+
+    private async void SectionContentEditRequest(TreeViewItem item)
+    {
+        if (item.Section.Name != "")
+        {
+            var rs = await lawDocAdminService.EditeContentSection(item.Section.ID, item.Section.Name);
+            if (rs)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit success!");
+                StateHasChanged();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit fail!");
+            }
+        }
+    }
+
+    private async void ArticalContentEditRequest(TreeViewItem item)
+    {
+        if (item.Artical.Name != "" && item.Artical.Title != "" && item.Artical.Content != "")
+        {
+            var rs = await lawDocAdminService.EditeContentArtical(item.Artical.ID, item.Artical.Name, item.Artical.Title, item.Artical.Content);
+            if (rs)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit success!");
+                StateHasChanged();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Edit fail!");
             }
         }
     }

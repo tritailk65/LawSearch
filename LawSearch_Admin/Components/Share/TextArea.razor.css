@@ -2,8 +2,8 @@
 .input {
     width: 90%;
     background-color: #303348;
-    border: 1px solid #434968;
+    border: 1px solid #BAB6E2;
     color: white;
-    resize:none;
-    overflow-y:auto;
+    resize: none;
+    overflow-y: auto;
 }

@@ -21,7 +21,7 @@
 
 .input {
     background-color: #303348;
-    border: 1px solid #434968;
+    border: 1px solid #BAB6E2;
     color: white;
     width: 90%;
     height: 39px;
@@ -44,4 +44,130 @@
 .btn-custom{
     width: 200px;
 }
+
+/*Loading*/
+.title-loading {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.loading_ {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    height: 100px;
+    padding: 10px;
+    overflow: auto;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    border: 3px solid;
+    border-color: #FFF #FFF transparent transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+    .loader::after,
+    .loader::before {
+        content: '';
+        box-sizing: border-box;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 3px solid;
+        border-color: transparent transparent #FF3D00 #FF3D00;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+    }
+
+    .loader::before {
+        width: 32px;
+        height: 32px;
+        border-color: #FFF #FFF transparent transparent;
+        animation: rotation 1.5s linear infinite;
+    }
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotationBack {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+/*End loading*/
+
+/* Modal */
+.modal-body {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #383C56;
+    height: fit-content;
+    justify-content: center;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-dialog {
+    max-width: 407px;
+    border-radius: 10px;
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-content{
+    border-radius: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    background-color: #383C56;
+    border-radius: 0 0 20px 20px;
+}
+
+.modal-title-alert {
+    text-align: center;
+    font-size: 1.4rem;
+    width:100%;
+}
+
+.modal-message-alert {
+    text-align: center;
+    width: 100%;
+    margin: 30px 0;
+}
+
+/*End Modal*/
+
+
+
+
 

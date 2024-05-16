@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace LawSearch_Core.Services
 {
@@ -17,6 +18,57 @@ namespace LawSearch_Core.Services
         public ChapterService(IDbService dbService)
         {
             this.dbService = dbService;
+        }
+
+        public void EditContentChapter(Chapter chapter)
+        {
+            #region Transaction init
+            IDbConnection connection = dbService.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = dbService.CreateCommand();
+            IDbTransaction transaction = dbService.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check data
+                command.CommandText = $"Select * From Chater Where ID = {chapter.ID}";
+                var checkId = dbService.ExecuteReaderCommand(command, "");
+                if (checkId.Rows.Count == 0)
+                {
+                    throw new BadRequestException("Không tìm thấy ID Chapter", 400, 400);
+                }
+
+                if (chapter.Name == null || chapter.Title == "")
+                {
+                    throw new BadRequestException("Nội dung chỉnh sửa không được bỏ trống", 400, 400);
+                }
+
+                command.CommandText = $"Update Chapter " +
+                                        $"Set Name = N'{chapter.Name}', " +
+                                        $"Title = N'{chapter.Title}' " +
+                                        $"Where ID = {chapter.ID}";
+                dbService.ExecuteNonQueryCommand(command);
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                dbService.CloseConnection();
+            }
         }
 
         public List<Chapter> GetListChapterByLawID(int id)

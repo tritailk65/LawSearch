@@ -26,7 +26,7 @@ namespace LawSearch_Core.Services
                 List<Clause> lst = new List<Clause>();
                 db.OpenConnection();
 
-                var sql = @"select * from [Claust] where LawID = " + id + @" order by id";
+                var sql = @"select * from [Clause] where LawID = " + id + @" order by id";
                 DataTable rs = db.ExecuteReaderCommand(sql, "");
                 if (rs.Rows.Count != 0)
                 {

@@ -11,8 +11,8 @@ namespace LawSearch_Core.Models
         public int ID { get; set; }
         public string Name { get; set; }
         public int Number { get; set; }
-        public string Title { get; set; }
-        public int LawID { get; set; }
+        public string? Title { get; set; }
+        public int? LawID { get; set; }
         public List<Section> lstSection { get; set; }
 
         public Chapter() { lstSection = new List<Section>(); }

@@ -4,10 +4,31 @@
     padding-left: 20px;
 }
 
+.result-info {
+    height: 35px;
+    cursor: pointer;
+    width: fit-content;
+    transition: transform 0.3s ease;
+}
+
+    .result-info:hover {
+        transform: scale(1.1); 
+        color: red;
+        cursor: pointer;
+    }
+
 .result-content {
     font-size: 14px;
 }
 
 .aa{
     color: orange;
+}
+
+.modal-content {
+    color: black;
+}
+
+.modal-dialog {
+    max-width: 700px;
 }

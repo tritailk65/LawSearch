@@ -1,10 +1,15 @@
-﻿namespace LawSearch_Admin.ViewModels
+﻿using LawSearch_Core.Models;
+
+namespace LawSearch_Admin.ViewModels
 {
     public class TreeViewItem
     {
         public string? Text { get; set; }
         public string? Type { get; set; }
         public int? ID { get; set; }
+        public Chapter? Chapter { get; set; } = null;
+        public Section? Section { get; set; } = null;
+        public Artical? Artical { get; set; } = null;
         public List<TreeViewItem>? Children { get; set; }
         public bool IsCollapsed { get; set; }
         public bool IsSelected { get; set; }

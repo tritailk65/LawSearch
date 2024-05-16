@@ -20,6 +20,58 @@ namespace LawSearch_Core.Services
             this.db = db;
         }
 
+        public void EditContentArtical(Artical artical)
+        {
+            #region Transaction init
+            IDbConnection connection = db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = db.CreateCommand();
+            IDbTransaction transaction = db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check data
+                command.CommandText = $"Select * From Artical Where ID = {artical.ID}";
+                var checkId = db.ExecuteReaderCommand(command, "");
+                if (checkId.Rows.Count == 0)
+                {
+                    throw new BadRequestException("Không tìm thấy ID Chapter", 400, 400);
+                }
+
+                if (artical.Name == null || artical.Title == "" || artical.Content == "")
+                {
+                    throw new BadRequestException("Nội dung chỉnh sửa không được bỏ trống", 400, 400);
+                }
+
+                command.CommandText = $"Update Artical " +
+                                        $"Set Name = N'{artical.Name}', " +
+                                        $"Title = N'{artical.Title}', " +
+                                        $"Content = N'{artical.Content} '" +
+                                        $"Where ID = {artical.ID}";
+                db.ExecuteNonQueryCommand(command);
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                db.CloseConnection();
+            }
+        }
+
         public List<Artical> GetAllArtical()
         {
             try
@@ -35,6 +87,60 @@ namespace LawSearch_Core.Services
             {
                 throw;
             } finally
+            {
+                db.CloseConnection();
+            }
+        }
+
+        public ArticalDetail GetArticalDetail(int id)
+        {
+            try
+            {              
+                db.OpenConnection();
+
+                string sql = $"Select * From Artical Where ID = {id}";
+                var checkId = db.ExecuteReaderCommand(sql, "");
+                if (checkId.Rows.Count == 0)
+                {
+                    throw new BadRequestException("Không tìm thấy ID Artical", 400, 400);
+                }
+
+                string sqlDetail = @"Select a.ID, 
+		                                    a.Name, 
+		                                    a.Title, 
+		                                    a.Number, 
+		                                    a.Content,
+		                                    l.Name as 'LawName',
+		                                    c.Name as 'ChapterName', 
+		                                    c.Title as 'ChapterTitle', 
+		                                    ci.Name as 'SectionName' 
+                                    From Artical a
+                                    inner join Law l on l.ID = a.LawID
+                                    inner join Chapter c on c.ID = a.ChapterID
+                                    inner join ChapterItem ci on ci.ID = a.ChapterItemID
+                                    Where a.ID = " + id;
+
+                DataTable rs = db.ExecuteReaderCommand(sqlDetail, "");
+                ArticalDetail articalDetail = new ArticalDetail
+                {
+                    ID = Globals.GetIDinDT(rs,0,"ID"),
+                    Name = Globals.GetinDT_String(rs, 0, "Name"),
+                    Title = Globals.GetinDT_String(rs, 0, "Title"),
+                    Number = Globals.GetIDinDT(rs, 0, "Number"),
+                    Content = Globals.GetinDT_String(rs, 0, "Content"),
+                    LawName = Globals.GetinDT_String(rs, 0, "LawName"),
+                    ChapterName = Globals.GetinDT_String(rs,0,"ChapterName"),
+                    ChapterTitle = Globals.GetinDT_String(rs, 0, "ChapterTitle"),
+                    SectionName = Globals.GetinDT_String(rs, 0, "SectionName")
+                };
+
+                return articalDetail;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
             {
                 db.CloseConnection();
             }

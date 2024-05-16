@@ -10,5 +10,7 @@ namespace LawSearch_Core.Interfaces
     public interface ISectionService
     {
         List<Section> GetByLawID(int id);
+
+        void EditContentSection(Section section);
     }
 }

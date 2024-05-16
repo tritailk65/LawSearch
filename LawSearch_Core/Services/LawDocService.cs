@@ -334,7 +334,7 @@ namespace LawSearch_Core.Services
 
             clause.Title = hasLawPoint ? Globals.GetContentBetween(clause.Content, "\n" + Name, "a)", true, true) : "";
 
-            command.CommandText = "exec GetClaust N'" + clause.Content + "', N'" + clause.Title + "'," + number + "," + ArticalID;
+            command.CommandText = "exec GetClause N'" + clause.Content + "', N'" + clause.Title + "'," + number + "," + ArticalID;
             clause.ID = !isGenerateNewID ? -1 : Globals.GetIDinDT(db.ExecuteReaderCommand(command,""), 0, 0);
 
             if (clause.ID > 0 || !isGenerateNewID)

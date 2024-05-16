@@ -32,12 +32,30 @@ namespace BlazorAppAPI.Controllers
         }
 
         [HttpGet("[action]")]
+        public APIResult GetArticalDetail([BindRequired] int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            ArticalDetail dtResult = _articalService.GetArticalDetail(id);
+            APIResult rs = new APIResult();
+            return rs.Success(dtResult);
+        }
+
+        [HttpGet("[action]")]
         public APIResult GetByLawID([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             List<Artical> dtResult = _articalService.GetListArticalByLawID(id);
             APIResult rs = new APIResult();
             return rs.Success(dtResult);
+        }
+
+        [HttpPut]
+        public APIResult EditContentArtical([FromBody] Artical artical)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            _articalService.EditContentArtical(artical);
+            APIResult rs = new();
+            return rs.MessageSuccess("Chỉnh sửa nội dung Artical thành công!");
         }
 
     }

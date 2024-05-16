@@ -1,5 +1,12 @@
-﻿.ss{
+﻿.ss {
     min-height: 88vh;
+    padding: 0 80px;
+}
+
+@media (max-width:768px){
+    .ss{
+        padding:0;
+    }
 }
 
 .search-container {
@@ -63,4 +70,12 @@
     font-size: 1rem;
     height:50px;
     color: red;
+}
+
+.modal-content{
+    color: black;
+}
+
+.modal-dialog {
+    max-width: 700px;
 }

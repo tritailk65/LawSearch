@@ -73,7 +73,6 @@ namespace LawSearch_Core.Services
                         Keyphrase = Globals.GetinDT_String(rs, i,  "KeyPhrase"),
                         NumberArtical = Globals.GetIDinDT(rs, i, "NumberArtical"),
                         KeyNorm = Globals.GetinDT_String(rs, i, "KeyNorm"),
-                        LawID = Globals.GetIDinDT(rs, i, "LawID")
                     });
                 }
                 return lst;

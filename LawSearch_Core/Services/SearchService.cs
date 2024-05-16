@@ -42,7 +42,6 @@ namespace LawSearch_Core.Services
                         {
                             ID = Globals.GetIDinDT(dtKeyPhrases, i, "ID"),
                             Key = Globals.GetinDT_String(dtKeyPhrases, i, "KeyPhrase"),
-                            Source = (KeyPhraseSource)(Globals.GetIDinDT(dtKeyPhrases, i, "source")),
                             NumberArtical = Globals.GetIDinDT(dtKeyPhrases, i, "NumberArtical"),
                             PosTag = Globals.GetinDT_String(dtKeyPhrases, i, "PosTag"),
                             WordClassWeight = Globals.GetWordClassWeight(Globals.GetinDT_String(dtKeyPhrases, i, "PosTag")),
@@ -50,7 +49,6 @@ namespace LawSearch_Core.Services
                         });
                     }
                 }
-
 
                 foreach (var item in lstKeyPhrases_Searched)
                 {
@@ -107,7 +105,7 @@ namespace LawSearch_Core.Services
 
                 foreach (var artical in rs.lstArticals)
                 {
-                    DataTable dsDetail = _db.ExecuteReaderCommand("exec GetArticalDetail2 " + artical.ID,"");
+                    DataTable dsDetail = _db.ExecuteReaderCommand("exec GetArticalDetail " + artical.ID,"");
                     artical.Title = Globals.GetinDT_String(dsDetail, 0, "ChapterName") + " - " + Globals.GetinDT_String(dsDetail, 0, "Name");
                     artical.Content = Globals.GetinDT_String(dsDetail, 0, "Title");
                     artical.LawName = Globals.GetinDT_String(dsDetail, 0, "LawName");

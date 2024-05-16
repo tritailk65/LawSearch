@@ -14,9 +14,9 @@ namespace LawSearch_Core.Models
         public int ChapterID { get; set; }
         public int Number { get; set; }
         public string Name { get; set; }
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public int ChapterNumber { get; set; }
-        public List<Artical> lstArtical { get; set; }
+        public List<Artical>? lstArtical { get; set; }
 
         internal int GetFirstArticalNumber(string chapterItemContent, int chapterItemnumber)
         {
