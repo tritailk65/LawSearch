@@ -6,5 +6,6 @@ namespace LawSearch_Admin.Interfaces
     {
         Task<List<Artical>> GetListArtical();
         Task<ArticalDetail> GetArticalDetail(int id);
+
     }
 }

@@ -527,7 +527,6 @@ namespace LawSearch_Core.Services
 
         /// <summary>
         /// Hàm tự sinh ConceptMapping với đầu vào là ID văn bản luật
-        /// Note: Dùng khi muốn mapping concept(name) với những văn bản khác ngoài luật bđs 2024
         /// </summary>
         /// <param name="LawID">ID văn bản luật</param>
         /// <exception cref="BadRequestException"></exception>

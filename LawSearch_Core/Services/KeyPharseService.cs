@@ -316,31 +316,6 @@ namespace LawSearch_Core.Services
                     }
                 }
 
-                //Calc word class weight
-/*                List<KeyPhrase> keyPhrases = new List<KeyPhrase>();
-                command.CommandText = "select * from keyphrase";
-                var dt = _db.ExecuteReaderCommand(command, "");
-                if(dt.Rows.Count > 0)
-                {
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        keyPhrases.Add(new KeyPhrase
-                        {
-                            ID = Globals.GetIDinDT(dt,i,"ID"),
-                            PosTag = Globals.GetinDT_String(dt,i,"PosTag")
-                        });
-                    }
-                }
-
-                foreach (var keyPhrase in keyPhrases)
-                {
-                    var weight = Globals.GetWordClassWeight(keyPhrase.PosTag);
-                    command.CommandText = $"Update keyphrase set WordClassWeight = {weight} where id = {keyPhrase.ID}";
-                    _db.ExecuteNonQueryCommand(command);
-                }*/
-
-                //GenerateMapping(command, LawID);
-
                 transaction.Commit();
             }
             catch
@@ -494,5 +469,6 @@ namespace LawSearch_Core.Services
                 connection.Close();
             }
         }
+
     }
 }

@@ -1,43 +1,45 @@
 ﻿@inject IArticalAdminService articalAdminService;﻿
 
 <div class="result-item">
-    <label class="result-info" data-toggle="modal" data-target="#exampleModal" @onclick="() => {}">
-            [Rank #@Rank] - [@Artical.Title] - [@Artical.LawName] 
+    <label class="result-info w-100" @onclick="() => GetArticalDetailAsync(Artical.ID)">
+        <div>[Rank #@Rank] - [@Artical.Title] - [@Artical.LawName] </div>
+        <div class="mt-1">@Artical.Content</div>
     </label>
-    <div class="result-content">
-        @Artical.Content
-    </div><br />
-    <div>
+    <div class="mt-2">
         <div class="aa">Score: @Math.Round(Artical.Distance, 6)</div>
     </div>
     <hr />
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Thông tin chi tiết</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                @if(articalDetail != null)
-                {
-                    <div>
-                        @articalDetail.Content
-                    </div>
-                     
-                }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+@if (isShowModal)
+{
+    <div class="modal bg-dark bg-opacity-50" style="display:block"></div>
+    <div class="modal fade show"  style="display:block" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Thông tin chi tiết</h5>
+                    <button type="button" class="close" @onclick="CloseModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (articalDetail != null)
+                    {
+                        <h4 class="w-100 d-flex justify-content-center mt-2">@articalDetail.LawName</h4>
+                        <h5 class="w-100 d-flex justify-content-center mt-2">@(articalDetail.ChapterName + " " + articalDetail.ChapterTitle) </h5>
+                        <div class="artical-content mt-2 w-100 px-2">@articalDetail.Content</div>
+                    }                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="CloseModal">OK</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+
 
 @code {
     [Parameter]
@@ -47,14 +49,23 @@
     public ArticalResult Artical { get; set; }
 
     public ArticalDetail articalDetail = null;
+    public bool isShowModal = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var rs = await articalAdminService.GetArticalDetail(Artical.ID);
-        if (rs != null)
-        {
-            articalDetail = rs;
-            Console.WriteLine(articalDetail.Content);
-        }
+
+    }
+
+    private async Task GetArticalDetailAsync(int id)
+    {
+        var rs = await articalAdminService.GetArticalDetail(id);
+        articalDetail = rs;
+        isShowModal = true;
+        StateHasChanged();
+    }
+
+    private void CloseModal()
+    {
+        isShowModal = false;
     }
 }

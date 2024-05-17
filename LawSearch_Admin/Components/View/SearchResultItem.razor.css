@@ -10,10 +10,9 @@
     width: fit-content;
     transition: transform 0.3s ease;
 }
-
     .result-info:hover {
-        transform: scale(1.1); 
-        color: red;
+        transform: scale(1.04);
+        color: #03FCDE;
         cursor: pointer;
     }
 
@@ -30,5 +29,18 @@
 }
 
 .modal-dialog {
-    max-width: 700px;
+    max-width: 1000px;
+}
+
+.modal-body{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.artical-content {
+    white-space: pre-line;
+    height: fit-content;
+    overflow-y: auto;
+    max-height: 57vh;
 }
