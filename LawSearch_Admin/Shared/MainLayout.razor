@@ -1,27 +1,64 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
 
-<div class="page">
-    <div class="header ">
-        <div class="logo">          
-            <NavLink href="/">
-                <img class="logo-img" src="assests/Logo.png" alt="Logo main">
-            </NavLink>            
+@code {
+    private string currentPageName;
+
+    protected override void OnInitialized()
+    {
+        currentPageName = GetPageName();
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        currentPageName = GetPageName();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string GetPageName()
+    {
+        var uri = NavigationManager.Uri;
+        var uriSegments = new Uri(uri).Segments;
+        return uriSegments.Length > 1 ? uriSegments[1].TrimEnd('/') : "home";
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+
+@if (currentPageName == "home")
+{
+    @Body
+}
+else
+{
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <NavLink href="/">
+                    <img class="logo-img" src="assests/image/Logo.png" alt="Logo main">
+                </NavLink>
+            </div>
+            <div class="user-info">
+                <div class="avatar-container">
+                    <img src="assests/image/avatar.jpg" alt="User Avatar" class="avatar">
+                    <div class="status"></div>
+                </div>
+            </div>
         </div>
-        <div class="user-info">
-            <div class="avatar-container">
-              <img src="assests/avatar.jpg" alt="User Avatar" class="avatar">
-              <div class="status"></div>
-            </div>      
+
+        <div class="sidebar">
+            <NavMenu />
         </div>
-    </div>
 
-    <div class="sidebar">
-        <NavMenu />
+        <main>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
     </div>
-
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+}
