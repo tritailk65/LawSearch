@@ -1,8 +1,9 @@
 ﻿@page "/editlaw"
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager NavigationManager
-
 @inject ILawDocAdminService lawDocAdminService;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager;
 
 <div class="body-container">
     <div class="header-content">
@@ -44,7 +45,7 @@
                         foreach (var c in lawVM.lstChapters)
                         {
                             <div class="chapter">
-                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                <img class="icon" src="assets/icon/item_down.png" aria-hidden="true" />
                                 @c.Name @c.Title
                             </div>
                             if (c.lstSections != null && c.lstSections.Count > 0)
@@ -54,7 +55,7 @@
                                     if (s.Name != "")
                                     {
                                         <div class="section">
-                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                            <img class="icon" src="assets/icon/item_down.png" aria-hidden="true" />
                                             @s.Name
                                         </div>
                                     }
@@ -63,7 +64,7 @@
                                         foreach (var a in s.lstArticals)
                                         {
                                             <div class="artical">
-                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
+                                                <img class="icon" src="assets/icon/item_up.png" aria-hidden="true" />
                                                 @a.Name: @a.Title
                                             </div>
                                         }
@@ -89,6 +90,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await InvokeAsync(StateHasChanged);
+
         lawVM = null;
         var lstLawDocData = await lawDocAdminService.GetListLawDoc();
         lstLawDoc = lstLawDocData;

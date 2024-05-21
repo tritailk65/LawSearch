@@ -2,6 +2,8 @@
 @inject IConceptAdminService conceptAS;
 @inject IKeyPhraseAdminService keyphraseAS
 @inject IJSRuntime JsRuntime;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager;
 
 @* Băt đầu web *@
 <div class="background_view">
@@ -11,7 +13,7 @@
             <div class="form_add_new_concept_view">
                 <div class="top_form_view">
                     <div class="title_form"><a>Add New Concept</a></div>
-                    <div class="close_btn" @onclick="CloseAddNewConceptForm"><img class="icon" src="assests/icon/close_480px.png" /></div>
+                    <div class="close_btn" @onclick="CloseAddNewConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
                 </div>
                 <div>
                     <div class="concept_input_view">
@@ -41,7 +43,7 @@
             <div class="form_add_new_concept_view">
                 <div class="top_form_view">
                     <div class="title_form"><a>Edit Concept</a></div>
-                    <div class="close_btn" @onclick="CloseEditConceptForm"><img class="icon" src="assests/icon/close_480px.png" /></div>
+                    <div class="close_btn" @onclick="CloseEditConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
                 </div>
                 <div>
                     <div class="concept_input_view">
@@ -210,6 +212,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await InvokeAsync(StateHasChanged);
+
         // fetch concept
         await fetchConcept();
 
