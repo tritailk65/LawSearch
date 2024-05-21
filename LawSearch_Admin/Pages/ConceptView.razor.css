@@ -195,7 +195,6 @@ input[type="text"] {
         .keyphrase_not_selected a {
             width: 230px;
             word-wrap: break-word;
-            background-color: forestgreen;
         }
 
         .keyphrase_not_selected div {

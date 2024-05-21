@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\assests\adminkit-dev\**" />
-    <Content Remove="wwwroot\assests\adminkit-dev\**" />
-    <EmbeddedResource Remove="wwwroot\assests\adminkit-dev\**" />
-    <None Remove="wwwroot\assests\adminkit-dev\**" />
+    <Compile Remove="wwwroot\assets\adminkit-dev\**" />
+    <Content Remove="wwwroot\assets\adminkit-dev\**" />
+    <EmbeddedResource Remove="wwwroot\assets\adminkit-dev\**" />
+    <None Remove="wwwroot\assets\adminkit-dev\**" />
   </ItemGroup>
 
   <ItemGroup>

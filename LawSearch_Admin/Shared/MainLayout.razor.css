@@ -122,3 +122,11 @@ main {
         font-size: 13px; /* Adjust font size */
         font-weight: bold; /* Bold text */
     }
+
+.content_middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    min-height: 83vh;
+}

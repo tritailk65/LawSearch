@@ -1,9 +1,126 @@
 ﻿@page "/usermanager"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager
 
-<div class="main-content">
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        bool isLogin = await localStorage.GetItemAsync<bool>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}
 
+<div class="main_content">
+    <div class="top_content">
+        <div class="totalQuestions_view">
+            <div class="totalQuestions_view_Line1">
+                <div class="icon_view">
+                    <img src="assets/icon/question.png" />
+                </div>
+                <a>Total questions</a>
+            </div>
+            <div class="totalQuestions_view_Line2">
+                <a>@totalQuestions</a>
+            </div>
+        </div>
+
+        <div class="totalQuestions_view">
+            <div class="totalQuestions_view_Line1">
+                <div class="icon_view">
+                    <img src="assets/icon/user1.png" />
+                </div>
+                <a>Total users</a>
+            </div>
+            <div class="totalQuestions_view_Line2">
+                <a>@totalUsers</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom_content">
+        <div class="top_bar_table_view">
+            <div class="search-container">
+                <input type="text" placeholder="Search user..." @bind="searchUser" class="search-input" />
+                <button @onclick="PerformSearch" class="search-button">
+                    <img src="assets/icon/search_icon.png" />
+                </button>
+            </div>
+
+            <button class="top_bar_table_btn">
+                Add user
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in users)
+                    {
+                        <tr>
+                            <td>@user.Name</td>
+                            <td>@user.Role</td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
+                                    <span class="slider"></span>
+                                </label>
+                            </td>
+                            <td>
+                                <a @onclick="() => ModifyRole(user)">Modify Role</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 
 @code {
+    private int totalQuestions = 106042;
+    private int totalUsers = 13902;
+    private string searchUser;
 
+    private void PerformSearch()
+    {
+        Console.WriteLine($"Searching for: {searchUser}");
+    }
+
+    private List<User> users = new List<User>
+    {
+        new User { Name = "John Doe", Role = "Admin", Status = true },
+        new User { Name = "Jane Smith", Role = "User", Status = false },
+        // Add more users as needed
+    };
+
+    private void ToggleStatus(User user)
+    {
+        user.Status = !user.Status;
+        Console.WriteLine($"Status changed for {user.Name} to {(user.Status ? "Active" : "Inactive")}");
+    }
+
+    private void ModifyRole(User user)
+    {
+        // Logic to modify the role
+        Console.WriteLine($"Modify role for {user.Name}");
+    }
+
+    public class User
+    {
+        public string Name { get; set; }
+        public string Role { get; set; }
+        public bool Status { get; set; }
+    }
 }

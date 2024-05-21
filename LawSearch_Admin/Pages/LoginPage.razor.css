@@ -1,7 +1,7 @@
 ﻿.background_view {
     width: 100%;
     min-height: 100vh;
-    background-image: url('/assests/image/background1.png');
+    background-image: url('/assets/image/background1.png');
     background-size: cover;
     background-position: center;
     display: flex;

@@ -37,7 +37,7 @@
                         foreach (var c in lawVM.lstChapters)
                         {
                             <div class="chapter">
-                                <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                <img class="icon" src="assets/icon/item_down.png" aria-hidden="true" />
                                 @c.Name @c.Title [@c.ID]
                             </div>
                             if (c.lstSections != null && c.lstSections.Count > 0)
@@ -47,7 +47,7 @@
                                     if(s.Name != "")
                                     {
                                         <div class="section">
-                                            <img class="icon" src="assests/icon/item_down.png" aria-hidden="true" />
+                                            <img class="icon" src="assets/icon/item_down.png" aria-hidden="true" />
                                             @s.Name [@s.ID]
                                         </div>
                                     }
@@ -56,7 +56,7 @@
                                         foreach (var a in s.lstArticals)
                                         {
                                             <div class="artical">
-                                                <img class="icon" src="assests/icon/item_up.png" aria-hidden="true" />
+                                                <img class="icon" src="assets/icon/item_up.png" aria-hidden="true" />
                                                 @a.Name: @a.Title [@a.ID]
                                             </div>
                                         }
