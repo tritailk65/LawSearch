@@ -1,4 +1,17 @@
-﻿<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+
+@code {
+    User user = new User();
+    Boolean isLogin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        user = await localStorage.GetItemAsync<User>(LocalStorageKeys.user);
+    }
+}
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="navbar position-static mx-5">
 
         <div class="nav-item">

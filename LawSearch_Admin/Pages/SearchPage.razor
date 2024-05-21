@@ -2,6 +2,8 @@
 @using LawSearch_Admin.ViewModels
 @inject ISearchAdminService searchAdminService;
 @inject IArticalAdminService articalAdminService;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager
 
 <div class="ss">
     <div class="search-container">
@@ -46,6 +48,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
         var data = await articalAdminService.GetListArtical();
         lstArtical = data;
     }

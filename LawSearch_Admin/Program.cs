@@ -3,6 +3,7 @@ using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Blazored.LocalStorage;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,5 +14,6 @@ builder.Services.AddScoped<IConceptAdminService, ConceptAdminService>();
 builder.Services.AddScoped<IKeyPhraseAdminService, KeyPhraseAdminService>();
 builder.Services.AddScoped<ILawDocAdminService, LawDocAdminService>();
 builder.Services.AddScoped<ISearchAdminService, SearchAdminService>();
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

@@ -1,9 +1,35 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
 
 @code {
+    private User user = new User();
     private string currentPageName;
+    public string avatarPath = "";
+    public Boolean openUserMenu = false;
+
+    private string getPathAvatar(string gmail)
+    {
+        if (gmail == "adminquocan@gmail.com")
+        {
+            return "assests/image/avatar1.jpg";
+        }
+        else if (gmail == "admintritai@gmail.com")
+        {
+            return "assests/image/avatar.jpg";
+        } else
+        {
+            return "assests/image/avatarUser.png";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
+        await localStorage.SetItemAsync(LocalStorageKeys.user, user);
+        StateHasChanged();
+    }
 
     protected override void OnInitialized()
     {
@@ -13,8 +39,16 @@
 
     private void OnLocationChanged(object sender, LocationChangedEventArgs e)
     {
+        _ = HandleLocationChangedAsync();
+    }
+
+    private async Task HandleLocationChangedAsync()
+    {
+        openUserMenu = false;
         currentPageName = GetPageName();
-        InvokeAsync(StateHasChanged);
+        user = await localStorage.GetItemAsync<User>(LocalStorageKeys.user);
+        avatarPath = getPathAvatar(user.Email);
+        await InvokeAsync(StateHasChanged);
     }
 
     private string GetPageName()
@@ -28,6 +62,19 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
+
+    public void handleClickAvatar()
+    {
+        openUserMenu = !openUserMenu;
+    }
+
+    public async Task handleClickLogout()
+    {
+        User defaultUser = new User();
+        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
+        await localStorage.SetItemAsync(LocalStorageKeys.user, defaultUser);
+        NavigationManager.NavigateTo("/");
+    }
 }
 
 @if (currentPageName == "home")
@@ -39,16 +86,32 @@ else
     <div class="page">
         <div class="header">
             <div class="logo">
-                <NavLink href="/">
-                    <img class="logo-img" src="assests/image/Logo.png" alt="Logo main">
-                </NavLink>
+                <img class="logo-img" src="assests/image/Logo.png" alt="Logo main">
             </div>
             <div class="user-info">
-                <div class="avatar-container">
-                    <img src="assests/image/avatar.jpg" alt="User Avatar" class="avatar">
+                <div class="avatar-container" @onclick=handleClickAvatar>
+                    <img src=@avatarPath alt="User Avatar" class="avatar">
                     <div class="status"></div>
                 </div>
             </div>
+            @if (openUserMenu)
+            {
+                <div class="userMenu_view">
+                    <div class="userMenu_function_btn">
+                        <a>Hello @user.UserName</a>
+                        <div class="level_cicle_view">
+                            <a>Level @user.Type</a>
+                        </div >
+                    </div>
+
+                    <div class="spacer"> </div>
+
+                    <div class="userMenu_function_btn" @onclick=handleClickLogout>
+                        <img src="assests/icon/logout.png" />
+                        <a>Logout</a>
+                    </div>
+                </div>
+            }
         </div>
 
         <div class="sidebar">
