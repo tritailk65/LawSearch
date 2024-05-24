@@ -59,6 +59,7 @@ namespace LawSearch_API.Controllers
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
             user.Role = "User";
+            user.Status = true;
 
             _userService.AddUserToList(user);
             APIResult rs = new();
