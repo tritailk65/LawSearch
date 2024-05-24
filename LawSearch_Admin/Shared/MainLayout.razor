@@ -1,27 +1,127 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
 
-<div class="page">
-    <div class="header ">
-        <div class="logo">          
-            <NavLink href="/">
-                <img class="logo-img" src="assests/Logo.png" alt="Logo main">
-            </NavLink>            
+@code {
+    private User user = new User();
+    private string currentPageName;
+    public string avatarPath = "";
+    public Boolean openUserMenu = false;
+
+    private string getPathAvatar(string gmail)
+    {
+        if (gmail == "adminquocan@gmail.com")
+        {
+            return "assets/image/avatar1.jpg";
+        }
+        else if (gmail == "admintritai@gmail.com")
+        {
+            return "assets/image/avatar.jpg";
+        } else
+        {
+            return "assets/image/avatarUser.png";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
+        await localStorage.SetItemAsync(LocalStorageKeys.user, user);
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        currentPageName = GetPageName();
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        _ = HandleLocationChangedAsync();
+    }
+
+    private async Task HandleLocationChangedAsync()
+    {
+        openUserMenu = false;
+        currentPageName = GetPageName();
+        user = await localStorage.GetItemAsync<User>(LocalStorageKeys.user);
+        avatarPath = getPathAvatar(user.Email);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private string GetPageName()
+    {
+        var uri = NavigationManager.Uri;
+        var uriSegments = new Uri(uri).Segments;
+        return uriSegments.Length > 1 ? uriSegments[1].TrimEnd('/') : "home";
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    public void handleClickAvatar()
+    {
+        openUserMenu = !openUserMenu;
+    }
+
+    public async Task handleClickLogout()
+    {
+        User defaultUser = new User();
+        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
+        await localStorage.SetItemAsync(LocalStorageKeys.user, defaultUser);
+        NavigationManager.NavigateTo("/");
+    }
+}
+
+@if (currentPageName == "home")
+{
+    @Body
+}
+else
+{
+    <div class="page">
+        <div class="header">
+            <div class="logo">
+                <img class="logo-img" src="assets/image/Logo.png" alt="Logo main">
+            </div>
+            <div class="user-info">
+                <div class="avatar-container" @onclick=handleClickAvatar>
+                    <img src=@avatarPath alt="User Avatar" class="avatar">
+                    <div class="status"></div>
+                </div>
+            </div>
+            @if (openUserMenu)
+            {
+                <div class="userMenu_view">
+                    <div class="userMenu_function_btn">
+                        <a>Hello @user.UserName</a>
+                        <div class="level_cicle_view">
+                            <a>Level @user.Type</a>
+                        </div >
+                    </div>
+
+                    <div class="spacer"> </div>
+
+                    <div class="userMenu_function_btn" @onclick=handleClickLogout>
+                        <img src="assets/icon/logout.png" />
+                        <a>Logout</a>
+                    </div>
+                </div>
+            }
         </div>
-        <div class="user-info">
-            <div class="avatar-container">
-              <img src="assests/avatar.jpg" alt="User Avatar" class="avatar">
-              <div class="status"></div>
-            </div>      
+
+        <div class="sidebar">
+            <NavMenu />
         </div>
-    </div>
 
-    <div class="sidebar">
-        <NavMenu />
+        <main>
+            <div class="content_middle">
+                @Body
+            </div>
+        </main>
     </div>
-
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+}

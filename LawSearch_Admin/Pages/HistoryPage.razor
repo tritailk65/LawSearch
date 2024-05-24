@@ -1,4 +1,18 @@
 ﻿@page "/history"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+}
 
 <div class="main-content">
 

@@ -69,3 +69,64 @@ main {
     background-color: #25293C
 }
 
+.userMenu_view {
+    position: absolute;
+    top: 100px;
+    right: 0;
+    min-width: 15%;
+    padding: 5px 20px;
+    background-color: #7065E8;
+    border-radius: 10px;
+    margin-right: 20px;
+}
+
+.userMenu_function_btn {
+    cursor: pointer;
+    margin: 10px 0px;
+}
+    .userMenu_function_btn:first-child {
+        padding: 5px 0px;
+        cursor: default;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .userMenu_function_btn img {
+        width: 35px;
+        height: 35px;
+    }
+
+.spacer {
+    border-bottom: 2px solid #434968;
+    margin: 3px 0px;
+}
+
+.level_cicle_view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px; /* Adjust width */
+    height: 35px; /* Adjust height */
+    background-color: #25293C; /* Background color */
+    border-radius: 30px;
+    border: 2px solid #28C76F; /* Border style */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    margin-left: 20px;
+}
+
+    .level_cicle_view a {
+        text-decoration: none; /* Remove underline */
+        color: #fff; /* Text color */
+        font-size: 13px; /* Adjust font size */
+        font-weight: bold; /* Bold text */
+    }
+
+.content_middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    min-height: 83vh;
+}

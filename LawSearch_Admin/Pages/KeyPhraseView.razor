@@ -1,6 +1,9 @@
 ﻿@page "/keyphrase"
 @inject IKeyPhraseAdminService keyphraseService;
 @inject IJSRuntime JsRuntime;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager;
+
 @* 
 <div class="title">
     <h3>KeyPhrase</h3>
@@ -51,7 +54,7 @@
                         <input placeholder="Search keyphrase..." @oninput="SetSearchKeyphrase"/>
                     </div>
                     <div class="search_btn" @onclick="SearchKeyphraseFunc">
-                        <img class="icon" src="assests/icon/search_icon.png" />
+                        <img class="icon" src="assets/icon/search_icon.png" />
                     </div>
                 </div>
             </div>
@@ -318,7 +321,7 @@
                                         }
 
                                         <td>@kr.NumCount</td>
-                                        <td><div class="delete_btn_table"><img class="icon_table" src="assests/icon/trash_480px.png" /></div></td>
+                                        <td><div class="delete_btn_table"><img class="icon_table" src="assets/icon/trash_480px.png" /></div></td>
                                     </tr>
                                 }
                             }
@@ -357,6 +360,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await InvokeAsync(StateHasChanged);
+
         await fetchKeyphrase();
     }
 

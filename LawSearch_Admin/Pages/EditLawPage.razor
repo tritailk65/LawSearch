@@ -1,8 +1,9 @@
 ﻿@page "/editlaw"
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager NavigationManager
-
 @inject ILawDocAdminService lawDocAdminService;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject NavigationManager NavigationManager;
 
 <div class="body-container">
     <div class="header-content">
@@ -214,6 +215,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        if (!isLogin)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await InvokeAsync(StateHasChanged);
+
         lawVM = null;
         dataIndex = null;
         dataToEdit = null;
