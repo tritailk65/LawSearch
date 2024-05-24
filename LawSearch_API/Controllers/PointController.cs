@@ -1,5 +1,6 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -18,7 +19,7 @@ namespace LawSearch_API.Controllers
             _pointService = pointService;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetByLawID([BindRequired] int id)
         {
             var dt = _pointService.GetListPointByLawID(id);

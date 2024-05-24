@@ -1,6 +1,7 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
@@ -22,7 +23,7 @@ namespace LawSearch_API.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetByLawID([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -31,7 +32,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(data);
         }
 
-        [HttpPut]
+        [HttpPut, Authorize(Roles = "Admin")]
         public APIResult EditContentSection([FromBody] Section section)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);

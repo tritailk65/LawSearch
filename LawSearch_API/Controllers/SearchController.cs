@@ -2,6 +2,7 @@
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
 using LawSearch_Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -22,7 +23,7 @@ namespace LawSearch_API.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public APIResult SearchArticalByText([BindRequired] string input)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);

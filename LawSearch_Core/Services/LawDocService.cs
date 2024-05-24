@@ -97,22 +97,7 @@ namespace LawSearch_Core.Services
 
             try
             {
-                //Step 1: Save file to database
-                /*                var fileDetails = new FileDetails()
-                                {
-                                    FileName = fileUpload.File.FileName,
-                                    fileType = fileUpload.FileType
-                                };
-
-                                using (var stream = new MemoryStream())
-                                {
-                                    fileUpload.File.CopyTo(stream);
-                                    fileDetails.FileData = stream.ToArray();
-                                }
-                */
-
-                //Step 2: Parse document
-
+                //Step 1: Parse document
                 LawDoc l = new LawDoc();
                 ParseContentLaw(command, true, content, name);
 

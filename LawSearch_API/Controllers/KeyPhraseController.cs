@@ -2,6 +2,7 @@
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
 using LawSearch_Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -22,7 +23,7 @@ namespace LawSearch_API.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public APIResult GetAllKeyPhrase()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -31,7 +32,7 @@ namespace LawSearch_API.Controllers
             return result.Success(dtResult);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetKeyPhraseRelate([BindRequired] int ID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -40,7 +41,7 @@ namespace LawSearch_API.Controllers
             return result.Success(dtResult);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public APIResult AddKeyPhrase([FromBody] KeyPhrase keyPhrase)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -49,7 +50,7 @@ namespace LawSearch_API.Controllers
             return result.Success(dtResult);
         }
 
-        [HttpDelete]
+        [HttpDelete, Authorize(Roles = "Admin")]
         public APIResult DeleteKeyPhrase([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -58,7 +59,7 @@ namespace LawSearch_API.Controllers
             return result.MessageSuccess("Xóa keyphrase thành công!");
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public  async Task<APIResult> GenerateKeyphraseVNCoreNLP([BindRequired] int LawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -67,7 +68,7 @@ namespace LawSearch_API.Controllers
             return rs.MessageSuccess("Generate success!");
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public APIResult GenerateKeyphraseMapping([BindRequired] int LawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);

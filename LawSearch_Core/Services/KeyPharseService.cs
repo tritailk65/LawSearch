@@ -134,7 +134,6 @@ namespace LawSearch_Core.Services
                     Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
                     NumberArtical = Globals.GetIDinDT(dt, 0, "NumberArtical"),
                     KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
-                    LawID = Globals.GetIDinDT(dt, 0, "LawID")
                 };
                 #endregion
 
@@ -198,7 +197,7 @@ namespace LawSearch_Core.Services
                 foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID, ChapterItemID, ArticalID, LawID, NumCount, PositionWeight) " +
-                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
+                                          $"values ({rsAddKeyphrase.ID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
                     _db.ExecuteNonQueryCommand(command);
                 }
 

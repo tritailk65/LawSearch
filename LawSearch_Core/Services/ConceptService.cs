@@ -315,9 +315,7 @@ namespace LawSearch_Core.Services
             #endregion
 
             try
-            {
-                int LawID = 16;
-
+            { 
                 //Check ID concept 
                 command.CommandText = $"select * from concept where id = {ConceptID}";
                 var checkConceptID = _db.ExecuteReaderCommand(command, "");
@@ -343,13 +341,20 @@ namespace LawSearch_Core.Services
                     Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
                     NumberArtical = Globals.GetIDinDT(dt, 0, "NumberArtical"),
                     KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
-                    LawID = Globals.GetIDinDT(dt, 0, "LawID")
                 };
                 #endregion
 
-                #region Step 2: Add ConceptKeyphrase
-                command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, {LawID}, 1";
-                _db.ExecuteNonQueryCommand(command);
+                #region Step 2: Add ConceptKeyphrase       
+                command.CommandText = "Select * from law";
+                var dbLaw = _db.ExecuteReaderCommand(command, "");
+                if(dbLaw.Rows.Count > 0)
+                {
+                    foreach (DataRow dr in dbLaw.Rows)
+                    {
+                        command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, {dr["ID"]}, 1";
+                        _db.ExecuteNonQueryCommand(command);
+                    }
+                }
                 #endregion
 
                 #region Step 3: Generate KeyphraseMapping and ConceptMapping
@@ -364,7 +369,7 @@ namespace LawSearch_Core.Services
 
                 #region Get List Artical
                 List<Artical> lstArtical = new List<Artical>();
-                command.CommandText = $"select Name, Title, Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                command.CommandText = $"select Name, Title, Content, ID, ChapterID, ChapterItemID from Artical";
                 Console.WriteLine("Start load all artical...\n");
                 var dtArticals = _db.ExecuteReaderCommand(command, "");
                 for (var i = 0; i < dtArticals.Rows.Count; i++)
@@ -402,7 +407,7 @@ namespace LawSearch_Core.Services
                         int countTermContent = Globals.CountTerm(contentTMP, rsAddKeyphrase.KeyNorm);
                         float positionWeight = (countTermTitle + (countTermContent * 0.5F)) / total;
 
-                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total));
+                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, a.LawID, total));
                     }
                 });
 
@@ -414,11 +419,11 @@ namespace LawSearch_Core.Services
                 foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID, ChapterItemID, ArticalID, LawID, NumCount, PositionWeight) " +
-                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
+                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, {data.NumCount}, {data.PositionWeight})";
                     _db.ExecuteNonQueryCommand(command);
 
                     command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClauseID, PointID, KeyphraseID) " +
-                                          $"values ({ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0, {rsAddKeyphrase.ID})";
+                                          $"values ({ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, 0,0, {rsAddKeyphrase.ID})";
                     _db.ExecuteNonQueryCommand(command);
                 }
                 #endregion

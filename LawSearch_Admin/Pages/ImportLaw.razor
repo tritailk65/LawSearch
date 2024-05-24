@@ -15,7 +15,7 @@
         <TextArea @bind-ChildData="Content" />
     </div>
     <div class="import-btn">
-        <Button ButtonStyle="add-button btn-custom" data-toggle="modal" data-target="#exampleModalCenter" data-backdrop="static" data-keyboard="false" @onclick="() => ImportNewLaw()">
+        <Button ButtonStyle="add-button btn-custom" data-toggle="modal" data-target="#modal-import" data-backdrop="static" data-keyboard="false" @onclick="() => ImportNewLaw()">
             Import
         </Button>
     </div>
@@ -23,8 +23,8 @@
 </div>
 
 <!-- Modal Loading -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" >
-    <div class="modal-generate-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="modal-import" tabindex="-1" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             @if (isLoading)
             {
@@ -51,7 +51,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" #onclick="CancleModal">OK</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="CancleModal">OK</button>
                 </div>
             }
         </div>
