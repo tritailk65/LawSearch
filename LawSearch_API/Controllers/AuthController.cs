@@ -35,7 +35,7 @@ namespace LawSearch_API.Controllers
             return Ok(userName);
         }
 
-        [HttpPost("Register")]
+        [HttpPost("AddUser"), Authorize(Roles = "Admin")]
         public async Task<APIResult> Register(UserVM request)
         {
             _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.Body);
