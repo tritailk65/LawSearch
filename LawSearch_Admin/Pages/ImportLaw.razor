@@ -29,23 +29,76 @@
         <TextArea @bind-ChildData="Content" />
     </div>
     <div class="import-btn">
-        <Button ButtonStyle="add-button btn-custom" @onclick="() => ImportNewLaw()">
+        <Button ButtonStyle="add-button btn-custom" data-toggle="modal" data-target="#modal-import" data-backdrop="static" data-keyboard="false" @onclick="() => ImportNewLaw()">
             Import
         </Button>
     </div>
 
 </div>
 
+<!-- Modal Loading -->
+<div class="modal fade" id="modal-import" tabindex="-1" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            @if (isLoading)
+            {
+                <div class="modal-body">
+                    <div class="title-loading">
+                        Proccess
+                    </div>
+                    <div class="loading_">
+                        <span class="loader"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancle</button>
+                </div>
+            }
+            @if (!isLoading )
+            {
+                <div class="modal-body">
+                    <div class="modal-title-alert">
+                        Import law
+                    </div>
+                    <div class="modal-message-alert">
+                        @messageImport
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="CancleModal">OK</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
 @code {
     public string Name;
     public string Content;
+    public string messageImport = "";
+    public bool isLoading = true;
+    public bool isImportSuccess = false;
 
     public async void ImportNewLaw()
     {
+        isLoading = true; //Default value
         var rs = await lawDocAdminService.ImportLaw(Name, Content);
         if(rs == true)
         {
-            
+            isLoading = false;
+            messageImport = "Import văn bản luật thành công!";
+            StateHasChanged();
         }
+        else
+        {
+            isLoading = false;
+            messageImport = "Import văn bản luật thất bại!";
+            StateHasChanged();
+        }
+    }
+
+    public void CancleModal()
+    {
+        isLoading = false;
     }
 }

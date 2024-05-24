@@ -1,5 +1,6 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -20,7 +21,7 @@ namespace LawSearch_API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetByLawID([BindRequired] int id)
         {
             _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);

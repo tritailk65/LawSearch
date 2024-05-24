@@ -13,5 +13,6 @@ namespace LawSearch_Admin.Interfaces
 
         Task<ResponceMessage> DeleteKeyphrase(int id);
 
+
     }
 }

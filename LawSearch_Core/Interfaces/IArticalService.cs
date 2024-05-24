@@ -10,7 +10,9 @@ namespace LawSearch_Core.Interfaces
 {
     public interface IArticalService
     {
+        ArticalDetail GetArticalDetail(int id);
         List<Artical> GetAllArtical();
         List<Artical> GetListArticalByLawID(int lawID);
+        void EditContentArtical(Artical artical);
     }
 }

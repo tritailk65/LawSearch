@@ -296,140 +296,6 @@ namespace LawSearch_Core.Services
             } finally{ connection.Close(); }
         }
 
-        /// <summary>
-        /// Hàm tự sinh ConceptMapping từ tên Concept
-        /// </summary>
-        /// <param name="LawID">ID văn bản luật</param>
-        /// <exception cref="BadRequestException"></exception>
-/*        public void GenerateMappingFromName(int LawID)
-        {
-            #region Transaction init
-            IDbConnection connection = _db.GetDbConnection();
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception ex)
-            {
-                throw new BadRequestException(ex.Message.ToString(), 500);
-            }
-            IDbCommand command = _db.CreateCommand();
-            IDbTransaction transaction = _db.BeginTransaction();
-            command.Connection = connection;
-            command.Transaction = transaction;
-            #endregion
-
-            try
-            {
-                #region Check Data
-                command.CommandText = $"select * from Law where id = {LawID}";
-                var checkLawID = _db.ExecuteReaderCommand(command, "");
-                if(checkLawID.Rows.Count == 0)
-                {
-                    throw new BadRequestException("LawID not found!", 400, 400);
-                }
-                #endregion
-
-                #region Get List Concept
-                Console.WriteLine("Start load Concept...");
-                List<Concept> lstConcepts = new List<Concept>();
-                command.CommandText = "select dbo.getnormtext(Name) Name, ID from Concept";
-                var dtConcepts = _db.ExecuteReaderCommand(command, "");
-                if(dtConcepts.Rows.Count > 0)
-                {
-                    for (var i = 0;i< dtConcepts.Rows.Count; i++)
-                    {
-                        lstConcepts.Add(new Concept
-                        {
-                            ID = Globals.GetIDinDT(dtConcepts, i, "ID"),
-                            Name = Globals.GetinDT_String(dtConcepts, i, "Name"),
-                        });
-                    }
-                }
-                Console.WriteLine("Done load all Concept");
-                #endregion
-
-                #region Get List Artical
-                Console.WriteLine("Start load Artical...");
-                List<Artical> lstArticals = new List<Artical>();
-                command.CommandText = $"select Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
-               
-                var dtArtical = _db.ExecuteReaderCommand(command, "");               
-                if(dtArtical.Rows.Count > 0)
-                {
-                    for(var i = 0; i < dtArtical.Rows.Count; i++)
-                    {
-                        lstArticals.Add(new Artical
-                        {
-                            ID = Globals.GetIDinDT(dtArtical, i, "ID"),
-                            ChapterID = Globals.GetIDinDT(dtArtical, i, "ChapterID"),
-                            ChapterItemID = Globals.GetIDinDT(dtArtical, i, "ChapterItemID"),
-                            Content = Globals.GetNormText(Globals.GetinDT_String(dtArtical, i, "Content"))
-                        });
-                    }
-                }
-                Console.WriteLine("Done load all artical\n");
-                #endregion
-
-                //thread-safe bag for load data in multithreading
-                ConcurrentBag<ConceptMapping> dataCollection = new ConcurrentBag<ConceptMapping>();
-
-                foreach (Concept concept in lstConcepts)
-                {
-                    command.CommandText = $"select top 1 id from ConceptMapping where ConceptID = {concept.ID} and LawID = {LawID}";
-                    var checkIfMapped = _db.ExecuteReaderCommand(command, "");
-                    if (checkIfMapped.Rows.Count > 0)
-                    {
-                        continue;
-                    }
-
-                    Parallel.ForEach(lstArticals, a =>
-                    {
-                        Console.WriteLine($"Thread {Task.CurrentId}: Processing article {a.ID} Mapping Concept {concept.Name}");
-
-                        string Normtext = a.Content;
-                        int lenghtNormtext = Normtext.Length;
-                        string tmp = Normtext.Replace(concept.Name, "");
-                        int lengthTMP = tmp.Length;
-                        int total = (Normtext.Length - tmp.Length) / concept.Name.Length;
-                        if (total > 0)
-                        {
-                            dataCollection.Add(new ConceptMapping(concept.ID, a.ID, a.ChapterID, a.ChapterItemID, 0, 0, LawID));
-                        }
-                    });
-                }
-
-                Console.WriteLine("Total data collection: " + dataCollection.Count);
-
-                List<ConceptMapping> conceptMappings = new List<ConceptMapping>();
-
-                conceptMappings = dataCollection.ToList();
-                conceptMappings = conceptMappings.OrderBy(x => x.ConceptID).ToList();
-
-                foreach (ConceptMapping concept in conceptMappings)
-                {
-                    Console.WriteLine("" + concept.ConceptID + "/" + concept.ArticalID + "/" + concept.ChapterID + "/" + concept.ChapterItemID + "/" + concept.LawID);
-                }
-
-                foreach (var data in dataCollection)
-                {
-                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID ) " +
-                                          $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
-                    _db.ExecuteNonQueryCommand(command);
-                }
-
-                transaction.Commit();
-            } catch
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-        }*/
-
         public async void AddConceptKeyphrase(int ConceptID, string Keyphrase)
         {
             #region Transaction init
@@ -449,9 +315,7 @@ namespace LawSearch_Core.Services
             #endregion
 
             try
-            {
-                int LawID = 16;
-
+            { 
                 //Check ID concept 
                 command.CommandText = $"select * from concept where id = {ConceptID}";
                 var checkConceptID = _db.ExecuteReaderCommand(command, "");
@@ -477,13 +341,20 @@ namespace LawSearch_Core.Services
                     Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
                     NumberArtical = Globals.GetIDinDT(dt, 0, "NumberArtical"),
                     KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
-                    LawID = Globals.GetIDinDT(dt, 0, "LawID")
                 };
                 #endregion
 
-                #region Step 2: Add ConceptKeyphrase
-                command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, {LawID}, 1";
-                _db.ExecuteNonQueryCommand(command);
+                #region Step 2: Add ConceptKeyphrase       
+                command.CommandText = "Select * from law";
+                var dbLaw = _db.ExecuteReaderCommand(command, "");
+                if(dbLaw.Rows.Count > 0)
+                {
+                    foreach (DataRow dr in dbLaw.Rows)
+                    {
+                        command.CommandText = $"exec UpdateConcept_KeyPhrase {ConceptID}, {rsAddKeyphrase.ID}, {dr["ID"]}, 1";
+                        _db.ExecuteNonQueryCommand(command);
+                    }
+                }
                 #endregion
 
                 #region Step 3: Generate KeyphraseMapping and ConceptMapping
@@ -498,7 +369,7 @@ namespace LawSearch_Core.Services
 
                 #region Get List Artical
                 List<Artical> lstArtical = new List<Artical>();
-                command.CommandText = $"select Name, Title, Content, ID, ChapterID, ChapterItemID from Artical where LawID = {LawID}";
+                command.CommandText = $"select Name, Title, Content, ID, ChapterID, ChapterItemID from Artical";
                 Console.WriteLine("Start load all artical...\n");
                 var dtArticals = _db.ExecuteReaderCommand(command, "");
                 for (var i = 0; i < dtArticals.Rows.Count; i++)
@@ -536,7 +407,7 @@ namespace LawSearch_Core.Services
                         int countTermContent = Globals.CountTerm(contentTMP, rsAddKeyphrase.KeyNorm);
                         float positionWeight = (countTermTitle + (countTermContent * 0.5F)) / total;
 
-                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, LawID, total));
+                        dataCollection.Add(new KeyphraseMapping(rsAddKeyphrase.ID, a.ChapterID, a.ID, a.ChapterItemID, a.LawID, total));
                     }
                 });
 
@@ -548,11 +419,11 @@ namespace LawSearch_Core.Services
                 foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID, ChapterItemID, ArticalID, LawID, NumCount, PositionWeight) " +
-                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
+                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, {data.NumCount}, {data.PositionWeight})";
                     _db.ExecuteNonQueryCommand(command);
 
-                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID, KeyphraseID) " +
-                                          $"values ({ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0, {rsAddKeyphrase.ID})";
+                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClauseID, PointID, KeyphraseID) " +
+                                          $"values ({ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {data.LawID}, 0,0, {rsAddKeyphrase.ID})";
                     _db.ExecuteNonQueryCommand(command);
                 }
                 #endregion
@@ -661,7 +532,6 @@ namespace LawSearch_Core.Services
 
         /// <summary>
         /// Hàm tự sinh ConceptMapping với đầu vào là ID văn bản luật
-        /// Note: Dùng khi muốn mapping concept(name) với những văn bản khác ngoài luật bđs 2024
         /// </summary>
         /// <param name="LawID">ID văn bản luật</param>
         /// <exception cref="BadRequestException"></exception>
@@ -769,7 +639,7 @@ namespace LawSearch_Core.Services
 
                 foreach (var data in conceptMappings)
                 {
-                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClaustID, PointID) " +
+                    command.CommandText = $"insert into ConceptMapping (ConceptID, ChapterID, ChapterItemID, ArticalID, LawID, ClauseID, PointID) " +
                                           $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
                     _db.ExecuteNonQueryCommand(command);
                 }

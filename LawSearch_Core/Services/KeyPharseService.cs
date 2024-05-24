@@ -73,7 +73,6 @@ namespace LawSearch_Core.Services
                         Keyphrase = Globals.GetinDT_String(rs, i,  "KeyPhrase"),
                         NumberArtical = Globals.GetIDinDT(rs, i, "NumberArtical"),
                         KeyNorm = Globals.GetinDT_String(rs, i, "KeyNorm"),
-                        LawID = Globals.GetIDinDT(rs, i, "LawID")
                     });
                 }
                 return lst;
@@ -135,7 +134,6 @@ namespace LawSearch_Core.Services
                     Keyphrase = Globals.GetinDT_String(dt, 0, "KeyPhrase"),
                     NumberArtical = Globals.GetIDinDT(dt, 0, "NumberArtical"),
                     KeyNorm = Globals.GetinDT_String(dt, 0, "KeyNorm"),
-                    LawID = Globals.GetIDinDT(dt, 0, "LawID")
                 };
                 #endregion
 
@@ -199,7 +197,7 @@ namespace LawSearch_Core.Services
                 foreach (var data in keyphraseMappings)
                 {
                     command.CommandText = $"insert into KeyPhraseMapping(KeyPhraseID, ChapterID, ChapterItemID, ArticalID, LawID, NumCount, PositionWeight) " +
-                                          $"values ({data.KeyPhraseID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
+                                          $"values ({rsAddKeyphrase.ID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, {data.NumCount}, {data.PositionWeight})";
                     _db.ExecuteNonQueryCommand(command);
                 }
 
@@ -316,31 +314,6 @@ namespace LawSearch_Core.Services
                         }
                     }
                 }
-
-                //Calc word class weight
-/*                List<KeyPhrase> keyPhrases = new List<KeyPhrase>();
-                command.CommandText = "select * from keyphrase";
-                var dt = _db.ExecuteReaderCommand(command, "");
-                if(dt.Rows.Count > 0)
-                {
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        keyPhrases.Add(new KeyPhrase
-                        {
-                            ID = Globals.GetIDinDT(dt,i,"ID"),
-                            PosTag = Globals.GetinDT_String(dt,i,"PosTag")
-                        });
-                    }
-                }
-
-                foreach (var keyPhrase in keyPhrases)
-                {
-                    var weight = Globals.GetWordClassWeight(keyPhrase.PosTag);
-                    command.CommandText = $"Update keyphrase set WordClassWeight = {weight} where id = {keyPhrase.ID}";
-                    _db.ExecuteNonQueryCommand(command);
-                }*/
-
-                //GenerateMapping(command, LawID);
 
                 transaction.Commit();
             }
@@ -495,5 +468,6 @@ namespace LawSearch_Core.Services
                 connection.Close();
             }
         }
+
     }
 }

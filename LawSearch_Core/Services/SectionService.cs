@@ -19,6 +19,57 @@ namespace LawSearch_Core.Services
             _db = db;
         }
 
+        public void EditContentSection(Section section)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check data
+                command.CommandText = $"Select * From ChapterItem Where ID = {section.ID}";
+                var checkId = _db.ExecuteReaderCommand(command,"");
+                if (checkId.Rows.Count == 0)
+                {
+                    throw new BadRequestException("Không tìm thấy ID Section", 400, 400);
+                }
+
+                if (section.Name == null)
+                {
+                    throw new BadRequestException("Nội dung chỉnh sửa không được bỏ trống", 400, 400);
+                }
+                
+
+                command.CommandText = $"Update ChapterItem " +
+                                        $"Set Name = N'{section.Name}' " +
+                                        $"Where ID = {section.ID}";
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                _db.CloseConnection();
+            }
+        }
+
         public List<Section> GetByLawID(int id)
         {
             try

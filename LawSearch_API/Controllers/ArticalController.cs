@@ -1,6 +1,7 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
@@ -22,7 +23,7 @@ namespace BlazorAppAPI.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public APIResult GetAllArtical()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -31,13 +32,31 @@ namespace BlazorAppAPI.Controllers
             return rs.Success(dtResult);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
+        public APIResult GetArticalDetail([BindRequired] int id)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            ArticalDetail dtResult = _articalService.GetArticalDetail(id);
+            APIResult rs = new APIResult();
+            return rs.Success(dtResult);
+        }
+
+        [HttpGet("[action]"), Authorize]
         public APIResult GetByLawID([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             List<Artical> dtResult = _articalService.GetListArticalByLawID(id);
             APIResult rs = new APIResult();
             return rs.Success(dtResult);
+        }
+
+        [HttpPut, Authorize(Roles = "Admin")]
+        public APIResult EditContentArtical([FromBody] Artical artical)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
+            _articalService.EditContentArtical(artical);
+            APIResult rs = new();
+            return rs.MessageSuccess("Chỉnh sửa nội dung Artical thành công!");
         }
 
     }

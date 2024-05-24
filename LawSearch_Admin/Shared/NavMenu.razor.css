@@ -14,7 +14,7 @@
 .nav-item ::deep a {
     color: white;
     border-radius: 8px;
-    width: 200px;
+    width: auto;
     height: 42px;
     font-weight: 500;
     display: flex;
@@ -22,7 +22,6 @@
     justify-content: center;
     line-height: 3rem;
 }
-
 
 .nav-item ::deep a.active {
     background-color: #7065E8;
@@ -49,10 +48,14 @@
 .nav-item-icon{
     height: 24px;
     width: 24px;
-    margin: 6px;
+    margin: 12px;
 }
 
 .dropdown-menu {
     float: left;
     background-color: #2F3349;
+}
+
+.nav-item-list{
+    margin: 10px;
 }

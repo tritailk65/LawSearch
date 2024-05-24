@@ -10,5 +10,7 @@ namespace LawSearch_Core.Interfaces
     public interface IChapterService
     {
         List<Chapter> GetListChapterByLawID(int id);
+
+        void EditContentChapter(Chapter chapter);
     }
 }

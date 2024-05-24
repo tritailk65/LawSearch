@@ -18,7 +18,20 @@ namespace LawSearch_Core.Models
         public int LawID { get; set; }
         public int ChapterNumber { get; set; }
         public double score { get; set; }
-        public List<Clause> lstClause { get; set; }
+        public List<Clause>? lstClause { get; set; }
+    }
+
+    public class ArticalDetail
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Title { get; set; }
+        public int Number { get; set; }
+        public string Content { get; set; }
+        public string ChapterName { get; set; }
+        public string SectionName { get; set; }
+        public string ChapterTitle { get; set; }
+        public string LawName { get; set; }
     }
 
     public class ArticalResult

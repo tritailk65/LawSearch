@@ -1,0 +1,26 @@
+﻿﻿.item {
+    display: flex;
+    margin-bottom: 14px;
+    list-style-type: none;
+    cursor: pointer;
+    font-size:14px;
+}
+
+/*.item.selected {
+    background-color: lightblue;
+}*/
+
+.item > .arrow, .arrow-placeholder {
+    min-width: 16px;
+    user-select: none;
+}
+
+/*    .item > .arrow:hover {
+        color: steelblue;
+    }
+*/
+.icon {
+    height: 16px;
+    width: 16px;
+    margin-right: 12px;
+}

@@ -1,5 +1,6 @@
 ﻿.body-container {
     min-height: 88vh;
+    padding: 0 80px;
 }
 
 .header-content {
@@ -24,6 +25,7 @@
     background-color: #25293C;
     border: 1px solid #434968;
     color: white;
+    padding-left: 10px;
 }
 
 .dropdown-item {
@@ -38,7 +40,23 @@
     background-color: #303348;
     border-radius: 20px;
     padding: 26px;
+    margin-bottom: 20px;
 }
+
+
+.btn-view-full {
+    background-color: #3D4451;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 6px 10px 0 20px;
+}
+
+    .btn-view-full:hover {
+        background-color: #5E6A7F;
+    }
 
 .left-content {
     width: 40%;
@@ -46,6 +64,7 @@
     padding: 10px;
     overflow: auto;
 }
+
 
 .right-content {
     display: flex;
@@ -55,7 +74,16 @@
     padding: 10px;
     overflow-y: auto;
     border-left: 3px solid #434968;
-    font-size: 1rem;   
+    font-size: 1rem;
+    padding: 0 0 0 10px;
+}
+
+.document-view{
+    padding: 30px 50px;
+    background-color:white;
+    width:max-content;
+    height: max-content;
+    color: black;
 }
 
 .icon {
@@ -155,4 +183,44 @@
         transform: rotate(-360deg);
     }
 }
+/*End loading*/
+
+/*Modal*/
+
+.modal-dialog{
+    max-width: 80%;
+    margin: 2rem auto;
+}
+
+.modal-content {
+/*    height: 90vh;*/
+}
+
+.modal-header {
+    background-color: #303348;
+}
+
+.modal-body {
+    margin-left: 30px;
+    overflow-y: auto;
+}
+
+.full-right-content {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    padding: 0 0 0 10px;
+}
+
+.full-document-view {
+    padding: 30px 50px;
+    background-color: white;
+    width: max-content;
+    height: max-content;
+    color: black;
+}
+/*End modal*/
     

@@ -2,6 +2,7 @@
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
 using LawSearch_Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Data;
@@ -23,8 +24,7 @@ namespace LawSearch_API.Controllers
             this.logger = logger;
         }
 
-        // GET: api/<ConceptController>
-        [HttpGet]
+        [HttpGet, Authorize]
         public APIResult GetListConcept()
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -33,7 +33,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(dtResult);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public APIResult AddConcept([FromBody] Concept concept)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
@@ -42,7 +42,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(dtConcept);
         }
 
-        [HttpPut]
+        [HttpPut, Authorize(Roles = "Admin")]
         public APIResult UpdateConcept([FromBody] Concept concept)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
@@ -51,7 +51,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(dtConcept);
         }
 
-        [HttpDelete]
+        [HttpDelete, Authorize(Roles = "Admin")]
         public APIResult DeleteConcept([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -60,7 +60,7 @@ namespace LawSearch_API.Controllers
             return rs.MessageSuccess("Delete Concept success !");
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetListKeyPhrases([BindRequired]int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -69,7 +69,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(lst);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetConceptKeyphrase([BindRequired] int ConceptID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -78,7 +78,7 @@ namespace LawSearch_API.Controllers
             return rs.Success(lst);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public async Task<APIResult> GenerateKeyphraseDescript([BindRequired] int lawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -87,7 +87,7 @@ namespace LawSearch_API.Controllers
             return  rs.MessageSuccess("Generate ConceptKeyphrase success!");
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public APIResult GenerateConceptMapping([BindRequired] int LawID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -96,7 +96,7 @@ namespace LawSearch_API.Controllers
             return rs.MessageSuccess("Generate ConceptMapping success!");
         }
 
-        [HttpDelete("[action]")]
+        [HttpDelete("[action]"), Authorize(Roles = "Admin")]
         public APIResult DeleteConceptKeyphrase([BindRequired] int ConceptKeyphraseID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
@@ -105,7 +105,7 @@ namespace LawSearch_API.Controllers
             return rs.MessageSuccess("Delete ConceptKeyphrase success!");
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public APIResult AddConceptKeyphrase([FromForm] AddConceptKeyphrase addConceptKeyphrase)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);

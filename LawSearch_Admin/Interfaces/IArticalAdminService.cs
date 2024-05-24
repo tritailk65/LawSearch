@@ -5,6 +5,7 @@ namespace LawSearch_Admin.Interfaces
     public interface IArticalAdminService
     {
         Task<List<Artical>> GetListArtical();
-        
+        Task<ArticalDetail> GetArticalDetail(int id);
+
     }
 }

@@ -1,5 +1,7 @@
 ﻿using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
+using LawSearch_Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -20,13 +22,23 @@ namespace LawSearch_API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize]
         public APIResult GetByLawID([BindRequired] int id)
         {
             _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
             var data = _chapterService.GetListChapterByLawID(id);
             APIResult rs = new APIResult();
             return rs.Success(data);
+        }
+
+        [HttpPut, Authorize(Roles = "Admin")]
+        public APIResult EditContentChapter([FromBody] Chapter chapter)
+        {
+            _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.Query);
+            _chapterService.EditContentChapter(chapter);
+            APIResult rs = new APIResult();
+            return rs.MessageSuccess("Chỉnh sửa nội dung Chapter thành công!");
+
         }
     }
 }
