@@ -344,7 +344,7 @@
             StateHasChanged();
 
             // Logic add here
-            ResponceMessage rsAddConcept = await conceptAS.AddConcept(new_concept, new_description);
+            ResponseMessage rsAddConcept = await conceptAS.AddConcept(new_concept, new_description);
 
             if (rsAddConcept != null)
             {
@@ -414,7 +414,7 @@
             c.Content = new_description;
         }
 
-        ResponceMessage rs = await conceptAS.UpdateConcept(c);
+        ResponseMessage rs = await conceptAS.UpdateConcept(c);
         if (rs.Status)
         {
             await JsRuntime.InvokeVoidAsync("alert", rs.Message);
@@ -455,7 +455,7 @@
     public async Task fetchDeleteConcept()
     {
         if (SelectedConcept == null) return;
-        ResponceMessage rs = await conceptAS.DeleteConcept(SelectedConcept.ID);
+        ResponseMessage rs = await conceptAS.DeleteConcept(SelectedConcept.ID);
 
         if (rs != null)
         {
@@ -478,7 +478,7 @@
 
     public async Task AddNewKeyphrase()
     {
-        ResponceMessage rs = new();
+        ResponseMessage rs = new();
 
         if (new_keyphrase != null && SelectedConcept != null)
         {
@@ -518,7 +518,7 @@
 
     public async Task DeleteConceptKeyphrase(ConceptKeyphraseShow k)
     {
-        ResponceMessage rs = new();
+        ResponseMessage rs = new();
 
         rs = await conceptAS.DeleteConceptKeyphrase(k);
 

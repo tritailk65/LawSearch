@@ -8,12 +8,16 @@ using Blazored.LocalStorage;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["BackendApiUrl"]) });
+
+builder.Services.AddScoped<ICookie, Cookie>();
 builder.Services.AddScoped<IArticalAdminService, ArticalAdminService>();
 builder.Services.AddScoped<IConceptAdminService, ConceptAdminService>();
 builder.Services.AddScoped<IKeyPhraseAdminService, KeyPhraseAdminService>();
 builder.Services.AddScoped<ILawDocAdminService, LawDocAdminService>();
 builder.Services.AddScoped<ISearchAdminService, SearchAdminService>();
+builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

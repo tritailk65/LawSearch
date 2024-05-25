@@ -4,6 +4,7 @@ using LawSearch_Core.Models;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -15,15 +16,20 @@ namespace LawSearch_Admin.Services
     public class ConceptAdminService : IConceptAdminService
     {
         private readonly HttpClient httpClient;
+        private readonly ICookie _cookie;
 
-        public ConceptAdminService(HttpClient httpClient)
+        public ConceptAdminService(HttpClient httpClient, ICookie cookie)
         {
             this.httpClient = httpClient;
+            _cookie = cookie;
         }
 
         public async Task<List<Concept>> GetListConcept()
         {
             List<Concept> lst = new List<Concept>();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<Concept>>($"api/concept");
 
@@ -43,6 +49,10 @@ namespace LawSearch_Admin.Services
         public async Task<List<ConceptKeyphraseShow>> GetListKeyphraseByConceptID(int concept_id)
         {
             List<ConceptKeyphraseShow> ls = new();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+
             var rs_client = await httpClient.GetAsync($"api/Concept/GetConceptKeyphrase?ConceptID=" + concept_id);
             var _ = await rs_client.Content.ReadAsStringAsync();
 
@@ -76,7 +86,7 @@ namespace LawSearch_Admin.Services
             return ls;
         }
 
-        public async Task<ResponceMessage> AddConcept(string name, string content)
+        public async Task<ResponseMessage> AddConcept(string name, string content)
         {
             Concept newConcept = new()
             {
@@ -84,7 +94,11 @@ namespace LawSearch_Admin.Services
                 Content = content
             };
 
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
+
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.PostAsJsonAsync($"api/concept", newConcept);
 
@@ -105,9 +119,12 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<ResponceMessage> UpdateConcept(Concept newConcept)
+        public async Task<ResponseMessage> UpdateConcept(Concept newConcept)
         {
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.PutAsJsonAsync($"api/Concept", newConcept);
 
@@ -129,9 +146,12 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<ResponceMessage> DeleteConcept(int id)
+        public async Task<ResponseMessage> DeleteConcept(int id)
         {
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.DeleteAsync($"api/Concept?id=" + id);
 
@@ -153,15 +173,18 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<ResponceMessage> AddConceptKeyphrase(int conceptid, string keyphrase)
+        public async Task<ResponseMessage> AddConceptKeyphrase(int conceptid, string keyphrase)
         {
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
 
             var formContent = new FormUrlEncodedContent(new[]
 {
                 new KeyValuePair<string, string>("ConceptID", conceptid.ToString()),
                 new KeyValuePair<string, string>("Keyphrase",keyphrase)
             });
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.PostAsync($"api/Concept/AddConceptKeyphrase", formContent);
 
@@ -183,9 +206,12 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<ResponceMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k)
+        public async Task<ResponseMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k)
         {
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.DeleteAsync($"api/Concept/DeleteConceptKeyphrase?ConceptKeyphraseID=" +k.ID);
 
