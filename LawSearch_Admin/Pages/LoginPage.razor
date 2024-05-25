@@ -2,7 +2,7 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
-@inject IJSRuntime JsRuntime;
+@inject IUserAdminService UserAdminService;
 
 <div class="background_view">
     <div class="login-container">
@@ -36,6 +36,7 @@
     </div>
 </div>
 
+
 @code {
     private string username;
     private string password;
@@ -45,27 +46,34 @@
 
     private async Task HandleLogin()
     {
-        var users = new List<User>
-            {
-                new User { ID = 1, UserName = "adminQuocAn", Password = "9999", Type = 0, Email = "adminquocan@gmail.com" },
-                new User { ID = 2, UserName = "adminTriTai", Password = "9999", Type = 0, Email = "admintritai@gmail.com" },
-                new User { ID = 3, UserName = "normaluser", Password = "1234", Type = 1, Email = "user@gmail.com" }
-            };
+        ResponseMessage rsUserLogin = await UserAdminService.UserLogin(username, password);
 
-        Console.WriteLine($"Login attempt for {username} with password {password}");
-
-        var user = users.Find(u => u.UserName == username && u.Password == password);
-
-        if (user != null)
+        if (rsUserLogin != null)
         {
-            await localStorage.SetItemAsync(LocalStorageKeys.isLogin, true);
-            await localStorage.SetItemAsync(LocalStorageKeys.user, user);
-            NavigationManager.NavigateTo("/search");
+            if (rsUserLogin.Status)
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rsUserLogin.Message);
+                await HandleLoginSuccess();
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", rsUserLogin.Error);
+                // await JsRuntime.InvokeVoidAsync("alert", "Invalid username or password");
+            }
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Invalid username or password");
+            // handler error
         }
+
+    }
+
+    private async Task HandleLoginSuccess()
+    {
+        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, true);
+        // await localStorage.SetItemAsync(LocalStorageKeys.user, user);
+
+        NavigationManager.NavigateTo("/search");
     }
 
     private void TogglePasswordVisibility()

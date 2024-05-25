@@ -2,6 +2,7 @@
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
 using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace LawSearch_Admin.Services
@@ -9,15 +10,21 @@ namespace LawSearch_Admin.Services
     public class KeyPhraseAdminService : IKeyPhraseAdminService
     {
         private readonly HttpClient httpClient;
+        private readonly ICookie _cookie;
 
-        public KeyPhraseAdminService(HttpClient httpClient)
+        public KeyPhraseAdminService(HttpClient httpClient, ICookie cookie)
         {
             this.httpClient = httpClient;
+            this._cookie = cookie;
         }
 
         public async Task<List<KeyPhraseRelate>> GetKeyPhraseRelates(int id)
         {
             List<KeyPhraseRelate> lst = new List<KeyPhraseRelate>();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhraseRelate>>($"api/keyphrase/GetKeyPhraseRelate?ID={id}");
             if (rs != null && rs.Status == 200 && rs.Data.Count != 0)
             {
@@ -30,6 +37,10 @@ namespace LawSearch_Admin.Services
         public async Task<List<KeyPhrase>> GetListKeyPhrase()
         {
             List<KeyPhrase> lst = new List<KeyPhrase>();
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/keyphrase");
             if (rs != null && rs.Status == 200 && rs.Data.Count != 0)
             {
@@ -38,14 +49,18 @@ namespace LawSearch_Admin.Services
             return lst;
         }
 
-        public async Task<ResponceMessage> AddKeyphrase(String keyphraseText)
+        public async Task<ResponseMessage> AddKeyphrase(String keyphraseText)
         {
             KeyPhrase k = new()
             {
                 Keyphrase = keyphraseText
             };
+
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+
             HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/KeyPhrase", k);
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
                 rm.Status = true;
@@ -53,7 +68,6 @@ namespace LawSearch_Admin.Services
                 try
                 {
                     APIResultVM apiResponse = await rs.Content.ReadAsAsync<APIResultVM>();
-                    var a = apiResponse;
                     if (apiResponse.Data != null)
                     {
                         KeyPhrase rs_k = JsonConvert.DeserializeObject<KeyPhrase>(apiResponse.Data);
@@ -77,10 +91,13 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<ResponceMessage> DeleteKeyphrase(int id)
+        public async Task<ResponseMessage> DeleteKeyphrase(int id)
         {
+            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
+            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+
             var rs = await httpClient.DeleteAsync($"api/KeyPhrase?id=" + id);
-            ResponceMessage rm = new();
+            ResponseMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
                 rm.Status = true;

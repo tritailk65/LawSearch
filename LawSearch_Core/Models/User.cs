@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace LawSearch_Core.Models
@@ -17,6 +18,7 @@ namespace LawSearch_Core.Models
         public DateTime TokenExpires { get; set; }
         public string Role { get; set; } = string.Empty;
         public bool Status { get; set; }
+        public string Email { get; set; } = string.Empty;
     }
 
     public class UserVM
@@ -33,9 +35,16 @@ namespace LawSearch_Core.Models
 
     public class UserInfoVM
     {
-        public int ID { set; get; }
-        public string Username { set; get; }
-        public string Role { set; get; }
-        public string Token { set; get; }
+        [JsonPropertyName("id")]
+        public int ID { get; set; }
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; }
+
+        [JsonPropertyName("role")]
+        public string Role { get; set; }
+
+        [JsonPropertyName("token")]
+        public string Token { get; set; }
     }
 }
