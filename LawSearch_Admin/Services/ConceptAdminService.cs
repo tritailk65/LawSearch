@@ -58,7 +58,7 @@ namespace LawSearch_Admin.Services
 
             try
             {
-                APIResultVM<ConceptKeyphraseShow> rs = JsonConvert.DeserializeObject<APIResultVM<ConceptKeyphraseShow>>(_);
+                APIResultVM<ConceptKeyphraseShow>? rs = JsonConvert.DeserializeObject<APIResultVM<ConceptKeyphraseShow>>(_);
 
                 if (rs != null && rs.Status == 200)
                 {
