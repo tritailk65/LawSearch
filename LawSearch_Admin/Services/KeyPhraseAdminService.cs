@@ -63,7 +63,7 @@ namespace LawSearch_Admin.Services
             ResponseMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Add Keyphrase Success";
                 try
                 {
@@ -100,7 +100,7 @@ namespace LawSearch_Admin.Services
             ResponseMessage rm = new();
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Delete KeyPhrase Success";
             }
             else

@@ -348,7 +348,7 @@
 
             if (rsAddConcept != null)
             {
-                if(rsAddConcept.StatusAPI)
+                if(rsAddConcept.Status)
                 {
                     await JsRuntime.InvokeVoidAsync("alert", rsAddConcept.Message);
                     await fetchConcept();
@@ -415,7 +415,7 @@
         }
 
         ResponseMessage rs = await conceptAS.UpdateConcept(c);
-        if (rs.StatusAPI)
+        if (rs.Status)
         {
             await JsRuntime.InvokeVoidAsync("alert", rs.Message);
             CloseEditConceptForm();
@@ -459,7 +459,7 @@
 
         if (rs != null)
         {
-            if (rs.StatusAPI)
+            if (rs.Status)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 await fetchConcept();
@@ -487,7 +487,7 @@
 
         if (rs != null)
         {
-            if (rs.StatusAPI)
+            if (rs.Status)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 await fetchKeyphrase(SelectedConcept.ID);
@@ -524,7 +524,7 @@
 
         if (rs != null)
         {
-            if (rs.StatusAPI)
+            if (rs.Status)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 if (SelectedConcept != null)
