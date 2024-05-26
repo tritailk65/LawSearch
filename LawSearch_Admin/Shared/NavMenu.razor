@@ -1,164 +1,71 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage;
-@inject ICookie Cookie;
 
 @code {
-    public enum LevelAccess
-    {
-        Admin,
-        User,
-        Guest
-    }
-
-
-    public class UserAccess
-    {
-        public LevelAccess UserLevel { get; private set; }
-        public string UserRole { get; private set; }
-
-        private static readonly Dictionary<LevelAccess, List<string>> AccessRights = new Dictionary<LevelAccess, List<string>>
-    {
-        { LevelAccess.Admin, new List<string> { 
-                FeatureKeys.Search, 
-                FeatureKeys.ViewLaw, 
-                FeatureKeys.EditLaw,
-                FeatureKeys.ImportLaw,
-                FeatureKeys.ImportLaw,
-                FeatureKeys.KeyPhrase,
-                FeatureKeys.UserManager,
-                FeatureKeys.History 
-            } 
-        },
-        { LevelAccess.User, new List<string> { 
-                FeatureKeys.Search,
-                FeatureKeys.ViewLaw,
-                FeatureKeys.History
-            } 
-        },
-        { LevelAccess.Guest, new List<string> { 
-                FeatureKeys.Search
-            } 
-        }
-    };
-
-        public UserAccess(string userRole)
-        {
-            UserRole = userRole;
-            if (Enum.TryParse(userRole, out LevelAccess level))
-            {
-                UserLevel = level;
-            }
-            else
-            {
-                // Default to Guest or handle unknown roles
-                UserLevel = LevelAccess.Guest;
-            }
-        }
-
-        public List<string> GetAccessRights()
-        {
-            return AccessRights[UserLevel];
-        }
-    }
-}
-
-@code {
-    private UserAccess? userAccess = null;
-
-    private bool HasAccess(string feature)
-    {
-        return userAccess?.GetAccessRights().Contains(feature) ?? false;
-    }
+    User user = new User();
+    Boolean isLogin;
 
     protected override async Task OnInitializedAsync()
     {
-        string userRole = await Cookie.GetValue(CookieKeys.userrole);
-        userAccess = new UserAccess(userRole);
-        StateHasChanged();
+        isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
+        user = await localStorage.GetItemAsync<User>(LocalStorageKeys.user);
     }
 }
 
-
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="navbar position-static mx-5">
-        @if (HasAccess(FeatureKeys.Search))
-        {
-            <div class="nav-item">
-                <NavLink class="nav-link" href="/search" Match="NavLinkMatch.All">
-                    <img class="nav-item-icon" src="assets/icon/search_icon.png" aria-hidden="true" /> Search Law
-                </NavLink>
-            </div>
-        }
 
-        @if (HasAccess(FeatureKeys.ViewLaw) || HasAccess(FeatureKeys.EditLaw) || HasAccess(FeatureKeys.ImportLaw))
-        {
-            <div class="nav-item dropdown">
-                <NavLink class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="nav-item-icon" src="assets/icon/document_icon.png" aria-hidden="true" /> Law Documents
-                </NavLink>
-                <div class="dropdown-menu" style="justify-content:none;" aria-labelledby="navbarDropdown">
-                    @if (HasAccess(FeatureKeys.ViewLaw))
-                    {
-                        <div class="nav-item-list">
-                            <NavLink class="nav-link" href="viewlaw">
-                                <img class="nav-item-icon" src="assets/icon/viewlaw_icon.png" aria-hidden="true" /> View law
-                            </NavLink>
-                        </div>
-                    }
-                    @if (HasAccess(FeatureKeys.EditLaw))
-                    {
-                        <div class="nav-item-list">
-                            <NavLink class="nav-link" href="editlaw">
-                                <img class="nav-item-icon" src="assets/icon/editlaw_icon.png" aria-hidden="true" /> Edit law
-                            </NavLink>
-                        </div>
-                    }
-                    @if (HasAccess(FeatureKeys.ImportLaw))
-                    {
-                        <div class="nav-item-list">
-                            <NavLink class="nav-link" href="importlaw">
-                                <img class="nav-item-icon" src="assets/icon/import_law.png" aria-hidden="true" /> Import law
-                            </NavLink>
-                        </div>
-                    }
+        <div class="nav-item">
+            <NavLink class="nav-link" href="/search" Match="NavLinkMatch.All">
+                <img class="nav-item-icon" src="assets/icon/search_icon.png" aria-hidden="true" /> Search Law
+            </NavLink>
+        </div>
+
+        <div class="nav-item dropdown">
+            <NavLink class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="nav-item-icon" src="assets/icon/document_icon.png" aria-hidden="true" /> Law Documents
+            </NavLink>
+            <div class="dropdown-menu" style="justify-content:none;" aria-labelledby="navbarDropdown">
+                <div class="nav-item-list">
+                    <NavLink class="nav-link" href="viewlaw">
+                        <img class="nav-item-icon" src="assets/icon/viewlaw_icon.png" aria-hidden="true" /> View law
+                    </NavLink>
+                </div>
+                <div class="nav-item-list">
+                    <NavLink class="nav-link" href="editlaw">
+                        <img class="nav-item-icon" src="assets/icon/editlaw_icon.png" aria-hidden="true" /> Edit law
+                        </NavLink>
+                </div>
+                <div class="nav-item-list">
+                    <NavLink class="nav-link" href="importlaw">
+                        <img class="nav-item-icon" src="assets/icon/import_law.png" aria-hidden="true" /> Import law
+                        </NavLink>
                 </div>
             </div>
-        }
+        </div>
 
-        @if (HasAccess(FeatureKeys.Concept))
-        {
-            <div class="nav-item">
-                <NavLink class="nav-link" href="concept">
-                    <img class="nav-item-icon" src="assets/icon/concept_icon.png" aria-hidden="true" /> Concept
-                </NavLink>
-            </div>
-        }
+        <div class="nav-item ">
+            <NavLink class="nav-link" href="concept">
+                <img class="nav-item-icon" src="assets/icon/concept_icon.png" aria-hidden="true" /> Concept
+            </NavLink>
+        </div>
 
-        @if (HasAccess(FeatureKeys.KeyPhrase))
-        {
-            <div class="nav-item">
-                <NavLink class="nav-link" href="keyphrase">
-                    <img class="nav-item-icon" src="assets/icon/keyphrase_icon.png" aria-hidden="true" /> KeyPhrase
-                </NavLink>
-            </div>
-        }
+        <div class="nav-item ">
+            <NavLink class="nav-link" href="keyphrase">
+                <img class="nav-item-icon" src="assets/icon/keyphrase_icon.png" aria-hidden="true" /> KeyPharse
+            </NavLink>
+        </div>
 
-        @if (HasAccess(FeatureKeys.UserManager))
-        {
-            <div class="nav-item">
-                <NavLink class="nav-link" href="usermanager">
-                    <img class="nav-item-icon" src="assets/icon/user_management_icon.png" aria-hidden="true" /> User Management
-                </NavLink>
-            </div>
-        }
+        <div class="nav-item ">
+            <NavLink class="nav-link" href="usermanager">
+                <img class="nav-item-icon" src="assets/icon/user_management_icon.png" aria-hidden="true"> User Management
+            </NavLink>
+        </div>
 
-        @if (HasAccess(FeatureKeys.History))
-        {
-            <div class="nav-item">
-                <NavLink class="nav-link" href="history">
-                    <img class="nav-item-icon" src="assets/icon/history_icon.png" aria-hidden="true" /> History search
-                </NavLink>
-            </div>
-        }
+        <div class="nav-item">
+            <NavLink class="nav-link" href="history">
+                <img class="nav-item-icon" src="assets/icon/history_icon.png" aria-hidden="true" /> History search
+            </NavLink>
+        </div>
     </nav>
 </div>
 
