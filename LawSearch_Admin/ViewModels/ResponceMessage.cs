@@ -22,37 +22,42 @@ namespace LawSearch_Admin.ViewModels
         public string? Exception { get; set; } = null;
 
         [JsonPropertyName("data")]
-        public string? Data { get; set; }
+        public string? Data { get; set; } = null;
+
+        public ResponseMessage()
+        {
+
+        }
     }
 
     public class ResponseMessageLogin
     {
         [JsonPropertyName("status")]
-        public int? Status { get; set; }
+        public int? Status { get; set; } = null;
 
         [JsonPropertyName("message")]
-        public string? Message { get; set; }
+        public string? Message { get; set; } = null;
 
         [JsonPropertyName("exception")]
-        public string? Exception { get; set; }
+        public string? Exception { get; set; } = null;
 
         [JsonPropertyName("data")]
-        public UserInfo? Data { get; set; }
+        public UserInfo? Data { get; set; } = null;
     }
 
     public class UserInfo
     {
         [JsonPropertyName("id")]
-        public int? Id { get; set; }
+        public int? Id { get; set; } = null;
 
         [JsonPropertyName("username")]
-        public string? Username { get; set; }
+        public string? Username { get; set; } = null;
 
         [JsonPropertyName("role")]
-        public string? Role { get; set; }
+        public string? Role { get; set; } = null;
 
         [JsonPropertyName("token")]
-        public string? Token { get; set; }
+        public string? Token { get; set; } = null;
     }
 
     public class ResponseMessageListData<T>
@@ -90,7 +95,7 @@ namespace LawSearch_Admin.ViewModels
         public string? Message { get; set; }
 
         [JsonPropertyName("exception")]
-        public string? Exception { get; set; }
+        public string? Exception { get; set; } = null;
 
         [JsonPropertyName("data")]
         public T? Data { get; set; }
