@@ -58,7 +58,7 @@ namespace LawSearch_Admin.Services
 
             try
             {
-                APIResultVM<ConceptKeyphraseShow>? rs = JsonConvert.DeserializeObject<APIResultVM<ConceptKeyphraseShow>>(_);
+                APIResultVM<ConceptKeyphraseShow> rs = JsonConvert.DeserializeObject<APIResultVM<ConceptKeyphraseShow>>(_);
 
                 if (rs != null && rs.Status == 200)
                 {
@@ -104,7 +104,7 @@ namespace LawSearch_Admin.Services
 
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Add concept success";
             }
             else
@@ -130,7 +130,7 @@ namespace LawSearch_Admin.Services
 
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Update concept success";
             }
             else
@@ -157,7 +157,7 @@ namespace LawSearch_Admin.Services
 
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Delete concept success";
             }
             else
@@ -190,7 +190,7 @@ namespace LawSearch_Admin.Services
 
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Add concept keyphrase success";
             }
             else
@@ -217,7 +217,7 @@ namespace LawSearch_Admin.Services
 
             if (rs.IsSuccessStatusCode)
             {
-                rm.StatusAPI = true;
+                rm.Status = true;
                 rm.Message = "Delete concept keyphrase success";
             }
             else

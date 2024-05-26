@@ -8,21 +8,10 @@ namespace LawSearch_Admin.ViewModels
 {
     public class ResponseMessage
     {
-        [JsonPropertyName("status")]
-        public int? Status { get; set; } = null;
-
-        public bool StatusAPI { get; set; } = false;
-
-        [JsonPropertyName("message")]
+        public bool Status { get; set; } = false;
         public string? Message { get; set; } = null;
-
         public string? Error { get; set; } = null;
-
-        [JsonPropertyName("exception")]
         public string? Exception { get; set; } = null;
-
-        [JsonPropertyName("data")]
-        public string? Data { get; set; }
     }
 
     public class ResponseMessageLogin
@@ -58,9 +47,7 @@ namespace LawSearch_Admin.ViewModels
     public class ResponseMessageListData<T>
     {
         [JsonPropertyName("status")]
-        public int? Status { get; set; } = null;
-
-        public bool StatusAPI { get; set; } = false;
+        public bool Status { get; set; } = false;
 
         [JsonPropertyName("message")]
         public string? Message { get; set; } = null;
@@ -76,28 +63,6 @@ namespace LawSearch_Admin.ViewModels
         public ResponseMessageListData()
         {
             ListData = new List<T>();
-        }
-    }
-
-    public class ResponseMessageObjectData<T>
-    {
-        [JsonPropertyName("status")]
-        public int? Status { get; set; } = null;
-
-        public bool StatusAPI { get; set; } = false;
-
-        [JsonPropertyName("message")]
-        public string? Message { get; set; }
-
-        [JsonPropertyName("exception")]
-        public string? Exception { get; set; }
-
-        [JsonPropertyName("data")]
-        public T? Data { get; set; }
-
-        public ResponseMessageObjectData()
-        {
-            Data = default(T);
         }
     }
 }
