@@ -27,13 +27,14 @@ namespace LawSearch_Admin.Services
             };
 
             HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/Auth/Login", body);
-            var a = await rs.Content.ReadAsStringAsync();
-
             ResponseMessage rm = new();
+
+
+            var rs_text = await rs.Content.ReadAsStringAsync();
+            ResponseMessageLogin? response = JsonSerializer.Deserialize<ResponseMessageLogin>(rs_text.ToString());
+
             if (rs.IsSuccessStatusCode)
             {
-                var rs_text = await rs.Content.ReadAsStringAsync();
-                ResponseMessageLogin? response = JsonSerializer.Deserialize<ResponseMessageLogin>(rs_text.ToString());
                 if (response?.Data != null)
                 {
                     try
@@ -51,24 +52,21 @@ namespace LawSearch_Admin.Services
                         Console.WriteLine(ex.Message);
                     }
 
-                    rm.Status = true;
+                    rm.StatusAPI = true;
                     rm.Message = "Login success";
                 }
                 else
                 {
-                    rm.Status = false;
                     rm.Message = "Login failed";
                     rm.Error = "Invalid response data.";
                 }
             }
             else
             {
-                // Read the error message from the response
-                var resultPost = await rs.Content.ReadFromJsonAsync<APIResultVM>();
-                if (resultPost != null && resultPost.Message != null)
+                if (response?.Exception != null)
                 {
                     rm.Message = "Login failed";
-                    rm.Error = resultPost.Message;
+                    rm.Error = response.Exception;
                 }
                 else
                 {
@@ -77,6 +75,119 @@ namespace LawSearch_Admin.Services
                 }
             }
             return rm;
+        }
+
+        public async Task<ResponseMessageListData<User>> GetListUser()
+        {
+            ResponseMessageListData<User>? rs = await httpClient.GetFromJsonAsync<ResponseMessageListData<User>>($"api/User/GetAll");
+            if(rs == null)
+            {
+                return new ResponseMessageListData<User>
+                {
+                    Message = "An unknown error occurred.",
+                    Exception = "Data is null"
+                };
+            } else
+            {
+                if(rs.Status == 200)
+                {
+                    rs.StatusAPI = true;
+                }
+            }
+            return rs;
+        }
+
+        public async Task<ResponseMessageObjectData<User>> UserModifyRole(string userid, string role)
+        {
+            var body = new
+            {
+                userid = userid,
+                role = role
+            };
+
+            HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/User/ModifyRole", body);
+
+            var rs_text = await rs.Content.ReadAsStringAsync();
+            ResponseMessageObjectData<User>? response = JsonSerializer.Deserialize<ResponseMessageObjectData<User>>(rs_text.ToString());
+
+
+            if(response == null)
+            {
+                return new ResponseMessageObjectData<User>
+                {
+                    Message = "An unknown error occurred.",
+                    Exception = "Data is null"
+                };
+            } else
+            {
+                if(response.Status == 200)
+                {
+                    response.StatusAPI = true;
+                }
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseMessage> UserChangeStatus(string userid)
+        {
+            HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/User/ChangeStatus?ID={userid}", "");
+
+
+            var rs_text = await rs.Content.ReadAsStringAsync();
+            ResponseMessage? response = JsonSerializer.Deserialize<ResponseMessage>(rs_text.ToString());
+
+
+            if (response != null)
+            {
+                if (response?.Status == 200)
+                {
+                    response.StatusAPI = true;
+                }
+            } else
+            {
+                return new ResponseMessage
+                {
+                    StatusAPI = false,
+                    Message = "An unknown error occurred.",
+                    Exception = "Data is null"
+                };
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseMessage> AddUser(string username, string password)
+        {
+            var body = new
+            {
+                username = username,
+                password = password
+            };
+
+            HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/Auth/AddUser", body);
+
+            var rs_text = await rs.Content.ReadAsStringAsync();
+            ResponseMessage? response = JsonSerializer.Deserialize<ResponseMessage>(rs_text.ToString());
+
+
+            if (response == null)
+            {
+                return new ResponseMessage
+                {
+                    Message = "An unknown error occurred.",
+                    Exception = "Data is null"
+                };
+            }
+            else
+            {
+                if (response.Status == 200)
+                {
+                    response.StatusAPI = true;
+                }
+            }
+
+            return response;
         }
     }
 }

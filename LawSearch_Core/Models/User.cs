@@ -9,16 +9,55 @@ namespace LawSearch_Core.Models
 {
     public class User
     {
+        [JsonPropertyName("id")]
         public int ID { get; set; }
-        public string Username { get; set; } = string.Empty;
+
+        [JsonPropertyName("username")]
+        public string Username { get; set; }
+
+        [JsonPropertyName("passwordHash")]
         public byte[] PasswordHash { get; set; }
+
+        [JsonPropertyName("passwordSalt")]
         public byte[] PasswordSalt { get; set; }
-        public string RefreshToken { get; set; } = string.Empty;
+
+        [JsonPropertyName("refreshToken")]
+        public string RefreshToken { get; set; }
+
+        [JsonPropertyName("tokenCreated")]
         public DateTime TokenCreated { get; set; }
+
+        [JsonPropertyName("tokenExpires")]
         public DateTime TokenExpires { get; set; }
-        public string Role { get; set; } = string.Empty;
+
+        [JsonPropertyName("role")]
+        public string Role { get; set; }
+
+        [JsonPropertyName("status")]
         public bool Status { get; set; }
-        public string Email { get; set; } = string.Empty;
+
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+
+        // Optional: Constructor for easier instantiation
+        public User(int id, string username, byte[] passwordHash, byte[] passwordSalt, string refreshToken, DateTime tokenCreated, DateTime tokenExpires, string role, bool status, string email)
+        {
+            ID = id;
+            Username = username;
+            PasswordHash = passwordHash;
+            PasswordSalt = passwordSalt;
+            RefreshToken = refreshToken;
+            TokenCreated = tokenCreated;
+            TokenExpires = tokenExpires;
+            Role = role;
+            Status = status;
+            Email = email;
+        }
+
+        // Optional: Parameterless constructor for serialization/deserialization
+        public User()
+        {
+        }
     }
 
     public class UserVM
