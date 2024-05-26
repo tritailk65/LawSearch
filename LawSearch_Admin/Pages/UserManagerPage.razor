@@ -10,7 +10,7 @@
     {
         ResponseMessageListData<User> rs = await UserAdminService.GetListUser();
 
-        if (rs.Status)
+        if (rs.StatusAPI)
         {
             string userid = await Cookie.GetValue(CookieKeys.userid);
             users = rs.ListData.Where(user => user.ID != int.Parse(userid)).ToList();
@@ -208,7 +208,7 @@
     {
         ResponseMessage rs = await UserAdminService.UserChangeStatus(user.ID.ToString());
 
-        if(rs.Status == true)
+        if(rs.StatusAPI)
         {
             await JSRuntime.InvokeVoidAsync("alert", rs.Message);
         }
@@ -234,7 +234,7 @@
 
         ResponseMessageObjectData<User> rs = await UserAdminService.UserModifyRole(selectedUser.ID.ToString(), role);
 
-        if (rs.Status == true)
+        if (rs.StatusAPI)
         {
             await JSRuntime.InvokeVoidAsync("alert", "Change role success!");
         }
@@ -292,7 +292,7 @@
     {
         ResponseMessage rm = await UserAdminService.AddUser(username, password);
 
-        if (rm.Status == true)
+        if (rm.StatusAPI)
         {
             await JSRuntime.InvokeVoidAsync("alert", rm.Message);
         } else

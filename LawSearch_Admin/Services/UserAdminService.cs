@@ -52,12 +52,11 @@ namespace LawSearch_Admin.Services
                         Console.WriteLine(ex.Message);
                     }
 
-                    rm.Status = true;
+                    rm.StatusAPI = true;
                     rm.Message = "Login success";
                 }
                 else
                 {
-                    rm.Status = false;
                     rm.Message = "Login failed";
                     rm.Error = "Invalid response data.";
                 }
@@ -81,7 +80,7 @@ namespace LawSearch_Admin.Services
         public async Task<ResponseMessageListData<User>> GetListUser()
         {
             ResponseMessageListData<User>? rs = await httpClient.GetFromJsonAsync<ResponseMessageListData<User>>($"api/User/GetAll");
-            if(rs == null && rs.StatusCode == 200)
+            if(rs == null)
             {
                 return new ResponseMessageListData<User>
                 {
@@ -90,9 +89,9 @@ namespace LawSearch_Admin.Services
                 };
             } else
             {
-                if(rs.StatusCode == 200)
+                if(rs.Status == 200)
                 {
-                    rs.Status = true;
+                    rs.StatusAPI = true;
                 }
             }
             return rs;
@@ -121,9 +120,9 @@ namespace LawSearch_Admin.Services
                 };
             } else
             {
-                if(response.StatusCode == 200)
+                if(response.Status == 200)
                 {
-                    response.Status = true;
+                    response.StatusAPI = true;
                 }
             }
 
@@ -141,20 +140,15 @@ namespace LawSearch_Admin.Services
 
             if (response != null)
             {
-                if (response?.StatusCode == 200)
+                if (response?.Status == 200)
                 {
-                    response.Status = true;
+                    response.StatusAPI = true;
                 }
-                else
-                {
-                    response.Status = false;
-                }
-                
             } else
             {
                 return new ResponseMessage
                 {
-                    Status = false,
+                    StatusAPI = false,
                     Message = "An unknown error occurred.",
                     Exception = "Data is null"
                 };
@@ -187,9 +181,9 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                if (response.StatusCode == 200)
+                if (response.Status == 200)
                 {
-                    response.Status = true;
+                    response.StatusAPI = true;
                 }
             }
 

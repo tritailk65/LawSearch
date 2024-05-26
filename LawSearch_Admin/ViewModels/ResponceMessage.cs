@@ -9,9 +9,9 @@ namespace LawSearch_Admin.ViewModels
     public class ResponseMessage
     {
         [JsonPropertyName("status")]
-        public int? StatusCode { get; set; } = null;
+        public int? Status { get; set; } = null;
 
-        public bool Status { get; set; } = false;
+        public bool StatusAPI { get; set; } = false;
 
         [JsonPropertyName("message")]
         public string? Message { get; set; } = null;
@@ -58,9 +58,9 @@ namespace LawSearch_Admin.ViewModels
     public class ResponseMessageListData<T>
     {
         [JsonPropertyName("status")]
-        public int? StatusCode { get; set; } = null;
+        public int? Status { get; set; } = null;
 
-        public bool Status { get; set; } = false;
+        public bool StatusAPI { get; set; } = false;
 
         [JsonPropertyName("message")]
         public string? Message { get; set; } = null;
@@ -82,9 +82,9 @@ namespace LawSearch_Admin.ViewModels
     public class ResponseMessageObjectData<T>
     {
         [JsonPropertyName("status")]
-        public int? StatusCode { get; set; } = null;
+        public int? Status { get; set; } = null;
 
-        public bool Status { get; set; } = false;
+        public bool StatusAPI { get; set; } = false;
 
         [JsonPropertyName("message")]
         public string? Message { get; set; }
