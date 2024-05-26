@@ -1,16 +1,93 @@
 ﻿@page "/usermanager"
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager
+@inject IUserAdminService UserAdminService;
+@inject IJSRuntime JSRuntime;
+@inject ICookie Cookie;
 
 @code {
+    public async Task LoadListUser()
+    {
+        ResponseMessageListData<User> rs = await UserAdminService.GetListUser();
+
+        if (rs.StatusAPI)
+        {
+            string userid = await Cookie.GetValue(CookieKeys.userid);
+            users = rs.ListData.Where(user => user.ID != int.Parse(userid)).ToList();
+            allUsers = users;
+            totalUsers = rs.ListData.Count() - 1; // Minus current user
+            uniqueRoles = users.Select(u => u.Role).Distinct().ToList();
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", rs.Exception);
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
-        bool isLogin = await localStorage.GetItemAsync<bool>(LocalStorageKeys.isLogin);
-        if (!isLogin)
+        string authToken = await Cookie.GetValue(CookieKeys.authToken);
+
+        if (authToken == null || authToken.Length < 100)
         {
             NavigationManager.NavigateTo("/");
         }
+
+        await LoadListUser();
     }
+}
+@if(isLoading)
+{
+    <div class="loading_view">
+        <LoadingScreenOverlay />
+        <a>Loading...</a>
+    </div>
+}
+
+@if(openRoleList)
+{
+    <div class="loading_view">
+        <div class="roleList_box">
+            <div class="roleList_box_title">
+                <a>Choose a role you want to change</a>
+            </div>
+            <div class="roleList_view">
+                @if(uniqueRoles?.Count > 0)
+                {
+                    foreach (var role in uniqueRoles)
+                    {
+                        <div class="role_view" @onclick="() => HandleChooseRole(role)">
+                            <a>@role</a>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="roleList_box_close_btn" @onclick="HandleClickCloseRoleBox">
+                <a>Close</a>
+            </div>
+        </div>
+    </div>
+}
+
+@if (openAddUser)
+{
+    <div class="loading_view">
+        <div class="adduser_box">
+            <form>
+                <div class="form_group form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" @bind="username_form" placeholder="Enter username" />
+                </div>
+                <div class="form_group form-group">
+                    <label for="password">Password</label>
+                    <input type="text" id="password" class="form-control" @bind="password_form" placeholder="Enter password" />
+                </div>
+                <div class="btns_view">
+                    <button type="button" class="form-btn btn btn-primary" @onclick="() => HandleCreateUser()">Create</button>
+                    <button type="button" class="form-btn btn btn-primary" @onclick="HandleClickCloseAddUserBox">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
 }
 
 <div class="main_content">
@@ -43,13 +120,13 @@
     <div class="bottom_content">
         <div class="top_bar_table_view">
             <div class="search-container">
-                <input type="text" placeholder="Search user..." @bind="searchUser" class="search-input" />
+                <input type="text" placeholder="Search user name..." @bind="searchUser" class="search-input" />
                 <button @onclick="PerformSearch" class="search-button">
                     <img src="assets/icon/search_icon.png" />
                 </button>
             </div>
 
-            <button class="top_bar_table_btn">
+            <button class="top_bar_table_btn" @onclick="() => {openAddUser = true; StateHasChanged();}">
                 Add user
             </button>
         </div>
@@ -65,62 +142,164 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var user in users)
+                    @if (users != null)
                     {
-                        <tr>
-                            <td>@user.Name</td>
-                            <td>@user.Role</td>
-                            <td>
-                                <label class="switch">
-                                    <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
-                                    <span class="slider"></span>
-                                </label>
-                            </td>
-                            <td>
-                                <a @onclick="() => ModifyRole(user)">Modify Role</a>
-                            </td>
-                        </tr>
+                        foreach (var user in users)
+                        {
+                            <tr>
+                                <td>@user.Username</td>
+                                <td>@user.Role</td>
+                                <td>
+                                    <label class="switch">
+                                        <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
+                                        <span class="slider"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <a @onclick="() => ModifyRole(user)">Modify Role</a>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
+
+
 @code {
-    private int totalQuestions = 106042;
-    private int totalUsers = 13902;
-    private string searchUser;
+    private int totalQuestions = 0;
+    private int totalUsers = 0;
+    private string? searchUser = null;
+    private List<User>? users = null;
+    private List<User>? allUsers = null; // List to store all users for searching
+    private List<string>? uniqueRoles = null;
+    private bool isLoading = false;
+    private bool openRoleList = false;
+    private User? selectedUser = null;
+    private bool openAddUser = false;
+    private string? username_form = null;
+    private string? password_form = null;
 
     private void PerformSearch()
     {
-        Console.WriteLine($"Searching for: {searchUser}");
+        if (!string.IsNullOrEmpty(searchUser))
+        {
+            users = allUsers?.Where(u => u.Username.Contains(searchUser, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            users = allUsers;
+        }
     }
 
-    private List<User> users = new List<User>
-    {
-        new User { Name = "John Doe", Role = "Admin", Status = true },
-        new User { Name = "Jane Smith", Role = "User", Status = false },
-        // Add more users as needed
-    };
-
-    private void ToggleStatus(User user)
+    private async Task ToggleStatus(User user)
     {
         user.Status = !user.Status;
-        Console.WriteLine($"Status changed for {user.Name} to {(user.Status ? "Active" : "Inactive")}");
+        Console.WriteLine($"Status changed for {user.Username} to {(user.Status ? "Active" : "Inactive")}");
+        isLoading = true;
+        StateHasChanged();
+        await UserChangeStatus(user);
+    }
+
+    private async Task UserChangeStatus(User user)
+    {
+        ResponseMessage rs = await UserAdminService.UserChangeStatus(user.ID.ToString());
+
+        if(rs.StatusAPI)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", rs.Message);
+        }
+
+        isLoading = false;
+        StateHasChanged();
     }
 
     private void ModifyRole(User user)
     {
-        // Logic to modify the role
-        Console.WriteLine($"Modify role for {user.Name}");
+        selectedUser = user;
+
+        openRoleList = true;
+        StateHasChanged();
     }
 
-    public class User
+    private async Task UserModifyRole(String role)
     {
-        public string Name { get; set; }
-        public string Role { get; set; }
-        public bool Status { get; set; }
+        if (selectedUser == null)
+        {
+            return;
+        }
+
+        ResponseMessageObjectData<User> rs = await UserAdminService.UserModifyRole(selectedUser.ID.ToString(), role);
+
+        if (rs.StatusAPI)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Change role success!");
+        }
+
+        await LoadListUser();
+    }
+
+    private async Task HandleChooseRole(String role)
+    {
+        openRoleList = false;
+        isLoading = true;
+        StateHasChanged();
+
+        await UserModifyRole(role);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void HandleClickCloseRoleBox()
+    {
+        openRoleList = false;
+        StateHasChanged();
+    }
+
+    private void HandleClickCloseAddUserBox()
+    {
+        openAddUser = false;
+        username_form = null;
+        password_form = null;
+        StateHasChanged();
+    }
+
+    private async Task HandleCreateUser()
+    {
+        if (username_form == null || password_form == null)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", (username_form == null) ? "Username is empty!" : "Password is empty!");
+            return;
+        }
+
+        openAddUser = false;
+        isLoading = true;
+        StateHasChanged();
+
+        await AddUser(username_form, password_form);
+        username_form = null;
+        password_form = null;
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task AddUser(string username, string password)
+    {
+        ResponseMessage rm = await UserAdminService.AddUser(username, password);
+
+        if (rm.StatusAPI)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", rm.Message);
+        } else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", rm.Exception);
+        }
+
+        await LoadListUser();
     }
 }
