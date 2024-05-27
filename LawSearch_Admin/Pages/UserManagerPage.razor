@@ -20,7 +20,7 @@
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("alert", rs.Exception);
+            await JSRuntime.InvokeVoidAsync("alert", rs.Message);
         }
     }
     protected override async Task OnInitializedAsync()
@@ -292,13 +292,7 @@
     {
         ResponseMessage rm = await UserAdminService.AddUser(username, password);
 
-        if (rm.StatusAPI)
-        {
-            await JSRuntime.InvokeVoidAsync("alert", rm.Message);
-        } else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", rm.Exception);
-        }
+        await JSRuntime.InvokeVoidAsync("alert", rm.Message);
 
         await LoadListUser();
     }

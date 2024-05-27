@@ -31,70 +31,88 @@ namespace LawSearch_Admin.Services
 
 
             var rs_text = await rs.Content.ReadAsStringAsync();
-            ResponseMessageLogin? response = JsonSerializer.Deserialize<ResponseMessageLogin>(rs_text.ToString());
-
-            if (rs.IsSuccessStatusCode)
+            
+            try
             {
-                if (response?.Data != null)
-                {
-                    try
-                    {
-                        await cookie.SetValue(CookieKeys.userid, response.Data.Id.ToString());
-                        await cookie.SetValue(CookieKeys.username, response.Data.Username);
-                        await cookie.SetValue(CookieKeys.userrole, response.Data.Role);
-                        await cookie.SetValue(CookieKeys.authToken, response.Data.Token);
-                        await cookie.SetValue(CookieKeys.password, password);
+                ResponseMessageLogin? response = JsonSerializer.Deserialize<ResponseMessageLogin>(rs_text.ToString());
 
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.Data.Token);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-
-                    rm.StatusAPI = true;
-                    rm.Message = "Login success";
-                }
-                else
+                if (response != null)
                 {
-                    rm.Message = "Login failed";
-                    rm.Error = "Invalid response data.";
+                    if (response.Status == 200)
+                    {
+                        rm.StatusAPI = true;
+
+                        try
+                        {
+                            // Save data to cookie
+                            if(response?.Data?.Id != null)
+                            {
+                                await cookie.SetValue(CookieKeys.userid, $"{response.Data.Id}");
+                            }
+                            if(response?.Data?.Username != null)
+                            {
+                                await cookie.SetValue(CookieKeys.username, response.Data.Username);
+                            }
+                            if(response?.Data?.Role != null)
+                            {
+                                await cookie.SetValue(CookieKeys.userrole, response.Data.Role);
+                            }
+                            if(response?.Data?.Token != null)
+                            {
+                                await cookie.SetValue(CookieKeys.authToken, response.Data.Token);
+                            }
+                            await cookie.SetValue(CookieKeys.password, password);
+
+                            // Authorization api with token
+                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.Data.Token);
+                        }
+                        catch (Exception ex)
+                        {
+                            rm.Message = ex.Message;
+                        }
+                    }
+                    else
+                    {
+                        rm.Message = response.Message;
+                    }
+                } else
+                {
+                    rm.Message = "An error occurred when data is empty!";
                 }
-            }
-            else
+            } catch (Exception ex)
             {
-                if (response?.Exception != null)
-                {
-                    rm.Message = "Login failed";
-                    rm.Error = response.Exception;
-                }
-                else
-                {
-                    rm.Message = "Login failed";
-                    rm.Error = "An unknown error occurred.";
-                }
+                rm.Message = ex.Message;
             }
+
             return rm;
         }
 
         public async Task<ResponseMessageListData<User>> GetListUser()
         {
-            ResponseMessageListData<User>? rs = await httpClient.GetFromJsonAsync<ResponseMessageListData<User>>($"api/User/GetAll");
-            if(rs == null)
+            ResponseMessageListData<User>? response = new ResponseMessageListData<User>();
+
+            try
             {
-                return new ResponseMessageListData<User>
+                var rs = await httpClient.GetFromJsonAsync<ResponseMessageListData<User>>($"api/User/GetAll");
+
+                if (rs != null)
                 {
-                    Message = "An unknown error occurred.",
-                    Exception = "Data is null"
-                };
-            } else
-            {
-                if(rs.Status == 200)
+                    response = rs;
+
+                    if (response.Status == 200)
+                    {
+                        response.StatusAPI = true;
+                    }
+                } else
                 {
-                    rs.StatusAPI = true;
+                    response.Message = "An error occurred when data is empty!";
                 }
+            } catch (Exception ex)
+            {
+                response.Message = ex.Message;
             }
-            return rs;
+
+            return response;
         }
 
         public async Task<ResponseMessageObjectData<User>> UserModifyRole(string userid, string role)
@@ -115,8 +133,7 @@ namespace LawSearch_Admin.Services
             {
                 return new ResponseMessageObjectData<User>
                 {
-                    Message = "An unknown error occurred.",
-                    Exception = "Data is null"
+                    Message = "An error occurred when data is empty!"
                 };
             } else
             {
@@ -131,27 +148,31 @@ namespace LawSearch_Admin.Services
 
         public async Task<ResponseMessage> UserChangeStatus(string userid)
         {
+            ResponseMessage response = new ResponseMessage();
+
             HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/User/ChangeStatus?ID={userid}", "");
 
+            string rs_text = await rs.Content.ReadAsStringAsync();
 
-            var rs_text = await rs.Content.ReadAsStringAsync();
-            ResponseMessage? response = JsonSerializer.Deserialize<ResponseMessage>(rs_text.ToString());
-
-
-            if (response != null)
+            try
             {
-                if (response?.Status == 200)
+                var temp = JsonSerializer.Deserialize<ResponseMessage>(rs_text);
+
+                if(temp == null)
                 {
-                    response.StatusAPI = true;
+                    response.Message = "An error occurred when data is empty!";
+                } else
+                {
+                    response = temp;
+
+                    if (response?.Status == 200)
+                    {
+                        response.StatusAPI = true;
+                    }
                 }
-            } else
+            } catch (Exception ex)
             {
-                return new ResponseMessage
-                {
-                    StatusAPI = false,
-                    Message = "An unknown error occurred.",
-                    Exception = "Data is null"
-                };
+                response.Message = ex.Message;
             }
 
             return response;
@@ -175,8 +196,7 @@ namespace LawSearch_Admin.Services
             {
                 return new ResponseMessage
                 {
-                    Message = "An unknown error occurred.",
-                    Exception = "Data is null"
+                    Message = "An unknown error occurred [Data is null]"
                 };
             }
             else
