@@ -9,9 +9,9 @@ namespace LawSearch_Admin.Interfaces
 
         Task<List<KeyPhraseRelate>> GetKeyPhraseRelates(int id);
 
-        Task<ResponceMessage> AddKeyphrase(String keyphrase);
+        Task<ResponseMessage> AddKeyphrase(String keyphrase);
 
-        Task<ResponceMessage> DeleteKeyphrase(int id);
+        Task<ResponseMessage> DeleteKeyphrase(int id);
 
 
     }

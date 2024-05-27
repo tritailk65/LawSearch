@@ -23,8 +23,8 @@ namespace LawSearch_Core.Services
             try
             {
                 _dbService.OpenConnection();
-                string sql = $"Insert into [User] (Username, PasswordHash, PasswordSalt, Role) " +
-                    $"Values('{user.Username}','{Convert.ToBase64String(user.PasswordHash)}', '{Convert.ToBase64String(user.PasswordSalt)}', '{user.Role}')";
+                string sql = $"Insert into [User] (Username, PasswordHash, PasswordSalt, Role, Status) " +
+                    $"Values('{user.Username}','{Convert.ToBase64String(user.PasswordHash)}', '{Convert.ToBase64String(user.PasswordSalt)}', '{user.Role}', '1')";
                 _dbService.ExecuteNonQueryCommand(sql);          
             } catch
             {

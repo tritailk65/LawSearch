@@ -1,23 +1,22 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
-@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject ICookie cookie
+@inject IUserAdminService UserAdminService;
 
 @code {
-    private User user = new User();
     private string currentPageName;
     public string avatarPath = "";
-    public Boolean openUserMenu = false;
+    public bool openUserMenu = false;
+    private bool isLogin = false;
+    private readonly UserRole userRoleValue;
+    private UserInfoVM? user = null;
 
-    private string getPathAvatar(string gmail)
+    private string getPathAvatar(string Role)
     {
-        if (gmail == "adminquocan@gmail.com")
+        if (Role == "Admin")
         {
-            return "assets/image/avatar1.jpg";
-        }
-        else if (gmail == "admintritai@gmail.com")
-        {
-            return "assets/image/avatar.jpg";
+            return "assets/image/avatarAdmin.png";
         } else
         {
             return "assets/image/avatarUser.png";
@@ -26,13 +25,43 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
-        await localStorage.SetItemAsync(LocalStorageKeys.user, user);
+        try
+        {
+            var authToken = await cookie.GetValue(CookieKeys.authToken);
+
+            if (authToken != null && authToken.Length > 100)
+            {
+                var userid = await cookie.GetValue(CookieKeys.userid);
+                var username = await cookie.GetValue(CookieKeys.username);
+                var userrole = await cookie.GetValue(CookieKeys.userrole);
+                var password = await cookie.GetValue(CookieKeys.password);
+
+                isLogin = true;
+                user = new UserInfoVM
+                    {
+                        ID = int.Parse(userid ?? "0"),
+                        Username = username ?? "None",
+                        Role = userrole ?? "User"
+                    };
+
+                avatarPath = getPathAvatar(userrole);
+
+                await UserAdminService.UserLogin(username, password);
+
+                NavigationManager.NavigateTo("/search");
+            }
+        } catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+
+
         StateHasChanged();
     }
 
     protected override void OnInitialized()
     {
+
         currentPageName = GetPageName();
         NavigationManager.LocationChanged += OnLocationChanged;
     }
@@ -44,10 +73,35 @@
 
     private async Task HandleLocationChangedAsync()
     {
+        try
+        {
+            var authToken = await cookie.GetValue(CookieKeys.authToken);
+            var userid = await cookie.GetValue(CookieKeys.userid);
+            var username = await cookie.GetValue(CookieKeys.username);
+            var userrole = await cookie.GetValue(CookieKeys.userrole);
+
+            if (authToken != null && authToken.Length > 100)
+            {
+                isLogin = true;
+                user = new UserInfoVM
+                    {
+                        ID = int.Parse(userid ?? "0"),
+                        Username = username ?? "None",
+                        Role = userrole ?? "User"
+                    };
+                avatarPath = getPathAvatar(userrole);
+            } else
+            {
+                isLogin = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
+
         openUserMenu = false;
         currentPageName = GetPageName();
-        user = await localStorage.GetItemAsync<User>(LocalStorageKeys.user);
-        avatarPath = getPathAvatar(user.Email);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -70,14 +124,12 @@
 
     public async Task handleClickLogout()
     {
-        User defaultUser = new User();
-        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, false);
-        await localStorage.SetItemAsync(LocalStorageKeys.user, defaultUser);
+        await cookie.DeleteAllValue();
         NavigationManager.NavigateTo("/");
     }
 }
 
-@if (currentPageName == "home")
+@if (currentPageName == "home" && isLogin == false)
 {
     @Body
 }
@@ -98,9 +150,9 @@ else
             {
                 <div class="userMenu_view">
                     <div class="userMenu_function_btn">
-                        <a>Hello @user.UserName</a>
+                        <a>Hello @user?.Username</a>
                         <div class="level_cicle_view">
-                            <a>Level @user.Type</a>
+                            <a>Level @user?.Role</a>
                         </div >
                     </div>
 
@@ -114,6 +166,7 @@ else
             }
         </div>
 
+        
         <div class="sidebar">
             <NavMenu />
         </div>

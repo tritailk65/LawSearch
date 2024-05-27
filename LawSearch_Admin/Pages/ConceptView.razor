@@ -344,11 +344,11 @@
             StateHasChanged();
 
             // Logic add here
-            ResponceMessage rsAddConcept = await conceptAS.AddConcept(new_concept, new_description);
+            ResponseMessage rsAddConcept = await conceptAS.AddConcept(new_concept, new_description);
 
             if (rsAddConcept != null)
             {
-                if(rsAddConcept.Status)
+                if(rsAddConcept.StatusAPI)
                 {
                     await JsRuntime.InvokeVoidAsync("alert", rsAddConcept.Message);
                     await fetchConcept();
@@ -414,8 +414,8 @@
             c.Content = new_description;
         }
 
-        ResponceMessage rs = await conceptAS.UpdateConcept(c);
-        if (rs.Status)
+        ResponseMessage rs = await conceptAS.UpdateConcept(c);
+        if (rs.StatusAPI)
         {
             await JsRuntime.InvokeVoidAsync("alert", rs.Message);
             CloseEditConceptForm();
@@ -455,11 +455,11 @@
     public async Task fetchDeleteConcept()
     {
         if (SelectedConcept == null) return;
-        ResponceMessage rs = await conceptAS.DeleteConcept(SelectedConcept.ID);
+        ResponseMessage rs = await conceptAS.DeleteConcept(SelectedConcept.ID);
 
         if (rs != null)
         {
-            if (rs.Status)
+            if (rs.StatusAPI)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 await fetchConcept();
@@ -478,7 +478,7 @@
 
     public async Task AddNewKeyphrase()
     {
-        ResponceMessage rs = new();
+        ResponseMessage rs = new();
 
         if (new_keyphrase != null && SelectedConcept != null)
         {
@@ -487,7 +487,7 @@
 
         if (rs != null)
         {
-            if (rs.Status)
+            if (rs.StatusAPI)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 await fetchKeyphrase(SelectedConcept.ID);
@@ -518,13 +518,13 @@
 
     public async Task DeleteConceptKeyphrase(ConceptKeyphraseShow k)
     {
-        ResponceMessage rs = new();
+        ResponseMessage rs = new();
 
         rs = await conceptAS.DeleteConceptKeyphrase(k);
 
         if (rs != null)
         {
-            if (rs.Status)
+            if (rs.StatusAPI)
             {
                 await JsRuntime.InvokeVoidAsync("alert", rs.Message);
                 if (SelectedConcept != null)

@@ -9,14 +9,14 @@ namespace LawSearch_Admin.Interfaces
 
         Task<List<ConceptKeyphraseShow>> GetListKeyphraseByConceptID(int concept_id);
 
-        Task<ResponceMessage> AddConcept(string name, string content);
+        Task<ResponseMessage> AddConcept(string name, string content);
 
-        Task<ResponceMessage> UpdateConcept(Concept newConcept);
+        Task<ResponseMessage> UpdateConcept(Concept newConcept);
 
-        Task<ResponceMessage> DeleteConcept(int id);
+        Task<ResponseMessage> DeleteConcept(int id);
 
-        Task<ResponceMessage> AddConceptKeyphrase(int conceptid, string keyphrase);
+        Task<ResponseMessage> AddConceptKeyphrase(int conceptid, string keyphrase);
 
-        Task<ResponceMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k);
+        Task<ResponseMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k);
     }
 }
