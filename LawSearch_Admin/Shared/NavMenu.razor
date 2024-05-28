@@ -1,7 +1,31 @@
-﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage;
-@inject ICookie Cookie;
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject Blazored.LocalStorage.ILocalStorageService localStorage;
+@inject ICookieService Cookie;
 
 @code {
+    private bool collapseNavMenu = true;
+    private UserAccess? userAccess = null;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private bool expandSubNav;
+
+    private bool HasAccess(string feature)
+    {
+        return userAccess?.GetAccessRights().Contains(feature) ?? false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userRole = await Cookie.GetValue(CookieKeys.userrole);
+        userAccess = new UserAccess(userRole);
+        StateHasChanged();
+    }
+
     public enum LevelAccess
     {
         Admin,
@@ -9,36 +33,36 @@
         Guest
     }
 
-
     public class UserAccess
     {
         public LevelAccess UserLevel { get; private set; }
         public string UserRole { get; private set; }
 
         private static readonly Dictionary<LevelAccess, List<string>> AccessRights = new Dictionary<LevelAccess, List<string>>
-    {
-        { LevelAccess.Admin, new List<string> { 
-                FeatureKeys.Search, 
-                FeatureKeys.ViewLaw, 
-                FeatureKeys.EditLaw,
-                FeatureKeys.ImportLaw,
-                FeatureKeys.ImportLaw,
-                FeatureKeys.KeyPhrase,
-                FeatureKeys.UserManager,
-                FeatureKeys.History 
-            } 
-        },
-        { LevelAccess.User, new List<string> { 
-                FeatureKeys.Search,
-                FeatureKeys.ViewLaw,
-                FeatureKeys.History
-            } 
-        },
-        { LevelAccess.Guest, new List<string> { 
-                FeatureKeys.Search
-            } 
-        }
-    };
+        {
+            { LevelAccess.Admin, new List<string> {
+                    FeatureKeys.Search,
+                    FeatureKeys.ViewLaw,
+                    FeatureKeys.EditLaw,
+                    FeatureKeys.ImportLaw,
+                    FeatureKeys.ImportLaw,
+                    FeatureKeys.KeyPhrase,
+                    FeatureKeys.UserManager,
+                    FeatureKeys.History,
+                    FeatureKeys.Concept
+                }
+            },
+            { LevelAccess.User, new List<string> {
+                    FeatureKeys.Search,
+                    FeatureKeys.ViewLaw,
+                    FeatureKeys.History
+                }
+            },
+            { LevelAccess.Guest, new List<string> {
+                    FeatureKeys.Search
+                }
+            }
+        };
 
         public UserAccess(string userRole)
         {
@@ -61,35 +85,27 @@
     }
 }
 
-@code {
-    private UserAccess? userAccess = null;
-
-    private bool HasAccess(string feature)
-    {
-        return userAccess?.GetAccessRights().Contains(feature) ?? false;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        string userRole = await Cookie.GetValue(CookieKeys.userrole);
-        userAccess = new UserAccess(userRole);
-        StateHasChanged();
-    }
-}
-
-
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="navbar position-static mx-5">
         @if (HasAccess(FeatureKeys.Search))
         {
             <div class="nav-item">
-                <NavLink class="nav-link" href="/search" Match="NavLinkMatch.All">
+                <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
                     <img class="nav-item-icon" src="assets/icon/search_icon.png" aria-hidden="true" /> Search Law
                 </NavLink>
             </div>
         }
 
-        @if (HasAccess(FeatureKeys.ViewLaw) || HasAccess(FeatureKeys.EditLaw) || HasAccess(FeatureKeys.ImportLaw))
+        @if (HasAccess(FeatureKeys.ViewLaw) && !HasAccess(FeatureKeys.EditLaw) && !HasAccess(FeatureKeys.ImportLaw))
+        {
+            <div class="nav-item">
+                <NavLink class="nav-link" href="viewlaw" Match="NavLinkMatch.All">
+                    <img class="nav-item-icon" src="assets/icon/viewlaw_icon.png" aria-hidden="true" /> View law
+                </NavLink>
+            </div>
+        }
+
+        @if (HasAccess(FeatureKeys.ViewLaw) && HasAccess(FeatureKeys.EditLaw) && HasAccess(FeatureKeys.ImportLaw))
         {
             <div class="nav-item dropdown">
                 <NavLink class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -162,17 +178,3 @@
     </nav>
 </div>
 
-@code {
-
-    List<string> dropdownOptions = new List<string> { "Option 1", "Option 2", "Option 3" };
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
-    private bool expandSubNav;
-}

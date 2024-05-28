@@ -2,8 +2,8 @@
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager NavigationManager
 @inject ILawDocAdminService lawDocAdminService;
-@inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager;
+@inject ICheckUserHasAccessService _checkUserHasAccesService;
 
 <div class="body-container">
     <div class="header-content">
@@ -215,12 +215,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
-        if (!isLogin)
+        var checkAccess = await _checkUserHasAccesService.CheckUserHasAccessAsync();
+        if (!checkAccess)
         {
             NavigationManager.NavigateTo("/");
         }
-        await InvokeAsync(StateHasChanged);
 
         lawVM = null;
         dataIndex = null;

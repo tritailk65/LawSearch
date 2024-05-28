@@ -2,8 +2,8 @@
 @inject IConceptAdminService conceptAS;
 @inject IKeyPhraseAdminService keyphraseAS
 @inject IJSRuntime JsRuntime;
-@inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager;
+@inject ICheckUserHasAccessService _checkUserHasAccesService;
 
 @* Băt đầu web *@
 <div class="background_view">
@@ -214,12 +214,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
-        if (!isLogin)
+        var checkAccess = await _checkUserHasAccesService.CheckUserHasAccessAsync();
+        if (!checkAccess)
         {
             NavigationManager.NavigateTo("/");
         }
-        await InvokeAsync(StateHasChanged);
 
         // fetch concept
         await fetchConcept();
@@ -541,4 +540,5 @@
 
         StateHasChanged();
     }
+
 }

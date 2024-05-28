@@ -1,12 +1,12 @@
 ﻿.import-container {
-    width: 100%;
+    width: 90%;
     min-height: 88vh;
     background-color: #303348;
     border-radius: 20px;
-    margin-bottom: 20px;
+    margin: 20px;
 }
 
-.title-container{
+.title-container {
     display: flex;
     height: 50px;
     margin: 20px;
@@ -36,12 +36,12 @@
 }
 
 .import-btn {
-    display:flex;
+    display: flex;
     float: right;
-    margin-right:20px;
+    margin: 0 10px 20px 0;
 }
 
-.btn-custom{
+.btn-custom {
     width: 200px;
 }
 
@@ -142,7 +142,7 @@
     border-radius: 20px 20px 0 0;
 }
 
-.modal-content{
+.modal-content {
     border-radius: 24px;
 }
 
@@ -156,7 +156,7 @@
 .modal-title-alert {
     text-align: center;
     font-size: 1.4rem;
-    width:100%;
+    width: 100%;
 }
 
 .modal-message-alert {
@@ -165,7 +165,6 @@
     margin: 30px 0;
 }
 /*End Modal*/
-
 
 
 

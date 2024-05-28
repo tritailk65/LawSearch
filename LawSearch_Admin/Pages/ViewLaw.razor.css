@@ -1,6 +1,8 @@
 ﻿.body-container {
+    margin-top:10px;
     min-height: 88vh;
     padding: 0 80px;
+    width:100%;
 }
 
 .header-content {
@@ -63,6 +65,8 @@
     height: 100%;
     padding: 10px;
     overflow: auto;
+    display: flex;
+    justify-content: center;
 }
 
 
@@ -78,10 +82,10 @@
     padding: 0 0 0 10px;
 }
 
-.document-view{
+.document-view {
     padding: 30px 50px;
-    background-color:white;
-    width:max-content;
+    background-color: white;
+    width: max-content;
     height: max-content;
     color: black;
 }
@@ -101,7 +105,7 @@
 .section {
     margin: 0 0 10px 15px;
     height: fit-content;
-    color:  lime;
+    color: lime;
 }
 
 .artical {
@@ -125,6 +129,7 @@
     padding: 10px;
     overflow: auto;
 }
+
 .loader {
     width: 48px;
     height: 48px;
@@ -187,13 +192,13 @@
 
 /*Modal*/
 
-.modal-dialog{
+.modal-dialog {
     max-width: 80%;
     margin: 2rem auto;
 }
 
 .modal-content {
-/*    height: 90vh;*/
+    /*    height: 90vh;*/
 }
 
 .modal-header {
@@ -223,4 +228,3 @@
     color: black;
 }
 /*End modal*/
-    

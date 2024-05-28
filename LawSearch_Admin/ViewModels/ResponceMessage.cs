@@ -10,12 +10,10 @@ namespace LawSearch_Admin.ViewModels
     {
         [JsonPropertyName("status")]
         public int? Status { get; set; } = null;
-
         public bool StatusAPI { get; set; } = false;
 
         [JsonPropertyName("message")]
         public string? Message { get; set; } = null;
-
         public string? Error { get; set; } = null;
 
         [JsonPropertyName("exception")]
@@ -23,11 +21,6 @@ namespace LawSearch_Admin.ViewModels
 
         [JsonPropertyName("data")]
         public string? Data { get; set; } = null;
-
-        public ResponseMessage()
-        {
-
-        }
     }
 
     public class ResponseMessageLogin

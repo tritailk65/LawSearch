@@ -10,9 +10,9 @@ namespace LawSearch_Admin.Services
     public class SearchAdminService : ISearchAdminService
     {
         private readonly HttpClient httpClient;
-        private readonly ICookie _cookie;
+        private readonly ICookieService _cookie;
 
-        public SearchAdminService(HttpClient httpClient, ICookie cookie)
+        public SearchAdminService(HttpClient httpClient, ICookieService cookie)
         {
             this.httpClient = httpClient;
             _cookie = cookie;

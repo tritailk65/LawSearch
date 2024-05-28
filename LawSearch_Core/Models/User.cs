@@ -39,20 +39,11 @@ namespace LawSearch_Core.Models
         [JsonPropertyName("email")]
         public string Email { get; set; }
 
+        [JsonPropertyName("token")]
+        public string Token { get; set; }
+
         // Optional: Constructor for easier instantiation
-        public User(int id, string username, byte[] passwordHash, byte[] passwordSalt, string refreshToken, DateTime tokenCreated, DateTime tokenExpires, string role, bool status, string email)
-        {
-            ID = id;
-            Username = username;
-            PasswordHash = passwordHash;
-            PasswordSalt = passwordSalt;
-            RefreshToken = refreshToken;
-            TokenCreated = tokenCreated;
-            TokenExpires = tokenExpires;
-            Role = role;
-            Status = status;
-            Email = email;
-        }
+        
 
         // Optional: Parameterless constructor for serialization/deserialization
         public User()

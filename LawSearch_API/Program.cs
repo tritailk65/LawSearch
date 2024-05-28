@@ -45,6 +45,7 @@ builder.Services.AddScoped<ISectionService, SectionService>();
 builder.Services.AddScoped<IClauseService, ClauseService>();
 builder.Services.AddScoped<IPointService, PointService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IHistorySearchService, HistorySearchService>();
 builder.Services.AddHttpContextAccessor();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

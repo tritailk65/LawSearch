@@ -1,14 +1,15 @@
 ﻿using LawSearch_Admin.Interfaces;
+using LawSearch_Admin.ViewModels;
 using Microsoft.JSInterop;
 
 namespace LawSearch_Admin.Services
 {
-    public class Cookie : ICookie
+    public class CookieService : ICookieService
     {
         readonly IJSRuntime JSRuntime;
         string expires = "";
 
-        public Cookie(IJSRuntime jsRuntime)
+        public CookieService(IJSRuntime jsRuntime)
         {
             this.JSRuntime = jsRuntime;
             ExpireDays = 300;
@@ -16,8 +17,14 @@ namespace LawSearch_Admin.Services
 
         public async Task SetValue(string key, string value, int? days = null)
         {
-            var curExp = days != null ? days > 0 ? DateToUTC(days.Value) : "" : expires;
-            await SetCookie($"{key}={value}; expires={curExp}; path=/");
+            try
+            {
+                var curExp = days != null ? days > 0 ? DateToUTC(days.Value) : "" : expires;
+                await SetCookie($"{key}={value}; expires={curExp}; path=/");
+            } catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public async Task<string> GetValue(string key, string def = "")

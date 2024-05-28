@@ -12,9 +12,9 @@ namespace LawSearch_Admin.Services
     public class ArticalAdminService : IArticalAdminService
     {
         private readonly HttpClient _httpClient;
-        private readonly ICookie _cookie;
+        private readonly ICookieService _cookie;
 
-        public ArticalAdminService(HttpClient httpClient, ICookie cookie)
+        public ArticalAdminService(HttpClient httpClient, ICookieService cookie)
         {
             _httpClient = httpClient;
             _cookie = cookie;

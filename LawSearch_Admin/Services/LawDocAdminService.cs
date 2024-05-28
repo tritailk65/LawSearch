@@ -12,9 +12,9 @@ namespace LawSearch_Admin.Services
     public class LawDocAdminService : ILawDocAdminService
     {
         private readonly HttpClient _httpClient;
-        private readonly ICookie _cookie;
+        private readonly ICookieService _cookie;
 
-        public LawDocAdminService(HttpClient httpClient, ICookie cookie)
+        public LawDocAdminService(HttpClient httpClient, ICookieService cookie)
         {
             _httpClient = httpClient;
             _cookie = cookie;
