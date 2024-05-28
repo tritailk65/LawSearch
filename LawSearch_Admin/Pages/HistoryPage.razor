@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager NavigationManager
 @inject IHistoryAdminService historyService;
+@inject ICookieService _cookieService;
 
 <style>
     .input-date {
@@ -80,13 +81,18 @@
     private List<HistorySearch> data = new List<HistorySearch>();
     private bool loadingData = false;
     private bool isEmpty = false;
+    private string UserID = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         data = null;
         loadingData = true;
         model ??= new() { fromDate = DateTime.Now.AddDays(-30), toDate = DateTime.Now };
-        var rs = await historyService.GetHistorySearch(1, model.fromDate, model.toDate);
+
+        var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
+        if (!string.IsNullOrEmpty(getUserIDFromCookie)){ UserID = getUserIDFromCookie; }
+
+        var rs = await historyService.GetHistorySearch(Convert.ToInt32(UserID), model.fromDate, model.toDate);
         if (rs != null)
         {
             data = rs;

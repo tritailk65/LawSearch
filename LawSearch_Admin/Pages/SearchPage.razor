@@ -4,11 +4,13 @@
 @inject IArticalAdminService articalAdminService;
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager
+@inject ICookieService _cookieService;
+@inject IHistoryAdminService _historySearchService;
 
 <div class="ss">
     <div class="search-container">
         <div class="search-input">
-            <input class="input" type="text" placeholder="Bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
+            <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
         </div>
         <div class="search-button" @onclick="SearchAction">
             <img class="search-icon" src="assets/icon/search_icon.png" />
@@ -36,30 +38,29 @@
 @code{
     public string keySearch = "";
     public string conceptTop = "";
-
-    public string input ;
+    public string input;
     public List<ArticalResult> lstResult = null;
     public SearchResult searchResult { get; set; }
-    public List<Artical> lstArtical;
+    //public List<Artical> lstArtical;
+    public string UserID = string.Empty;
 
     public double timeDone = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
-        if (!isLogin)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-        await InvokeAsync(StateHasChanged);
+        //var data = await articalAdminService.GetListArtical();
+        //lstArtical = data;
 
-        var data = await articalAdminService.GetListArtical();
-        lstArtical = data;
+        var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
+        if (!string.IsNullOrEmpty(getUserIDFromCookie)) { UserID = getUserIDFromCookie; }
     }
 
     private async void SearchAction(){
         if(input.Length >= 12)
         {
+            //Ghi history search
+            await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
+
             conceptTop = "";
             keySearch = "";
             var stopwatch = new System.Diagnostics.Stopwatch();

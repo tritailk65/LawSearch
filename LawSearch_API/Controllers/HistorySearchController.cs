@@ -22,13 +22,21 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpGet, Authorize]
-        public APIResult GetAllHistorySearchRecently([BindRequired] int UserID, [BindRequired] DateTime FromDate, [BindRequired] DateTime ToDate)
+        public APIResult GetHistorySearch([BindRequired] int UserID, [BindRequired] DateTime FromDate, [BindRequired] DateTime ToDate)
         {
-            _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.Query);
             var dtResult = _historySearchService.GetHistorySearchByDate(UserID, FromDate, ToDate);
             APIResult result = new APIResult();
             return result.Success(dtResult);
         }
 
+        [HttpPost, Authorize]
+        public APIResult AddHistorySearch([BindRequired] int UserID, [BindRequired] string SearchString)
+        {
+            _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.Query);
+            _historySearchService.AddHistorySearch(UserID,SearchString);
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Success!");
+        }
     }
 }

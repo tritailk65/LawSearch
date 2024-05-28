@@ -19,6 +19,31 @@ namespace LawSearch_Core.Services
             _dbService = dbService;
         }
 
+        public void AddHistorySearch(int UserID, string searchString)
+        {
+            try
+            {
+                _dbService.OpenConnection();
+
+                var checkUserID = _dbService.ExecuteReaderCommand($"select * from [User] where ID = {UserID}", "");
+                if (checkUserID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("UserID not found!", 404, 400);
+                }
+
+                string sql = $"exec QueryLog N'{searchString}', {UserID}";
+                _dbService.ExecuteNonQueryCommand(sql);
+
+            } catch
+            {
+                throw;
+            }
+            finally
+            {
+                _dbService.CloseConnection();
+            }
+        }
+
         public List<HistorySearch> GetHistorySearchByDate(int UserID, DateTime fromDate, DateTime toDate)
         {
             try
@@ -32,12 +57,12 @@ namespace LawSearch_Core.Services
                 }    
 
                 string fromDateFormat = fromDate.ToString("yyyy-MM-dd");
-                string toDateFormat = toDate.ToString("yyyy-MM-dd");
+                string toDateFormat = toDate.AddDays(1).ToString("yyyy-MM-dd");
 
                 List<HistorySearch> rs = new List<HistorySearch>();
                 string sql = $"select q.ID, q.Value, q.Result, q.Datetime, u.Username from Query q " +
                                 $"inner join [User] u on u.ID = q.UserID  " +
-                                $"where UserID = {UserID} and (DateTime >= '{fromDateFormat}' and DateTime <= '{toDateFormat}') " +
+                                $"where UserID = {UserID} and (DateTime >= '{fromDateFormat}' and DateTime < '{toDateFormat}') " +
                                 $"order by Datetime DESC";
                 var dt = _dbService.ExecuteReaderCommand(sql, "");
                 if(dt.Rows.Count > 0)
