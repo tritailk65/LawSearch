@@ -18,7 +18,7 @@ namespace LawSearch_Core.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public void AddUserToList(User user)
+        public void AddUser(User user)
         {
             try
             {
@@ -190,6 +190,26 @@ namespace LawSearch_Core.Services
             {
                 _dbService.CloseConnection();
             }
+        }
+
+        public void UpdateUserLogin(User user)
+        {
+            try
+            {
+                _dbService.OpenConnection();
+
+                string sql = $"Update [User] " +
+                            $"Set RefreshToken = '{user.RefreshToken}', " +
+                                $"TokenCreated = '{user.TokenCreated.ToString("yyyy-MM-dd HH:mm:ss")}', " +
+                                $"TokenExpires = '{user.TokenExpires.ToString("yyyy-MM-dd HH:mm:ss")}' " +
+                            $"Where ID = {user.ID}";
+                _dbService.ExecuteNonQueryCommand(sql);
+            }
+            catch
+            {
+                throw;
+            }
+            finally { _dbService.CloseConnection(); }
         }
     }
 }

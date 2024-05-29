@@ -16,9 +16,9 @@ namespace LawSearch_Admin.Services
     public class ConceptAdminService : IConceptAdminService
     {
         private readonly HttpClient httpClient;
-        private readonly ICookie _cookie;
+        private readonly ICookieService _cookie;
 
-        public ConceptAdminService(HttpClient httpClient, ICookie cookie)
+        public ConceptAdminService(HttpClient httpClient, ICookieService cookie)
         {
             this.httpClient = httpClient;
             _cookie = cookie;
@@ -27,9 +27,6 @@ namespace LawSearch_Admin.Services
         public async Task<List<Concept>> GetListConcept()
         {
             List<Concept> lst = new List<Concept>();
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<Concept>>($"api/concept");
 
@@ -49,9 +46,6 @@ namespace LawSearch_Admin.Services
         public async Task<List<ConceptKeyphraseShow>> GetListKeyphraseByConceptID(int concept_id)
         {
             List<ConceptKeyphraseShow> ls = new();
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs_client = await httpClient.GetAsync($"api/Concept/GetConceptKeyphrase?ConceptID=" + concept_id);
             var _ = await rs_client.Content.ReadAsStringAsync();
@@ -96,10 +90,6 @@ namespace LawSearch_Admin.Services
 
             ResponseMessage rm = new();
 
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.PostAsJsonAsync($"api/concept", newConcept);
 
             if (rs.IsSuccessStatusCode)
@@ -109,7 +99,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Update concept failed";
@@ -123,9 +113,6 @@ namespace LawSearch_Admin.Services
         {
             ResponseMessage rm = new();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.PutAsJsonAsync($"api/Concept", newConcept);
 
             if (rs.IsSuccessStatusCode)
@@ -135,7 +122,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Update concept failed";
@@ -150,9 +137,6 @@ namespace LawSearch_Admin.Services
         {
             ResponseMessage rm = new();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.DeleteAsync($"api/Concept?id=" + id);
 
             if (rs.IsSuccessStatusCode)
@@ -162,7 +146,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Delete concept failed";
@@ -183,9 +167,6 @@ namespace LawSearch_Admin.Services
                 new KeyValuePair<string, string>("Keyphrase",keyphrase)
             });
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.PostAsync($"api/Concept/AddConceptKeyphrase", formContent);
 
             if (rs.IsSuccessStatusCode)
@@ -195,7 +176,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Add concept keyphrase failed";
@@ -210,9 +191,6 @@ namespace LawSearch_Admin.Services
         {
             ResponseMessage rm = new();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.DeleteAsync($"api/Concept/DeleteConceptKeyphrase?ConceptKeyphraseID=" +k.ID);
 
             if (rs.IsSuccessStatusCode)
@@ -222,7 +200,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Delete concept keyphrase failed";

@@ -12,9 +12,10 @@ namespace LawSearch_Core.Interfaces
         string GetMyName();
         List<User> GetAllUser();
         User GetUserName(string username);
-        void AddUserToList(User user);
+        void AddUser(User user);
         User ModifyUserRole(int ID, string role);
         User GetUserByID(int ID);
         void ChangeUserStatus(User user);
+        void UpdateUserLogin(User user);
     }
 }

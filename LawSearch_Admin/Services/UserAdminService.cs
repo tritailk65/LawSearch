@@ -1,7 +1,11 @@
-﻿using LawSearch_Admin.Interfaces;
+﻿using LawSearch_Admin.Extensions;
+using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,81 +14,60 @@ namespace LawSearch_Admin.Services
     public class UserAdminService : IUserAdminService
     {
         private HttpClient httpClient;
-        private readonly ICookie cookie;
+        private readonly ICookieService cookie;
+        private readonly AuthenticationStateProvider _stateProvider;
 
-        public UserAdminService(HttpClient _httpClient, ICookie _cookie)
+        public UserAdminService(HttpClient httpClient, ICookieService cookie, AuthenticationStateProvider stateProvider, IConfiguration configuration)
         {
-            httpClient = _httpClient;
-            cookie = _cookie;
+            this.httpClient = httpClient;
+            this.cookie = cookie;
+            _stateProvider = stateProvider;
         }
 
-        public async Task<ResponseMessage> UserLogin(string username, string password)
-        {
-            var body = new
-            {
-                username = username,
-                password = password
-            };
-
-            HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/Auth/Login", body);
-            ResponseMessage rm = new();
-
-
-            var rs_text = await rs.Content.ReadAsStringAsync();
-            
+        public async Task<APIResultSingleVM<User>> UserLogin(LoginVM loginVM)
+        { 
             try
             {
-                ResponseMessageLogin? response = JsonSerializer.Deserialize<ResponseMessageLogin>(rs_text.ToString());
+                APIResultSingleVM<User> apiResponse = new APIResultSingleVM<User>();
+                var rs = await httpClient.PostAsJsonAsync($"api/Auth/Login",loginVM);
+                var rs_text = await rs.Content.ReadAsStringAsync();
 
-                if (response != null)
+                var options = new JsonSerializerOptions
                 {
-                    if (response.Status == 200)
-                    {
-                        rm.StatusAPI = true;
+                    PropertyNameCaseInsensitive = true
+                };
 
-                        try
-                        {
-                            // Save data to cookie
-                            if(response?.Data?.Id != null)
-                            {
-                                await cookie.SetValue(CookieKeys.userid, $"{response.Data.Id}");
-                            }
-                            if(response?.Data?.Username != null)
-                            {
-                                await cookie.SetValue(CookieKeys.username, response.Data.Username);
-                            }
-                            if(response?.Data?.Role != null)
-                            {
-                                await cookie.SetValue(CookieKeys.userrole, response.Data.Role);
-                            }
-                            if(response?.Data?.Token != null)
-                            {
-                                await cookie.SetValue(CookieKeys.authToken, response.Data.Token);
-                            }
-                            await cookie.SetValue(CookieKeys.password, password);
+                apiResponse = JsonSerializer.Deserialize<APIResultSingleVM<User>>(rs_text, options);
 
-                            // Authorization api with token
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.Data.Token);
-                        }
-                        catch (Exception ex)
-                        {
-                            rm.Message = ex.Message;
-                        }
-                    }
-                    else
+                if (apiResponse != null && apiResponse.Status == 200)
+                {                   
+                    // Save data to cookie
+                    if (apiResponse.Data.ID != null)
                     {
-                        rm.Message = response.Message;
+                        await cookie.SetValue(CookieKeys.userid, $"{apiResponse.Data.ID}");
                     }
-                } else
-                {
-                    rm.Message = "An error occurred when data is empty!";
-                }
+                    if (apiResponse.Data.Username != null)
+                    {
+                        await cookie.SetValue(CookieKeys.username, apiResponse.Data.Username);
+                    }
+                    if (apiResponse.Data.Role != null)
+                    {
+                        await cookie.SetValue(CookieKeys.userrole, apiResponse.Data.Role);
+                    }
+                    if (apiResponse.Data.Token != null)
+                    {
+                        await cookie.SetValue(CookieKeys.authToken, apiResponse.Data.Token);
+                    }
+
+                    ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsAuthenticated(loginVM.Username);
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiResponse.Data.Token);
+                }               
+
+                return apiResponse;
             } catch (Exception ex)
             {
-                rm.Message = ex.Message;
+                throw new Exception(ex.Message.ToString());
             }
-
-            return rm;
         }
 
         public async Task<ResponseMessageListData<User>> GetListUser()
@@ -208,6 +191,13 @@ namespace LawSearch_Admin.Services
             }
 
             return response;
+        }
+
+        public async Task UserLogout()
+        {
+            await cookie.DeleteAllValue();
+            ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
+            httpClient.DefaultRequestHeaders.Authorization = null;
         }
     }
 }

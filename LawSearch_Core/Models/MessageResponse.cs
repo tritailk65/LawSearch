@@ -15,7 +15,7 @@
             {MessageKey.BAD_REQUEST, new MessageModel(205, "An exception error occurred", "Xảy ra lỗi ngoại lệ (Kiểm tra Exception trả về)", "Any")},
             {MessageKey.PARTNERKEY_NOT_FOUND, new MessageModel(206, "PartnerKey not found", "Không tìm thấy mã đối tác (Kiểm tra PartnerKey ở Header)", "Any")},
 
-
+            
         };
         public static string GetMessage(MessageKey key, string? sub = null)
         {

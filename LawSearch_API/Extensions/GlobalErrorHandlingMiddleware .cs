@@ -36,7 +36,7 @@ namespace LawSearch_API.Extensions
             logger.LogError(exception.ToString());
             int status = 0;
             int? statusCustom = 0;
-            var data = string.Empty;
+            Object data = null;
             string message = "";
             var exceptionType = exception.GetType();
             if (exceptionType == typeof(BadRequestException))

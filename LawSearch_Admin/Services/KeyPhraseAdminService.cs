@@ -10,9 +10,9 @@ namespace LawSearch_Admin.Services
     public class KeyPhraseAdminService : IKeyPhraseAdminService
     {
         private readonly HttpClient httpClient;
-        private readonly ICookie _cookie;
+        private readonly ICookieService _cookie;
 
-        public KeyPhraseAdminService(HttpClient httpClient, ICookie cookie)
+        public KeyPhraseAdminService(HttpClient httpClient, ICookieService cookie)
         {
             this.httpClient = httpClient;
             this._cookie = cookie;
@@ -67,7 +67,7 @@ namespace LawSearch_Admin.Services
                 rm.Message = "Add Keyphrase Success";
                 try
                 {
-                    APIResultVM apiResponse = await rs.Content.ReadAsAsync<APIResultVM>();
+                    APIResultSingleVM apiResponse = await rs.Content.ReadAsAsync<APIResultSingleVM>();
                     if (apiResponse.Data != null)
                     {
                         KeyPhrase rs_k = JsonConvert.DeserializeObject<KeyPhrase>(apiResponse.Data);
@@ -79,7 +79,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 
                 if (resultPost != null && resultPost.Message != null)
                 {
@@ -105,7 +105,7 @@ namespace LawSearch_Admin.Services
             }
             else
             {
-                var resultPost = rs.Content.ReadFromJsonAsync<APIResultVM>().Result;
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
                 if (resultPost != null && resultPost.Message != null)
                 {
                     rm.Message = "Delete Keyphrase Failed";

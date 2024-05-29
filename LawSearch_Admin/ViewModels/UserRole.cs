@@ -1,4 +1,4 @@
-﻿namespace LawSearch_Admin
+﻿namespace LawSearch_Admin.ViewModels
 {
     public class UserRole
     {

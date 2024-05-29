@@ -1,4 +1,5 @@
 using LawSearch_API.Extensions;
+using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
 using LawSearch_Core.Services;
@@ -45,8 +46,8 @@ builder.Services.AddScoped<ISectionService, SectionService>();
 builder.Services.AddScoped<IClauseService, ClauseService>();
 builder.Services.AddScoped<IPointService, PointService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IHistorySearchService, HistorySearchService>();
 builder.Services.AddHttpContextAccessor();
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(gen =>
@@ -86,8 +87,11 @@ builder.Services.AddCors(options =>
             /*            policy.AllowAnyOrigin();*/
             policy.AllowAnyHeader();
             policy.AllowAnyMethod();
+            policy.AllowCredentials();
         });
 });
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -119,6 +123,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Value}/{id?}");
+    endpoints.MapHub<AuthenticationHub>("/authenticationHub");
 });
 
 app.UseSwagger();

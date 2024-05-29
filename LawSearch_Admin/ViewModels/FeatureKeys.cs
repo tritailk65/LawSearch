@@ -1,4 +1,4 @@
-﻿namespace LawSearch_Admin.Shared
+﻿namespace LawSearch_Admin.ViewModels
 {
     public static class FeatureKeys
     {

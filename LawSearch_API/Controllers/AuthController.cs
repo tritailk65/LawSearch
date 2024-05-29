@@ -61,7 +61,7 @@ namespace LawSearch_API.Controllers
             user.Role = "User";
             user.Status = true;
 
-            _userService.AddUserToList(user);
+            _userService.AddUser(user);
             APIResult rs = new();
             return rs.MessageSuccess("Register success!");
         }
@@ -88,9 +88,10 @@ namespace LawSearch_API.Controllers
             }
 
             string token = CreateToken(user);
-
             var refreshToken = GenerateRefreshToken();
             SetRefreshToken(refreshToken, user);
+
+            _userService.UpdateUserLogin(user);
 
             UserInfoVM userInfo = new UserInfoVM
             {
@@ -103,6 +104,31 @@ namespace LawSearch_API.Controllers
             APIResult rs = new APIResult();
             return rs.Success(userInfo);
         }
+
+/*        [HttpPost("RefreshToken")]
+        public async Task<APIResult> RefreshToken()
+        {
+
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            var userName = _userService.GetMyName();
+            var user = _userService.GetUserName(userName);
+
+            if (!user.RefreshToken.Equals(refreshToken))
+            {
+                return Unauthorized("Invalid Refresh Token.");
+            }
+            else if (user.TokenExpires < DateTime.Now)
+            {
+                return Unauthorized("Token expired.");
+            }
+
+            string token = CreateToken(user);
+            var newRefreshToken = GenerateRefreshToken();
+            SetRefreshToken(newRefreshToken, user);
+
+            return Ok(token);
+        }*/
 
         private void SetRefreshToken(RefreshToken newRefreshToken, User user)
         {

@@ -1,19 +1,7 @@
 ﻿@page "/importlaw"
 @inject ILawDocAdminService lawDocAdminService;
-@inject Blazored.LocalStorage.ILocalStorageService localStorage;
-@inject NavigationManager NavigationManager
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
-        if (!isLogin)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-        await InvokeAsync(StateHasChanged);
-    }
-}
+@inject NavigationManager NavigationManager;
+@inject ICheckUserHasAccessService _checkUserHasAccesService;
 
 <div class="import-container">
     <div class="title-container">
@@ -78,6 +66,15 @@
     public string messageImport = "";
     public bool isLoading = true;
     public bool isImportSuccess = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var checkAccess = await _checkUserHasAccesService.CheckUserHasAccessAsync();
+        if (!checkAccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
 
     public async void ImportNewLaw()
     {

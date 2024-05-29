@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/login"
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
@@ -14,72 +14,58 @@
             <a>Login</a>
         </div>
 
-        <form>
+        <EditForm Model="loginVM" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator/>
+
+            @if (!string.IsNullOrEmpty(loginVM.ErrorMessage))
+            {
+                <div class="alert alert-danger">@loginVM.ErrorMessage</div>
+            }
+
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" class="form-control" @bind="username" placeholder="Enter username" />
+                <InputText type="text" id="username" class="form-control" @bind-Value="loginVM.Username" placeholder="Enter username" @oninput="ClearErrorMessage" />
+                <ValidationMessage For="()=> loginVM.Username"></ValidationMessage>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-container">
-                    <input type="@passwordInputType" id="password" class="form-control" @bind="password" placeholder="Enter password" />
-                    <span class="togglepw_view toggle-password" @onclick="TogglePasswordVisibility">@togglePasswordText</span>
+                    <InputText type="password" id="password" class="form-control" @bind-Value="loginVM.Password" placeholder="Enter password" @oninput="ClearErrorMessage" />
                 </div>
+                <ValidationMessage For="()=> loginVM.Password"></ValidationMessage>
             </div>
-            <button type="button" class="btn btn-primary" @onclick="HandleLogin">Login</button>
-        </form>
-
-        <div class="signup_prompt">
-            <a>Don't have an account yet?</a>
-            <a class="bold">Signup</a>
-        </div>
+            <button type="submit" class="btn btn-primary mb-3">Login</button>
+        </EditForm>
     </div>
 </div>
 
 
 @code {
-    private string username;
-    private string password;
     private bool isPasswordVisible = false;
-    private string passwordInputType = "password";
     private string togglePasswordText = "Show";
+    private LoginVM loginVM = new LoginVM();
 
     private async Task HandleLogin()
     {
-        ResponseMessage rsUserLogin = await UserAdminService.UserLogin(username, password);
+        var rs = await UserAdminService.UserLogin(loginVM);
 
-        if (rsUserLogin != null)
+        if (rs != null)
         {
-            if (rsUserLogin.StatusAPI)
+            var apiResponse = rs;
+            if (apiResponse.Status == 200)
             {
-                await JsRuntime.InvokeVoidAsync("alert", rsUserLogin.Message);
-                await HandleLoginSuccess();
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
-            else
+            else if (apiResponse.Status == 400)
             {
-                await JsRuntime.InvokeVoidAsync("alert", rsUserLogin.Error);
-                // await JsRuntime.InvokeVoidAsync("alert", "Invalid username or password");
+                loginVM.ErrorMessage = apiResponse.Message;
+                StateHasChanged();
             }
         }
-        else
-        {
-            // handler error
-        }
-
     }
 
-    private async Task HandleLoginSuccess()
+    private void ClearErrorMessage()
     {
-        await localStorage.SetItemAsync(LocalStorageKeys.isLogin, true);
-        // await localStorage.SetItemAsync(LocalStorageKeys.user, user);
-
-        NavigationManager.NavigateTo("/search");
-    }
-
-    private void TogglePasswordVisibility()
-    {
-        isPasswordVisible = !isPasswordVisible;
-        passwordInputType = isPasswordVisible ? "text" : "password";
-        togglePasswordText = isPasswordVisible ? "Hide" : "Show";
+        loginVM.ErrorMessage = string.Empty;
     }
 }

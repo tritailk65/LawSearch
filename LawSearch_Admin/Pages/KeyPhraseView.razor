@@ -1,8 +1,8 @@
 ﻿@page "/keyphrase"
 @inject IKeyPhraseAdminService keyphraseService;
 @inject IJSRuntime JsRuntime;
-@inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager;
+@inject ICheckUserHasAccessService _checkUserHasAccesService;
 
 @* 
 <div class="title">
@@ -360,12 +360,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Boolean isLogin = await localStorage.GetItemAsync<Boolean>(LocalStorageKeys.isLogin);
-        if (!isLogin)
+        var checkAccess = await _checkUserHasAccesService.CheckUserHasAccessAsync();
+        if (!checkAccess)
         {
             NavigationManager.NavigateTo("/");
         }
-        await InvokeAsync(StateHasChanged);
 
         await fetchKeyphrase();
     }

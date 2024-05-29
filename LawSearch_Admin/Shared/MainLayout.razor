@@ -1,16 +1,77 @@
-﻿@inherits LayoutComponentBase
+﻿@using LawSearch_Admin.Extensions
+@using LawSearch_Admin.Pages
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
-@inject ICookie cookie
+@inject ICookieService cookie
 @inject IUserAdminService UserAdminService;
+@inject AuthenticationStateProvider _authenticationStateProvider;
+
+<AuthorizeView>
+    <Authorized>
+        <div class="page">
+            <div class="header">
+                <div class="logo">
+                     <img class="logo-img" src="assets/image/Logo.png" alt="Logo main">
+                </div>
+                <div class="user-info">
+                    <div class="avatar-container" @onclick=handleClickAvatar>
+                        <img src=@getPathAvatar(role) alt="User Avatar" class="avatar">
+                        <div class="status"></div>
+                    </div>
+                </div>
+                @if (openUserMenu)
+                {
+                    <div class="userMenu_view">
+                        <div class="userMenu_function_btn">
+                            <a>Hello @context.User.Identity.Name</a>
+                            <div class="level_cicle_view">
+                                <a>Level @role</a>
+                            </div>
+                        </div>
+
+                        <div class="spacer"> </div>
+
+                        <div class="userMenu_function_btn" @onclick=handleClickLogout>
+                            <img src="assets/icon/logout.png" />
+                            <a>Logout</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+
+            <main>
+                <div class="content_middle">
+                    @Body
+                </div>
+            </main>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <LoginPage/>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code {
-    private string currentPageName;
     public string avatarPath = "";
     public bool openUserMenu = false;
-    private bool isLogin = false;
-    private readonly UserRole userRoleValue;
-    private UserInfoVM? user = null;
+    private string role = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rs = await cookie.GetValue(CookieKeys.userrole);
+        if (!string.IsNullOrEmpty(rs))
+        {
+            role = rs;
+            StateHasChanged();
+        }
+    }
 
     private string getPathAvatar(string Role)
     {
@@ -23,100 +84,6 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var authToken = await cookie.GetValue(CookieKeys.authToken);
-
-            if (authToken != null && authToken.Length > 100)
-            {
-                var userid = await cookie.GetValue(CookieKeys.userid);
-                var username = await cookie.GetValue(CookieKeys.username);
-                var userrole = await cookie.GetValue(CookieKeys.userrole);
-                var password = await cookie.GetValue(CookieKeys.password);
-
-                isLogin = true;
-                user = new UserInfoVM
-                    {
-                        ID = int.Parse(userid ?? "0"),
-                        Username = username ?? "None",
-                        Role = userrole ?? "User"
-                    };
-
-                avatarPath = getPathAvatar(userrole);
-
-                await UserAdminService.UserLogin(username, password);
-
-                NavigationManager.NavigateTo("/search");
-            }
-        } catch (Exception ex)
-        {
-            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
-        }
-
-
-        StateHasChanged();
-    }
-
-    protected override void OnInitialized()
-    {
-
-        currentPageName = GetPageName();
-        NavigationManager.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
-    {
-        _ = HandleLocationChangedAsync();
-    }
-
-    private async Task HandleLocationChangedAsync()
-    {
-        try
-        {
-            var authToken = await cookie.GetValue(CookieKeys.authToken);
-            var userid = await cookie.GetValue(CookieKeys.userid);
-            var username = await cookie.GetValue(CookieKeys.username);
-            var userrole = await cookie.GetValue(CookieKeys.userrole);
-
-            if (authToken != null && authToken.Length > 100)
-            {
-                isLogin = true;
-                user = new UserInfoVM
-                    {
-                        ID = int.Parse(userid ?? "0"),
-                        Username = username ?? "None",
-                        Role = userrole ?? "User"
-                    };
-                avatarPath = getPathAvatar(userrole);
-            } else
-            {
-                isLogin = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
-        }
-
-        openUserMenu = false;
-        currentPageName = GetPageName();
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private string GetPageName()
-    {
-        var uri = NavigationManager.Uri;
-        var uriSegments = new Uri(uri).Segments;
-        return uriSegments.Length > 1 ? uriSegments[1].TrimEnd('/') : "home";
-    }
-
-    public void Dispose()
-    {
-        NavigationManager.LocationChanged -= OnLocationChanged;
-    }
-
     public void handleClickAvatar()
     {
         openUserMenu = !openUserMenu;
@@ -124,57 +91,7 @@
 
     public async Task handleClickLogout()
     {
-        await cookie.DeleteAllValue();
-        NavigationManager.NavigateTo("/");
+        await UserAdminService.UserLogout();
+        openUserMenu = false;
     }
-}
-
-@if (currentPageName == "home" && isLogin == false)
-{
-    @Body
-}
-else
-{
-    <div class="page">
-        <div class="header">
-            <div class="logo">
-                <img class="logo-img" src="assets/image/Logo.png" alt="Logo main">
-            </div>
-            <div class="user-info">
-                <div class="avatar-container" @onclick=handleClickAvatar>
-                    <img src=@avatarPath alt="User Avatar" class="avatar">
-                    <div class="status"></div>
-                </div>
-            </div>
-            @if (openUserMenu)
-            {
-                <div class="userMenu_view">
-                    <div class="userMenu_function_btn">
-                        <a>Hello @user?.Username</a>
-                        <div class="level_cicle_view">
-                            <a>Level @user?.Role</a>
-                        </div >
-                    </div>
-
-                    <div class="spacer"> </div>
-
-                    <div class="userMenu_function_btn" @onclick=handleClickLogout>
-                        <img src="assets/icon/logout.png" />
-                        <a>Logout</a>
-                    </div>
-                </div>
-            }
-        </div>
-
-        
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-
-        <main>
-            <div class="content_middle">
-                @Body
-            </div>
-        </main>
-    </div>
 }
