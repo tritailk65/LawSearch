@@ -1,11 +1,14 @@
 ﻿@page "/";
 @using LawSearch_Admin.ViewModels
+@using Microsoft.AspNetCore.Components.Authorization
 @inject ISearchAdminService searchAdminService;
 @inject IArticalAdminService articalAdminService;
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject NavigationManager NavigationManager
 @inject ICookieService _cookieService;
 @inject IHistoryAdminService _historySearchService;
+@inject AuthenticationStateProvider _authenticationStateProvider;
+
 
 <div class="ss">
     <div class="search-container">
@@ -19,20 +22,20 @@
 
     @if (lstResult != null)
     {
-@*         <div class="info">
-            Keyphrases search: @keySearch <br />
-            Concept: @conceptTop
-        </div> *@
+        @*         <div class="info">
+    Keyphrases search: @keySearch <br />
+    Concept: @conceptTop
+    </div> *@
         <div class="result-container">
             <div class="result-total">
                 Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
             </div>
-                @for (int i = 0; i < lstResult.Count; i++)
-                {
-                    <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
-                }
+            @for (int i = 0; i < lstResult.Count; i++)
+            {
+                <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
+            }
         </div>
-    } 
+    }
 </div>
 
 @code{
@@ -41,16 +44,11 @@
     public string input;
     public List<ArticalResult> lstResult = null;
     public SearchResult searchResult { get; set; }
-    //public List<Artical> lstArtical;
     public string UserID = string.Empty;
-
     public double timeDone = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        //var data = await articalAdminService.GetListArtical();
-        //lstArtical = data;
-
         var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
         if (!string.IsNullOrEmpty(getUserIDFromCookie)) { UserID = getUserIDFromCookie; }
     }

@@ -25,5 +25,4 @@ builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 builder.Services.AddScoped<IHistoryAdminService, HistoryAdminService>();
 builder.Services.AddScoped<ICheckUserHasAccessService, ChechUserHasAccessService>();
 builder.Services.AddBlazoredLocalStorage();
-
 await builder.Build().RunAsync();

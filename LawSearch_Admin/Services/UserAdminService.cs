@@ -3,6 +3,7 @@ using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,7 +17,7 @@ namespace LawSearch_Admin.Services
         private readonly ICookieService cookie;
         private readonly AuthenticationStateProvider _stateProvider;
 
-        public UserAdminService(HttpClient httpClient, ICookieService cookie, AuthenticationStateProvider stateProvider)
+        public UserAdminService(HttpClient httpClient, ICookieService cookie, AuthenticationStateProvider stateProvider, IConfiguration configuration)
         {
             this.httpClient = httpClient;
             this.cookie = cookie;

@@ -1,7 +1,9 @@
-﻿using Blazored.LocalStorage;
-using LawSearch_Admin.Interfaces;
+﻿using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
@@ -12,11 +14,26 @@ namespace LawSearch_Admin.Extensions
     {
         private readonly HttpClient _httpClient;
         private readonly ICookieService _cookieService;
+        private readonly HubConnection _hubConnection;
+        private readonly IConfiguration _configuration;
 
-        public ApiAuthenticationStateProvider(HttpClient httpClient, ICookieService cookieService)
+        public ApiAuthenticationStateProvider(HttpClient httpClient, ICookieService cookieService, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _cookieService = cookieService;
+            _configuration = configuration;
+
+            _configuration = configuration;
+            var hubBaseUrl = _configuration["BackendApiUrl"];
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl($"{hubBaseUrl}/authenticationHub")
+                .Build();
+
+            _hubConnection.On("UserLoggedOut",  () =>
+            {
+                MakeUserAsLoggedOutSignalR();
+            });
+            _hubConnection.StartAsync();
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -38,6 +55,14 @@ namespace LawSearch_Admin.Extensions
         }
 
         public void MarkUserAsLoggedOut()
+        {
+            var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+            var authState = Task.FromResult(new AuthenticationState(anonymousUser));
+            NotifyAuthenticationStateChanged(authState);
+            _hubConnection.SendAsync("UserLoggedOut");
+        }
+
+        public void MakeUserAsLoggedOutSignalR()
         {
             var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
             var authState = Task.FromResult(new AuthenticationState(anonymousUser));
