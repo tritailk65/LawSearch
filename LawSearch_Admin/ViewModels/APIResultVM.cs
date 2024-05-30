@@ -6,11 +6,11 @@ namespace LawSearch_Admin.ViewModels
     {
         public int Status { set; get; }
 
-        public string Message { set; get; }
+        public string? Message { set; get; }
 
-        public string Exception { set; get; }
+        public string? Exception { set; get; }
 
-        public string Data { set; get; }
+        public string? Data { set; get; }
 
     }
 

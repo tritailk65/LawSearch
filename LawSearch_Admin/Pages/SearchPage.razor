@@ -9,34 +9,37 @@
 @inject IHistoryAdminService _historySearchService;
 @inject AuthenticationStateProvider _authenticationStateProvider;
 
-
-<div class="ss">
-    <div class="search-container">
-        <div class="search-input">
-            <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
-        </div>
-        <div class="search-button" @onclick="SearchAction">
-            <img class="search-icon" src="assets/icon/search_icon.png" />
-        </div>
-    </div>
-
-    @if (lstResult != null)
-    {
-        @*         <div class="info">
-    Keyphrases search: @keySearch <br />
-    Concept: @conceptTop
-    </div> *@
-        <div class="result-container">
-            <div class="result-total">
-                Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
+<AuthorizeView>
+    <Authorized>
+        <div class="ss">
+            <div class="search-container">
+                <div class="search-input">
+                    <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
+                </div>
+                <div class="search-button" @onclick="SearchAction">
+                    <img class="search-icon" src="assets/icon/search_icon.png" />
+                </div>
             </div>
-            @for (int i = 0; i < lstResult.Count; i++)
+
+            @if (lstResult != null)
             {
-                <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
+                @*         <div class="info">
+            Keyphrases search: @keySearch <br />
+            Concept: @conceptTop
+            </div> *@
+                <div class="result-container">
+                    <div class="result-total">
+                        Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
+                    </div>
+                    @for (int i = 0; i < lstResult.Count; i++)
+                    {
+                        <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
+                    }
+                </div>
             }
         </div>
-    }
-</div>
+    </Authorized>
+</AuthorizeView>
 
 @code{
     public string keySearch = "";

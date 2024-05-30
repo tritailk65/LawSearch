@@ -29,7 +29,7 @@ namespace LawSearch_Admin.Extensions
                 .WithUrl($"{hubBaseUrl}/authenticationHub")
                 .Build();
 
-            _hubConnection.On("UserLoggedOut",  () =>
+            _hubConnection.On("UserLoggedOut", () =>
             {
                 MakeUserAsLoggedOutSignalR();
             });

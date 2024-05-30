@@ -1,75 +1,79 @@
 ﻿@page "/viewlaw"
 @inject ILawDocAdminService lawDocAdminService;
+@inject AuthenticationStateProvider _authenticationStateProvider;
 
-<div class="body-container">
-    <div class="header-content">
-        <div class="title">
-            Select your document
-        </div>
-        <select class="custom-select" @onchange="GetDataLaw">
-            @if (lstLawDoc != null)
-            {
-                @foreach (var law in lstLawDoc)
-                {
-                    <option class="dropdown-item" value="@law.ID">@law.Name</option>
-                }
-            }
-        </select>
-        <button class="btn-view-full" data-toggle="modal" data-target="#exampleModal">
-            View full document
-        </button>
-    </div>
-
-    <div class="main-content">
-        <div class="left-content">
-            @if (lawVM == null)
-            {
-                <div class="loading_">
-                    <span class="loader"></span>
+<AuthorizeView>
+    <Authorized>
+        <div class="body-container">
+            <div class="header-content">
+                <div class="title">
+                    Select your document
                 </div>
-            }
-            else if (lawVM != null)
-            {
-                <div class="index">
-                    <TreeView Items="@dataIndex" OnSelect="item => Console.WriteLine(item.Text)" />
-                </div>
-            }
-        </div>
-        <div class="right-content">
-            @if (lawHTML != null)
-            {
-                <div class="document-view">
-                    @((MarkupString)lawHTML.contentHTML) *
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <select class="custom-select" @onchange="GetDataLaw">
+                    @if (lstLawDoc != null)
+                    {
+                        @foreach (var law in lstLawDoc)
+                        {
+                            <option class="dropdown-item" value="@law.ID">@law.Name</option>
+                        }
+                    }
+                </select>
+                <button class="btn-view-full" data-toggle="modal" data-target="#exampleModal">
+                    View full document
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="full-right-content">
-                    @if (lawHTML != null)
+
+            <div class="main-content">
+                <div class="left-content">
+                    @if (lawVM == null)
                     {
-                        <div class="full-document-view">
-                            @((MarkupString)lawHTML.contentHTML);
+                        <div class="loading_">
+                            <span class="loader"></span>
+                        </div>
+                    }
+                    else if (lawVM != null)
+                    {
+                        <div class="index">
+                            <TreeView Items="@dataIndex" OnSelect="item => Console.WriteLine(item.Text)" />
                         </div>
                     }
                 </div>
-
+                <div class="right-content">
+                    @if (lawHTML != null)
+                    {
+                        <div class="document-view">
+                            @((MarkupString)lawHTML.contentHTML) *
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-</div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="full-right-content">
+                            @if (lawHTML != null)
+                            {
+                                <div class="full-document-view">
+                                    @((MarkupString)lawHTML.contentHTML);
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 
 @code {
     public List<LawDoc> lstLawDoc = new List<LawDoc>();

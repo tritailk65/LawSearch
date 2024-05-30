@@ -40,26 +40,26 @@ namespace LawSearch_Admin.ViewModels
         public class ChapterVM
         {
             public int ID { get; set; }
-            public string Name { get; set; }
-            public string Title { get; set; }
-            public List<SectionVM> lstSections { get; set; }
-            public List<ArticalVM> lstArticals { get; set; }
+            public string? Name { get; set; }
+            public string? Title { get; set; }
+            public List<SectionVM>? lstSections { get; set; }
+            public List<ArticalVM>? lstArticals { get; set; }
         }
 
         public class SectionVM
         {
             public int ID { get; set; }
             public int ChapterID { get; set; }
-            public string Name { get; set; }
-            public List<ArticalVM> lstArticals { get; set; }
+            public string? Name { get; set; }
+            public List<ArticalVM>? lstArticals { get; set; }
         }
 
         public class ArticalVM
         {
             public int ID { get; set; }
-            public string Name { get; set; }
-            public string Title { get; set; }
-            public string Content { get; set; }
+            public string? Name { get; set; }
+            public string? Title { get; set; }
+            public string? Content { get; set; }
             public int ChapterItemID { get; set; }
             public int ChapterID { get; set; }
         }
@@ -68,15 +68,15 @@ namespace LawSearch_Admin.ViewModels
         {
             public int ID { get; set; }
             public int ArticalID { get; set; }
-            public string Content { get; set; }
+            public string? Content { get; set; }
         }
 
         public class Point
         {
             public int ID { get; set; }
             public int ClauseID { get; set; }
-            public string Content { get; set; }
-            public string Name { get; set; }
+            public string? Content { get; set; }
+            public string? Name { get; set; }
         }
     }
 }

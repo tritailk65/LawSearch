@@ -4,170 +4,145 @@
 @inject IUserAdminService UserAdminService;
 @inject IJSRuntime JSRuntime;
 @inject ICookieService Cookie;
+@inject AuthenticationStateProvider _authenticationStateProvider;
 
-@code {
-    public async Task LoadListUser()
-    {
-        ResponseMessageListData<User> rs = await UserAdminService.GetListUser();
+<AuthorizeView>
+    <Authorized>
+        <div>
+            @if (isLoading)
+            {
+                <div class="loading_view">
+                    <LoadingScreenOverlay />
+                    <a>Loading...</a>
+                </div>
+            }
 
-        if (rs.StatusAPI)
-        {
-            string userid = await Cookie.GetValue(CookieKeys.userid);
-            users = rs.ListData.Where(user => user.ID != int.Parse(userid)).ToList();
-            allUsers = users;
-            totalUsers = rs.ListData.Count() - 1; // Minus current user
-            uniqueRoles = users.Select(u => u.Role).Distinct().ToList();
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", rs.Message);
-        }
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        string authToken = await Cookie.GetValue(CookieKeys.authToken);
-
-        if (authToken == null || authToken.Length < 100)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-
-        await LoadListUser();
-    }
-}
-@if(isLoading)
-{
-    <div class="loading_view">
-        <LoadingScreenOverlay />
-        <a>Loading...</a>
-    </div>
-}
-
-@if(openRoleList)
-{
-    <div class="loading_view">
-        <div class="roleList_box">
-            <div class="roleList_box_title">
-                <a>Choose a role you want to change</a>
-            </div>
-            <div class="roleList_view">
-                @if(uniqueRoles?.Count > 0)
-                {
-                    foreach (var role in uniqueRoles)
-                    {
-                        <div class="role_view" @onclick="() => HandleChooseRole(role)">
-                            <a>@role</a>
+            @if (openRoleList)
+            {
+                <div class="loading_view">
+                    <div class="roleList_box">
+                        <div class="roleList_box_title">
+                            <a>Choose a role you want to change</a>
                         </div>
-                    }
-                }
-            </div>
-            <div class="roleList_box_close_btn" @onclick="HandleClickCloseRoleBox">
-                <a>Close</a>
-            </div>
-        </div>
-    </div>
-}
-
-@if (openAddUser)
-{
-    <div class="loading_view">
-        <div class="adduser_box">
-            <form>
-                <div class="form_group form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" @bind="username_form" placeholder="Enter username" />
+                        <div class="roleList_view">
+                            @if (uniqueRoles?.Count > 0)
+                            {
+                                foreach (var role in uniqueRoles)
+                                {
+                                    <div class="role_view" @onclick="() => HandleChooseRole(role)">
+                                        <a>@role</a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="roleList_box_close_btn" @onclick="HandleClickCloseRoleBox">
+                            <a>Close</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="form_group form-group">
-                    <label for="password">Password</label>
-                    <input type="text" id="password" class="form-control" @bind="password_form" placeholder="Enter password" />
+            }
+
+            @if (openAddUser)
+            {
+                <div class="loading_view">
+                    <div class="adduser_box">
+                        <form>
+                            <div class="form_group form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" class="form-control" @bind="username_form" placeholder="Enter username" />
+                            </div>
+                            <div class="form_group form-group">
+                                <label for="password">Password</label>
+                                <input type="text" id="password" class="form-control" @bind="password_form" placeholder="Enter password" />
+                            </div>
+                            <div class="btns_view">
+                                <button type="button" class="form-btn btn btn-primary" @onclick="() => HandleCreateUser()">Create</button>
+                                <button type="button" class="form-btn btn btn-primary" @onclick="HandleClickCloseAddUserBox">Close</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="btns_view">
-                    <button type="button" class="form-btn btn btn-primary" @onclick="() => HandleCreateUser()">Create</button>
-                    <button type="button" class="form-btn btn btn-primary" @onclick="HandleClickCloseAddUserBox">Close</button>
+            }
+
+            <div class="main_content">
+                <div class="top_content">
+                    <div class="totalQuestions_view">
+                        <div class="totalQuestions_view_Line1">
+                            <div class="icon_view">
+                                <img src="assets/icon/question.png" />
+                            </div>
+                            <a>Total questions</a>
+                        </div>
+                        <div class="totalQuestions_view_Line2">
+                            <a>@totalQuestions</a>
+                        </div>
+                    </div>
+
+                    <div class="totalQuestions_view">
+                        <div class="totalQuestions_view_Line1">
+                            <div class="icon_view">
+                                <img src="assets/icon/user1.png" />
+                            </div>
+                            <a>Total users</a>
+                        </div>
+                        <div class="totalQuestions_view_Line2">
+                            <a>@totalUsers</a>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
-    </div>
-}
 
-<div class="main_content">
-    <div class="top_content">
-        <div class="totalQuestions_view">
-            <div class="totalQuestions_view_Line1">
-                <div class="icon_view">
-                    <img src="assets/icon/question.png" />
+                <div class="bottom_content">
+                    <div class="top_bar_table_view">
+                        <div class="search-container">
+                            <input type="text" placeholder="Search user name..." @bind="searchUser" class="search-input" />
+                            <button @onclick="PerformSearch" class="search-button">
+                                <img src="assets/icon/search_icon.png" />
+                            </button>
+                        </div>
+
+                        <button class="top_bar_table_btn" @onclick="() => {openAddUser = true; StateHasChanged();}">
+                            Add user
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (users != null)
+                                {
+                                    foreach (var user in users)
+                                    {
+                                        <tr>
+                                            <td>@user.Username</td>
+                                            <td>@user.Role</td>
+                                            <td>
+                                                <label class="switch">
+                                                    <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
+                                                    <span class="slider"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <a @onclick="() => ModifyRole(user)">Modify Role</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <a>Total questions</a>
-            </div>
-            <div class="totalQuestions_view_Line2">
-                <a>@totalQuestions</a>
             </div>
         </div>
-
-        <div class="totalQuestions_view">
-            <div class="totalQuestions_view_Line1">
-                <div class="icon_view">
-                    <img src="assets/icon/user1.png" />
-                </div>
-                <a>Total users</a>
-            </div>
-            <div class="totalQuestions_view_Line2">
-                <a>@totalUsers</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom_content">
-        <div class="top_bar_table_view">
-            <div class="search-container">
-                <input type="text" placeholder="Search user name..." @bind="searchUser" class="search-input" />
-                <button @onclick="PerformSearch" class="search-button">
-                    <img src="assets/icon/search_icon.png" />
-                </button>
-            </div>
-
-            <button class="top_bar_table_btn" @onclick="() => {openAddUser = true; StateHasChanged();}">
-                Add user
-            </button>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table custom-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (users != null)
-                    {
-                        foreach (var user in users)
-                        {
-                            <tr>
-                                <td>@user.Username</td>
-                                <td>@user.Role</td>
-                                <td>
-                                    <label class="switch">
-                                        <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
-                                        <span class="slider"></span>
-                                    </label>
-                                </td>
-                                <td>
-                                    <a @onclick="() => ModifyRole(user)">Modify Role</a>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private int totalQuestions = 0;
@@ -182,6 +157,18 @@
     private bool openAddUser = false;
     private string? username_form = null;
     private string? password_form = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string authToken = await Cookie.GetValue(CookieKeys.authToken);
+
+        if (authToken == null || authToken.Length < 100)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+        await LoadListUser();
+    }
 
     private void PerformSearch()
     {
@@ -295,5 +282,23 @@
         await JSRuntime.InvokeVoidAsync("alert", rm.Message);
 
         await LoadListUser();
+    }
+
+    public async Task LoadListUser()
+    {
+        ResponseMessageListData<User> rs = await UserAdminService.GetListUser();
+
+        if (rs.StatusAPI)
+        {
+            string userid = await Cookie.GetValue(CookieKeys.userid);
+            users = rs.ListData.Where(user => user.ID != int.Parse(userid)).ToList();
+            allUsers = users;
+            totalUsers = rs.ListData.Count() - 1; // Minus current user
+            uniqueRoles = users.Select(u => u.Role).Distinct().ToList();
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", rs.Message);
+        }
     }
 }
