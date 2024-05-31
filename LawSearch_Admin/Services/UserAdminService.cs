@@ -3,6 +3,7 @@ using LawSearch_Admin.Interfaces;
 using LawSearch_Admin.ViewModels;
 using LawSearch_Core.Models;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -196,6 +197,22 @@ namespace LawSearch_Admin.Services
             await cookie.DeleteAllValue();
             ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
             httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+
+        public async Task<List<HistorySearch>> GetAllHistorySearch()
+        {
+            List<HistorySearch> historySearches = new List<HistorySearch>();
+
+            var rs = await httpClient.GetFromJsonAsync<APIResultVM<HistorySearch>>($"api/HistorySearch/GetAll");
+            if (rs != null && rs.Status == 200)
+            {
+                if (rs.Data.Count > 0)
+                {
+                    historySearches = rs.Data.ToList();
+                }
+                return historySearches;
+            }
+            else return null;
         }
     }
 }

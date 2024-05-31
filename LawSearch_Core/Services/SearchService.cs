@@ -97,6 +97,8 @@ namespace LawSearch_Core.Services
 
                 #region Create candidate articles
                 List<KeyPhraseResult> lstCandidates = GetListArticalByConceptID(rs.lstConcepts.Select(x => x.ID).ToList());
+                
+                
                 #endregion
 
                 #region Get articles relate to query
@@ -136,7 +138,8 @@ namespace LawSearch_Core.Services
                         concept = new Concept
                         {
                             ID = Globals.GetIDinDT(dt,0,"ID"),
-                            Name = Globals.GetinDT_String(dt,0,"Name")
+                            Name = Globals.GetinDT_String(dt,0,"Name"),
+                            distance = item.distance
                         };
                         cRS.Add(concept);
                     }

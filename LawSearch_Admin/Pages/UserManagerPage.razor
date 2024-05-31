@@ -8,8 +8,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <div>
-            @if (isLoading)
+        @if (isLoading)
             {
                 <div class="loading_view">
                     <LoadingScreenOverlay />
@@ -17,7 +16,7 @@
                 </div>
             }
 
-            @if (openRoleList)
+        @if (openRoleList)
             {
                 <div class="loading_view">
                     <div class="roleList_box">
@@ -42,7 +41,7 @@
                 </div>
             }
 
-            @if (openAddUser)
+        @if (openAddUser)
             {
                 <div class="loading_view">
                     <div class="adduser_box">
@@ -64,83 +63,83 @@
                 </div>
             }
 
-            <div class="main_content">
-                <div class="top_content">
-                    <div class="totalQuestions_view">
-                        <div class="totalQuestions_view_Line1">
-                            <div class="icon_view">
-                                <img src="assets/icon/question.png" />
-                            </div>
-                            <a>Total questions</a>
+        <div class="main_content">
+            <div class="top_content">
+                <div class="totalQuestions_view">
+                    <div class="totalQuestions_view_Line1">
+                        <div class="icon_view">
+                            <img src="assets/icon/question.png" />
                         </div>
-                        <div class="totalQuestions_view_Line2">
-                            <a>@totalQuestions</a>
-                        </div>
+                        <a>Total questions</a>
                     </div>
-
-                    <div class="totalQuestions_view">
-                        <div class="totalQuestions_view_Line1">
-                            <div class="icon_view">
-                                <img src="assets/icon/user1.png" />
-                            </div>
-                            <a>Total users</a>
-                        </div>
-                        <div class="totalQuestions_view_Line2">
-                            <a>@totalUsers</a>
-                        </div>
+                    <div class="totalQuestions_view_Line2">
+                        <a>@totalQuestions</a>
                     </div>
                 </div>
 
-                <div class="bottom_content">
-                    <div class="top_bar_table_view">
-                        <div class="search-container">
-                            <input type="text" placeholder="Search user name..." @bind="searchUser" class="search-input" />
-                            <button @onclick="PerformSearch" class="search-button">
-                                <img src="assets/icon/search_icon.png" />
-                            </button>
+                <div class="totalQuestions_view">
+                    <div class="totalQuestions_view_Line1">
+                        <div class="icon_view">
+                            <img src="assets/icon/user1.png" />
                         </div>
-
-                        <button class="top_bar_table_btn" @onclick="() => {openAddUser = true; StateHasChanged();}">
-                            Add user
-                        </button>
+                        <a>Total users</a>
                     </div>
-
-                    <div class="table-responsive">
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (users != null)
-                                {
-                                    foreach (var user in users)
-                                    {
-                                        <tr>
-                                            <td>@user.Username</td>
-                                            <td>@user.Role</td>
-                                            <td>
-                                                <label class="switch">
-                                                    <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
-                                                    <span class="slider"></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <a @onclick="() => ModifyRole(user)">Modify Role</a>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                    <div class="totalQuestions_view_Line2">
+                        <a>@totalUsers</a>
                     </div>
                 </div>
             </div>
+
+            <div class="bottom_content">
+                <div class="top_bar_table_view">
+                    <div class="search-container">
+                        <input type="text" placeholder="Search user name..." @bind="searchUser" class="search-input" />
+                        <button @onclick="PerformSearch" class="search-button">
+                            <img src="assets/icon/search_icon.png" />
+                        </button>
+                    </div>
+
+                    <button class="top_bar_table_btn" @onclick="() => {openAddUser = true; StateHasChanged();}">
+                        Add user
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (users != null)
+                            {
+                                foreach (var user in users)
+                                {
+                                    <tr>
+                                        <td>@user.Username</td>
+                                        <td>@user.Role</td>
+                                        <td>
+                                            <label class="switch">
+                                                <input type="checkbox" checked="@user.Status" @onchange="() => ToggleStatus(user)" />
+                                                <span class="slider"></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <a @onclick="() => ModifyRole(user)">Modify Role</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
     </Authorized>
 </AuthorizeView>
 
@@ -168,6 +167,8 @@
         }
 
         await LoadListUser();
+        var getAllQuestion = await UserAdminService.GetAllHistorySearch();
+        if (getAllQuestion != null){ totalQuestions = getAllQuestion.Count; }
     }
 
     private void PerformSearch()

@@ -179,6 +179,8 @@
     height: fit-content;
     min-height: 100%;
     color: black;
+    line-height: 32px;
+    font-weight: 500;
 }
 
 .modal-header {

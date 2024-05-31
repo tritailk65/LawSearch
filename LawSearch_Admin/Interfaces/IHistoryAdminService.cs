@@ -6,6 +6,8 @@ namespace LawSearch_Admin.Interfaces
     {
         Task<List<HistorySearch>> GetHistorySearch(int UserID, DateTime fromDate, DateTime toDate);
 
+        Task DeleteHistorySearch(int UserID, DateTime fromDate, DateTime toDate);
+
         Task AddHistorySearch(int UserID, string searchString);
     }
 }

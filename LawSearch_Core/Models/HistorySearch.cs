@@ -13,6 +13,7 @@ namespace LawSearch_Core.Models
         public string Result { get; set; }
         public DateTime DateTime { get; set; }
         public string UserName { get; set; }
+        public int Count { get; set; }  
     }
     
 }

@@ -64,9 +64,16 @@
                         @if (dataIndex != null)
                         {
                             <div class="document-view">
+
+                                @if (string.IsNullOrEmpty(contentEdit))
+                                {
+                                    <div style="color:red; font-size:1.2rem">
+                                        Nhắc nhở: Chọn một mục bên trái để xem chi tiết nội dung cần chỉnh sửa.
+                                    </div>
+                                } 
                                 @contentEdit
                             </div>
-                        }
+                        }                        
                     </div>
                 }
             </div>
@@ -102,7 +109,7 @@
                         @if (dataToEdit.Type == "Chapter" && dataToEdit.Chapter != null)
                         {
                             <div class="modal-header">
-                                <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                                <h5 class="modal-title">Chỉnh sửa nội dung Chương</h5>
                             </div>
                             <div class="modal-body">
                                 <form spellcheck="false">
@@ -112,7 +119,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label fw-bold mt-2">Title:</label>
-                                        <textarea class="form-control" @bind="dataToEdit.Chapter.Title"></textarea>
+                                        <textarea class="form-control" style="height: 100px;" @bind="dataToEdit.Chapter.Title"></textarea>
                                     </div>
                                 </form>
                             </div>
@@ -124,7 +131,7 @@
                         @if (dataToEdit.Type == "Section" && dataToEdit.Section != null)
                         {
                             <div class="modal-header">
-                                <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                                <h5 class="modal-title">Chỉnh sửa nội dung Mục</h5>
                             </div>
                             <div class="modal-body">
                                 <form spellcheck="false">
@@ -142,7 +149,7 @@
                         @if (dataToEdit.Type == "Artical" && dataToEdit.Artical != null)
                         {
                             <div class="modal-header">
-                                <h5 class="modal-title">Edit content @dataToEdit.Type</h5>
+                                <h5 class="modal-title">Chỉnh sửa nội dung Điều</h5>
                             </div>
                             <div class="modal-body">
                                 <form spellcheck="false">
@@ -156,7 +163,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label fw-bold mt-2">Content:</label>
-                                        <textarea class="form-control" @bind="dataToEdit.Artical.Content"></textarea>
+                                        <textarea class="form-control" style="height: 265px;" @bind="dataToEdit.Artical.Content"></textarea>
                                     </div>
                                 </form>
                             </div>

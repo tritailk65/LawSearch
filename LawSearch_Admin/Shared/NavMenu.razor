@@ -2,89 +2,6 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
 @inject ICookieService Cookie;
 
-@code {
-    private bool collapseNavMenu = true;
-    private UserAccess? userAccess = null;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-
-    private bool expandSubNav;
-
-    private bool HasAccess(string feature)
-    {
-        return userAccess?.GetAccessRights().Contains(feature) ?? false;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        string userRole = await Cookie.GetValue(CookieKeys.userrole);
-        userAccess = new UserAccess(userRole);
-        StateHasChanged();
-    }
-
-    public enum LevelAccess
-    {
-        Admin,
-        User,
-        Guest
-    }
-
-    public class UserAccess
-    {
-        public LevelAccess UserLevel { get; private set; }
-        public string UserRole { get; private set; }
-
-        private static readonly Dictionary<LevelAccess, List<string>> AccessRights = new Dictionary<LevelAccess, List<string>>
-        {
-            { LevelAccess.Admin, new List<string> {
-                    FeatureKeys.Search,
-                    FeatureKeys.ViewLaw,
-                    FeatureKeys.EditLaw,
-                    FeatureKeys.ImportLaw,
-                    FeatureKeys.ImportLaw,
-                    FeatureKeys.KeyPhrase,
-                    FeatureKeys.UserManager,
-                    FeatureKeys.History,
-                    FeatureKeys.Concept
-                }
-            },
-            { LevelAccess.User, new List<string> {
-                    FeatureKeys.Search,
-                    FeatureKeys.ViewLaw,
-                    FeatureKeys.History
-                }
-            },
-            { LevelAccess.Guest, new List<string> {
-                    FeatureKeys.Search
-                }
-            }
-        };
-
-        public UserAccess(string userRole)
-        {
-            UserRole = userRole;
-            if (Enum.TryParse(userRole, out LevelAccess level))
-            {
-                UserLevel = level;
-            }
-            else
-            {
-                // Default to Guest or handle unknown roles
-                UserLevel = LevelAccess.Guest;
-            }
-        }
-
-        public List<string> GetAccessRights()
-        {
-            return AccessRights[UserLevel];
-        }
-    }
-}
-
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="navbar position-static mx-5">
         @if (HasAccess(FeatureKeys.Search))
@@ -177,4 +94,87 @@
         }
     </nav>
 </div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private UserAccess? userAccess = null;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private bool expandSubNav;
+
+    private bool HasAccess(string feature)
+    {
+        return userAccess?.GetAccessRights().Contains(feature) ?? false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string userRole = await Cookie.GetValue(CookieKeys.userrole);
+        userAccess = new UserAccess(userRole);
+        StateHasChanged();
+    }
+
+    public enum LevelAccess
+    {
+        Admin,
+        User,
+        Guest
+    }
+
+    public class UserAccess
+    {
+        public LevelAccess UserLevel { get; private set; }
+        public string UserRole { get; private set; }
+
+        private static readonly Dictionary<LevelAccess, List<string>> AccessRights = new Dictionary<LevelAccess, List<string>>
+        {
+            { LevelAccess.Admin, new List<string> {
+                    FeatureKeys.Search,
+                    FeatureKeys.ViewLaw,
+                    FeatureKeys.EditLaw,
+                    FeatureKeys.ImportLaw,
+                    FeatureKeys.ImportLaw,
+                    FeatureKeys.KeyPhrase,
+                    FeatureKeys.UserManager,
+                    FeatureKeys.History,
+                    FeatureKeys.Concept
+                }
+            },
+            { LevelAccess.User, new List<string> {
+                    FeatureKeys.Search,
+                    FeatureKeys.ViewLaw,
+                    FeatureKeys.History
+                }
+            },
+            { LevelAccess.Guest, new List<string> {
+                    FeatureKeys.Search
+                }
+            }
+        };
+
+        public UserAccess(string userRole)
+        {
+            UserRole = userRole;
+            if (Enum.TryParse(userRole, out LevelAccess level))
+            {
+                UserLevel = level;
+            }
+            else
+            {
+                // Default to Guest or handle unknown roles
+                UserLevel = LevelAccess.Guest;
+            }
+        }
+
+        public List<string> GetAccessRights()
+        {
+            return AccessRights[UserLevel];
+        }
+    }
+}
 
