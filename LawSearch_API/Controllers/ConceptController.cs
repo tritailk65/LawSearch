@@ -79,12 +79,12 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpPost("[action]"), Authorize(Roles = "Admin")]
-        public async Task<APIResult> GenerateKeyphraseDescript([BindRequired] int lawID)
+        public async Task<APIResult> GenerateKeyphraseDescript([BindRequired] int ConceptID)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
-            await _conceptService.GenerateKeyphraseDescript(lawID);
+            await _conceptService.GenerateKeyphraseDescript(ConceptID);
             APIResult rs = new();
-            return  rs.MessageSuccess("Generate ConceptKeyphrase success!");
+            return  rs.MessageSuccess("Generate keyphrase descript success!");
         }
 
         [HttpPost("[action]"), Authorize(Roles = "Admin")]
@@ -112,6 +112,16 @@ namespace LawSearch_API.Controllers
              _conceptService.AddConceptKeyphrase(addConceptKeyphrase.ConceptID, addConceptKeyphrase.Keyphrase);
             APIResult rs = new();
             return rs.MessageSuccess("Add success !");
+        }
+
+        [HttpDelete, Authorize(Roles = "Admin")]
+        [Route("DeleteMapping")]
+        public APIResult DeleteConceptMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            _conceptService.DeleteConceptMapping(LawID);
+            APIResult rs = new();
+            return rs.MessageSuccess("Delete Concept mapping success !");
         }
     }
 }

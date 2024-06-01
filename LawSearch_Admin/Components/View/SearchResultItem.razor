@@ -36,22 +36,21 @@
                     @if (analysis)
                     {
                         <div class="w-100 d-flex mb-2">
-                            <label class="fw-bold fs-6" style="color:red;">Question:</label>
+                            <label class="fw-bold fs-6" style="color:red;">Question: </label>
                             <label class="fw-bold fs-6 mx-2" >@SearchInfo</label>
+                        </div>
+                        <div class="w-100 mt-3 mb-2">
+                            <label class="fw-bold fs-6 " style="color:red;">Keyphrase search: </label>
+                            @foreach (var item in ResultDetail.keyphraseSearch)
+                            {
+                                <label class="fw-bold fs-6 mx-2" style="white-space: pre;">@(item.Key + "  |") </label>
+                            }
                         </div>
                         <div class="w-100 d-flex align-items-center">
                               <label class="fw-bold fs-6" style="color:red;">Concept top:</label>
                               @foreach (var item in ResultDetail.conceptTop)
                               {
                                   <span class="label info mx-2">@item.Name - Score: (@item.distance)</span>
-                              }
-                          </div>
-                        <br />
-                        <div class="w-100 mt-3 mb-2">
-                                <label class="fw-bold fs-6 " style="color:red;">Keyphrase search: </label>
-                              @foreach (var item in ResultDetail.keyphraseSearch)
-                              {
-                                  <label class="fw-bold fs-6 mx-2" style="white-space: pre;">@(item.Key + "  |") </label>
                               }
                           </div>
                         <h4 class="w-100 d-flex justify-content-center mt-2">@articalDetail.LawName</h4>

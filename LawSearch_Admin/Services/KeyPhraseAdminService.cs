@@ -115,5 +115,24 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
+        public async Task<bool> DeleteKeyphraseMapping(int LawID)
+        {
+            try
+            {
+                var rs = await httpClient.DeleteAsync($"api/KeyPhrase/DeleteMapping?LawID={LawID}");
+                if (rs.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
     }
 }

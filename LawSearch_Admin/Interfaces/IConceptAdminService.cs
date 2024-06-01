@@ -18,5 +18,9 @@ namespace LawSearch_Admin.Interfaces
         Task<ResponseMessage> AddConceptKeyphrase(int conceptid, string keyphrase);
 
         Task<ResponseMessage> DeleteConceptKeyphrase(ConceptKeyphraseShow k);
+
+        Task<bool> DeleteConceptMapping(int LawID);
+
+        Task<bool> GenerateKeyphraseDescript(int conceptID);
     }
 }

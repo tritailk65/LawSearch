@@ -82,7 +82,7 @@
                 <div class="form_add_new_concept_background_view">
                     <div class="dialog_delete_view">
                         <div class="dialog_title_view">
-                            <a>Are you confirm delete this?</a>                           
+                            <a>Bạn có chắc muôn xóa concept này?</a>                           
                         </div>
                         <div class="my-3">Concept "@SelectedConcept.Name"</div>
                         <div class="dialog_buttons_view">
@@ -98,10 +98,40 @@
                     </div>
                 </div>
             }
+            @if (isOpenForm_GenerateKeyphraseDescript)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="dialog_delete_view">
+                        @if (isloading_GenerateKeyphraseDescript)
+                        {
+                            <div class="loading_">
+                                <span class="loader"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="dialog_title_view">
+                                <p class="m-4 d-flex text-center fs-5 fw-bold">Bạn có chắc muốn phát sinh tự động keyphrase từ description ?</p>
+                            </div>
+                            <div class="my-3">Concept "@SelectedConcept.Name"</div>
+                            <div class="dialog_buttons_view">
+                                <div class="button_dialog"
+                                     style="background-color: #7367F0"
+                                     @onclick="ConfirmGenerateKeyphraseDescript">
+                                    <a>Yes</a>
+                                </div>
+                                <div class="button_dialog" @onclick="CloseGenerateKeyphraseDescriptDialog">
+                                    <a>No</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
             <div class="main_view">
                 <div class="button_concept_view">
                     @* Generate Keyphrase (generate keyphrase từ description khi add một concept mới) *@
-                    <div class="my_button" @onclick="() => {}"><a>Generate Keyphrase</a></div>
+                    <div class="my_button" @onclick="OpenGenerateKeyphraseDescriptDialog"><a>Generate Keyphrase</a></div>
                     <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
                     <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
                     <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
@@ -206,6 +236,9 @@
     public Boolean isOpenForm_AddNewConcept = false;
     public Boolean isOpenForm_EditConcept = false;
     public Boolean isOpenForm_DeleteConcept = false;
+    public Boolean isOpenForm_GenerateKeyphraseDescript = false;
+    public Boolean isloading_GenerateKeyphraseDescript = false;
+    public string message_GenerateKeyphraseDescript = string.Empty;
     public List<Concept> Concepts = new List<Concept>();
     public Concept? SelectedConcept = new Concept();
     public List<ConceptKeyphraseShow> Keyphrases = new List<ConceptKeyphraseShow>();
@@ -439,6 +472,18 @@
         StateHasChanged();
     }
 
+    public void OpenGenerateKeyphraseDescriptDialog()
+    {
+        isOpenForm_GenerateKeyphraseDescript = true;
+        StateHasChanged();
+    }
+
+    public void CloseGenerateKeyphraseDescriptDialog()
+    {
+        isOpenForm_GenerateKeyphraseDescript = false;
+        StateHasChanged();
+    }
+
     public void CloseDeleteConceptForm()
     {
         isOpenForm_DeleteConcept = false;
@@ -475,9 +520,26 @@
         }
     }
 
-    public void MapKeyphrase()
+    public async Task ConfirmGenerateKeyphraseDescript()
     {
-        // Step 3 - Add [KeyphraseMapping]
+        isloading_GenerateKeyphraseDescript = true;
+        await fetchGenerateKeyphraseDescript();
+        CloseGenerateKeyphraseDescriptDialog();
+        isloading_GenerateKeyphraseDescript = false;
+    }
+
+    public async Task fetchGenerateKeyphraseDescript()
+    {
+        if (SelectedConcept == null) return;
+        var rs = await conceptAS.GenerateKeyphraseDescript(SelectedConcept.ID);
+        if (rs)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Phát sinh dữ liệu thành công!");
+            await fetchConcept();
+        } else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Phát sinh dữ liệu không thành công!");
+        }
     }
 
     public async Task AddNewKeyphrase()

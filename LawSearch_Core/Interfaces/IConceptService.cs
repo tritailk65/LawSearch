@@ -16,9 +16,10 @@ namespace LawSearch_Core.Interfaces
         void DeleteConcept(int id);
         List<KeyPhrase> GetKeyPhrasesFormConceptID(int id);
         List<ConceptKeyphraseShow> GetConceptKeyphraseByConceptID(int id);
-        Task GenerateKeyphraseDescript(int LawID);
+        Task GenerateKeyphraseDescript(int id);
         void AddConceptKeyphrase(int concept_id, string keyphrase);
         void GenerateConceptMapping(int LawID);
         void DeleteConceptKeyphrase(int KeyphraseID);
+        void DeleteConceptMapping(int LawID);
     }
 }

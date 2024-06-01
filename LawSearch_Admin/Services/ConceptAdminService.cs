@@ -210,5 +210,42 @@ namespace LawSearch_Admin.Services
 
             return rm;
         }
+
+        public async Task<bool> DeleteConceptMapping(int LawID)
+        {
+            try
+            {
+                var rs = await httpClient.DeleteAsync($"api/Concept/DeleteMapping?LawID={LawID}");
+                if (rs.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> GenerateKeyphraseDescript(int conceptID)
+        {
+            var rs = await httpClient.PostAsJsonAsync($"api/Concept/GenerateKeyphraseDescript?ConceptID={conceptID}", new { });
+
+            if (rs.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                var errorContent = await rs.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorContent}");
+                return false;
+            }
+        }
     }
 }

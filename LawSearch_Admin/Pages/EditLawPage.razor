@@ -2,6 +2,8 @@
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager NavigationManager
 @inject ILawDocAdminService lawDocAdminService;
+@inject IConceptAdminService conceptAdminService;
+@inject IKeyPhraseAdminService keyphraseAdminService;
 @inject NavigationManager NavigationManager;
 @inject ICheckUserHasAccessService _checkUserHasAccesService;
 @inject AuthenticationStateProvider _authenticationStateProvider;
@@ -68,7 +70,7 @@
                                 @if (string.IsNullOrEmpty(contentEdit))
                                 {
                                     <div style="color:red; font-size:1.2rem">
-                                        Nhắc nhở: Chọn một mục bên trái để xem chi tiết nội dung cần chỉnh sửa.
+                                        Nhắc bạn: Chọn một mục bên trái để xem chi tiết nội dung cần chỉnh sửa.
                                     </div>
                                 } 
                                 @contentEdit
@@ -264,7 +266,9 @@
 
     public async void DeleteLaw()
     {
-        var rs = await lawDocAdminService.DeleteLaw(idLawSelect);
+        var rs = await conceptAdminService.DeleteConceptMapping(idLawSelect)
+                    && await keyphraseAdminService.DeleteKeyphraseMapping(idLawSelect)
+                    && await lawDocAdminService.DeleteLaw(idLawSelect);
         if (rs)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Delete success!");

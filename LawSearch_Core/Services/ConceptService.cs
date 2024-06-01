@@ -231,7 +231,7 @@ namespace LawSearch_Core.Services
             }
         }
 
-        public async Task GenerateKeyphraseDescript(int lawID)
+        public async Task GenerateKeyphraseDescript(int id)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();
@@ -251,14 +251,14 @@ namespace LawSearch_Core.Services
 
             try
             {
-                command.CommandText = $"select * from Law where ID = {lawID}";
-                var checkIDLaw = _db.ExecuteReaderCommand(command,"");
-                if(checkIDLaw.Rows.Count == 0)
+                command.CommandText = "select * from Concept where id = " + id;
+                var rs = _db.ExecuteReaderCommand(command, "");
+                if (rs.Rows.Count == 0)
                 {
-                    throw new BadRequestException("ID Law not found !", 400, 400);
+                    throw new BadRequestException("ConceptID not found", 400, 400);
                 }
 
-                command.CommandText = "select Name, ID, Description from concept";
+                command.CommandText = $"select Name, ID, Description from concept where id = {id}";
                 DataTable ds = _db.ExecuteReaderCommand(command, "");
                 if(ds.Rows.Count > 0)
                 {
@@ -283,7 +283,7 @@ namespace LawSearch_Core.Services
                             command.CommandText = $"exec GetKeyPhrase N'{key.Key}', '{key.Pos}'";
                             var rsKeyDT = _db.ExecuteReaderCommand(command,"");
                             int idKey = Globals.GetIDinDT(rsKeyDT, 0, "ID");
-                            command.CommandText = $"exec UpdateConcept_KeyPhrase {conceptID}, {Convert.ToInt32(idKey)}, {lawID}, {Count}";
+                            command.CommandText = $"exec UpdateConcept_KeyPhrase {conceptID}, {Convert.ToInt32(idKey)}, 0, {Count}";
                             _db.ExecuteNonQueryCommand(command);
                         }
                     }
@@ -530,11 +530,6 @@ namespace LawSearch_Core.Services
             }
         }
 
-        /// <summary>
-        /// Hàm tự sinh ConceptMapping với đầu vào là ID văn bản luật
-        /// </summary>
-        /// <param name="LawID">ID văn bản luật</param>
-        /// <exception cref="BadRequestException"></exception>
         public void GenerateConceptMapping(int LawID)
         {
             #region Transaction init
@@ -643,6 +638,49 @@ namespace LawSearch_Core.Services
                                           $"values ({data.ConceptID},  {data.ChapterID},  {data.ChapterItemID}, {data.ArticalID}, {LawID}, 0,0)";
                     _db.ExecuteNonQueryCommand(command);
                 }
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        public void DeleteConceptMapping(int LawID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                command.CommandText = "select * from law where id = " + LawID;
+                var rs = _db.ExecuteReaderCommand(command, "");
+                if (rs.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found", 400, 400);
+                }
+
+                command.CommandText = $"delete ConceptMapping where LawID = {LawID}";
+                _db.ExecuteNonQueryCommand(command);
+
                 transaction.Commit();
             }
             catch
