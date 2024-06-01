@@ -17,7 +17,7 @@ namespace LawSearch_Core.Models
         public string Content { get; set; }
         public int type { get; set; }
         public double[] vector;
-        public double distance;
+        public double distance { get; set; }
     }
 
     public class AddConceptKeyphrase

@@ -11,5 +11,6 @@ namespace LawSearch_Admin.Interfaces
         Task<ResponseMessage> UserChangeStatus(string userid);
         Task<ResponseMessage> AddUser(string username, string password);
         Task UserLogout();
+        Task<List<HistorySearch>> GetAllHistorySearch();
     }
 }

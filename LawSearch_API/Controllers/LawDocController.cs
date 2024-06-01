@@ -54,7 +54,7 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpDelete, Authorize(Roles = "Admin")]
-        public APIResult DeleteLawDocument([BindRequired] int id)
+        public async Task<APIResult> DeleteLawDocument([BindRequired] int id)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
             lawDocService.DeleteLawDocument(id);

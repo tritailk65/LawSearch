@@ -469,5 +469,48 @@ namespace LawSearch_Core.Services
             }
         }
 
+        public void DeleteKeyPhraseMapping(int LawID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check ID Law
+                command.CommandText = "select * from law where id = " + LawID;
+                var rs = _db.ExecuteReaderCommand(command, "");
+                if (rs.Rows.Count == 0)
+                {
+                    throw new BadRequestException("LawID not found", 400, 400);
+                }
+
+                command.CommandText = $"delete KeyphraseMapping where LawID = {LawID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
     }
 }

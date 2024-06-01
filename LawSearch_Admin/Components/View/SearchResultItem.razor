@@ -1,5 +1,13 @@
 ﻿@inject IArticalAdminService articalAdminService;﻿
 
+<style>
+    mark {
+        background-color: yellow;
+        color: black;
+        font-weight: 600;
+    }
+</style>
+
 <div class="result-item">
     <label class="result-info w-100" @onclick="() => GetArticalDetailAsync(Artical.ID)">
         <div>[Rank #@Rank] - [@Artical.Title] - [@Artical.LawName] </div>
@@ -25,7 +33,31 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    @if (articalDetail != null)
+                    @if (analysis)
+                    {
+                        <div class="w-100 d-flex mb-2">
+                            <label class="fw-bold fs-6" style="color:red;">Question: </label>
+                            <label class="fw-bold fs-6 mx-2" >@SearchInfo</label>
+                        </div>
+                        <div class="w-100 mt-3 mb-2">
+                            <label class="fw-bold fs-6 " style="color:red;">Keyphrase search: </label>
+                            @foreach (var item in ResultDetail.keyphraseSearch)
+                            {
+                                <label class="fw-bold fs-6 mx-2" style="white-space: pre;">@(item.Key + "  |") </label>
+                            }
+                        </div>
+                        <div class="w-100 d-flex align-items-center">
+                              <label class="fw-bold fs-6" style="color:red;">Concept top:</label>
+                              @foreach (var item in ResultDetail.conceptTop)
+                              {
+                                  <span class="label info mx-2">@item.Name - Score: (@item.distance)</span>
+                              }
+                          </div>
+                        <h4 class="w-100 d-flex justify-content-center mt-2">@articalDetail.LawName</h4>
+                        <h5 class="w-100 d-flex justify-content-center mt-2">@(articalDetail.ChapterName + " " + articalDetail.ChapterTitle) </h5>
+                        <div class="artical-content mt-2 w-100 px-2"> @((MarkupString)articalContentHighlight)</div>
+                    } 
+                    @if (articalDetail != null && !analysis)
                     {
                         <h4 class="w-100 d-flex justify-content-center mt-2">@articalDetail.LawName</h4>
                         <h5 class="w-100 d-flex justify-content-center mt-2">@(articalDetail.ChapterName + " " + articalDetail.ChapterTitle) </h5>
@@ -33,6 +65,7 @@
                     }                    
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="Analysis">Analysis</button>
                     <button type="button" class="btn btn-primary" @onclick="CloseModal">OK</button>
                 </div>
             </div>
@@ -48,18 +81,41 @@
     [Parameter]
     public ArticalResult Artical { get; set; }
 
+    [Parameter]
+    public SearchResult ResultDetail { get; set; }
+
+    [Parameter]
+    public string SearchInfo { get; set; }
+
     public ArticalDetail articalDetail = null;
     public bool isShowModal = false;
+    public bool analysis = false;
+    public string articalContentHighlight = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
 
     }
 
+    private void Analysis()
+    {
+        foreach (var keyphrase in ResultDetail.keyphraseSearch)
+        {
+            if (keyphrase.Key != null)
+            {
+                string keyword = keyphrase.Key.Replace("_", " ");
+                articalContentHighlight = articalContentHighlight.Replace(keyword, $"<mark>{keyword}</mark>");
+            }
+        }
+        analysis = true;
+        StateHasChanged();
+    }
+
     private async Task GetArticalDetailAsync(int id)
     {
         var rs = await articalAdminService.GetArticalDetail(id);
         articalDetail = rs;
+        articalContentHighlight = rs.Content;
         isShowModal = true;
         StateHasChanged();
     }
@@ -67,5 +123,6 @@
     private void CloseModal()
     {
         isShowModal = false;
+        analysis = false;
     }
 }

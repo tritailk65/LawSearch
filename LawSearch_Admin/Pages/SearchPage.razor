@@ -1,6 +1,4 @@
-﻿@page "/";
-@using LawSearch_Admin.ViewModels
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@page "/{input?}";
 @inject ISearchAdminService searchAdminService;
 @inject IArticalAdminService articalAdminService;
 @inject Blazored.LocalStorage.ILocalStorageService localStorage;
@@ -9,53 +7,96 @@
 @inject IHistoryAdminService _historySearchService;
 @inject AuthenticationStateProvider _authenticationStateProvider;
 
-
-<div class="ss">
-    <div class="search-container">
-        <div class="search-input">
-            <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
-        </div>
-        <div class="search-button" @onclick="SearchAction">
-            <img class="search-icon" src="assets/icon/search_icon.png" />
-        </div>
-    </div>
-
-    @if (lstResult != null)
-    {
-        @*         <div class="info">
-    Keyphrases search: @keySearch <br />
-    Concept: @conceptTop
-    </div> *@
-        <div class="result-container">
-            <div class="result-total">
-                Khoảng @lstResult.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
-            </div>
-            @for (int i = 0; i < lstResult.Count; i++)
+<AuthorizeView>
+    <Authorized>
+        <div class="ss">
+            @if (invalidInput)
             {
-                <SearchResultItem Rank="@(i+1)" Artical="@lstResult[i]" />
+                <label style="color: red">Vui lòng nhập nội dung tìm kiếm dài hơn 12 ký tự!</label>
+            }
+            <div class="search-container ">
+                <div class="search-input">
+                    <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
+                </div>
+                <div class="search-button" @onclick="SearchAction">
+                    <img class="search-icon" src="assets/icon/search_icon.png" />
+                </div>
+            </div>
+
+            @if (lstResultArtical != null && !loadingData && !emptyResult && !invalidInput)
+            {
+                <div class="result-container">
+                    <div class="result-total">
+                        Khoảng @lstResultArtical.Count kết quả - Thời gian tìm kiếm @Math.Round(timeDone, 6) giây
+                    </div>
+                    @for (int i = 0; i < lstResultArtical.Count; i++)
+                    {
+                        <SearchResultItem Rank="@(i+1)" Artical="@lstResultArtical[i]" ResultDetail="@searchResult" SearchInfo="@input"/>
+                    }
+                </div>
+            }
+            @if (loadingData)
+            {
+                <div class="loading_">
+                    <span class="loader"></span>
+                </div>
+            }
+            @if (emptyResult)
+            {
+                <div class="mt-4">
+                    <h4>Không tìm thấy kết quả nào chứa tất cả các cụm từ tìm kiếm của bạn.</h4>
+                    <br />
+                    Không tìm thấy <mark>@input</mark> trong tài liệu nào.
+                    <br />
+                    Ðề xuất:
+                    <ul>
+                        <li>Xin bạn chắc chắn rằng tất cả các từ đều đúng chính tả.</li>
+                        <li>Hãy thử những từ khóa khác.</li>
+                        <li>Hãy thử những từ khóa chung hơn</li>
+                        <li>Hãy thử bớt từ khóa.</li>
+                    </ul>
+                    <div class="d-flex w-50 justify-content-center align-items-center" style="height: 200px">
+                        <div class="cube-loader">
+                            <div class="cube-top"></div>
+                            <div class="cube-wrapper">
+                                <span style="--i:0" class="cube-span"></span>
+                                <span style="--i:1" class="cube-span"></span>
+                                <span style="--i:2" class="cube-span"></span>
+                                <span style="--i:3" class="cube-span"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
         </div>
-    }
-</div>
+
+    </Authorized>
+</AuthorizeView>
 
 @code{
     public string keySearch = "";
     public string conceptTop = "";
-    public string input;
-    public List<ArticalResult> lstResult = null;
-    public SearchResult searchResult { get; set; }
+    [Parameter]
+    public string input { get; set; } = string.Empty;
+    public List<ArticalResult>? lstResultArtical = null;
+    public SearchResult? searchResult { get; set; }
     public string UserID = string.Empty;
     public double timeDone = 0;
+    public bool loadingData = false;
+    public bool emptyResult = false;
+    public bool invalidInput = false;
 
     protected override async Task OnInitializedAsync()
     {
+        searchResult = null;
+        invalidInput = false;
         var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
         if (!string.IsNullOrEmpty(getUserIDFromCookie)) { UserID = getUserIDFromCookie; }
-    }
 
-    private async void SearchAction(){
-        if(input.Length >= 12)
+        //Console.WriteLine(input);
+        if (!string.IsNullOrEmpty(input))
         {
+            loadingData = true;
             //Ghi history search
             await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
 
@@ -70,7 +111,16 @@
             timeDone = stopwatch.Elapsed.TotalMilliseconds / 1000F;
 
             searchResult = rs;
-            lstResult = searchResult.articalResults;
+            lstResultArtical = searchResult.articalResults;
+
+            if (lstResultArtical.Count == 0)
+            {
+                emptyResult = true;
+            }
+            else
+            {
+                emptyResult = false;
+            }
 
             foreach (var key in searchResult.keyphraseSearch)
             {
@@ -80,7 +130,66 @@
             {
                 conceptTop = conceptTop + con.Name + " / ";
             }
+
+            loadingData = false;
             StateHasChanged();  //Re-render dom
+        }
+    }
+
+    private async void SearchAction(){
+        if(string.IsNullOrEmpty(input))
+        {
+            invalidInput = true;
+            emptyResult = false;
+        }
+        if (!string.IsNullOrEmpty(input))
+        {
+            if (input.Length < 12)
+            {
+                invalidInput = true;
+                emptyResult = false;
+            }
+
+            if (input.Length >= 12)
+            {
+                loadingData = true;
+                invalidInput = false;
+                //Ghi history search
+                await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
+
+                conceptTop = "";
+                keySearch = "";
+                var stopwatch = new System.Diagnostics.Stopwatch();
+                stopwatch.Start();
+
+                var rs = await searchAdminService.GetResultSearchLaw(input);
+
+                stopwatch.Stop();
+                timeDone = stopwatch.Elapsed.TotalMilliseconds / 1000F;
+
+                searchResult = rs;
+                lstResultArtical = searchResult.articalResults;
+
+                if (lstResultArtical.Count == 0)
+                {
+                    emptyResult = true;
+                }
+                else
+                {
+                    emptyResult = false;
+                }
+
+                foreach (var key in searchResult.keyphraseSearch)
+                {
+                    keySearch = keySearch + key.Key + " / ";
+                }
+                foreach (var con in searchResult.conceptTop)
+                {
+                    conceptTop = conceptTop + con.Name + " / ";
+                }
+                loadingData = false;
+                StateHasChanged();  //Re-render dom
+            }
         }
     }
 }

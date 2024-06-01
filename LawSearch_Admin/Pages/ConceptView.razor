@@ -4,196 +4,231 @@
 @inject IJSRuntime JsRuntime;
 @inject NavigationManager NavigationManager;
 @inject ICheckUserHasAccessService _checkUserHasAccesService;
+@inject AuthenticationStateProvider _authenticationStateProvider;
 
-@* Băt đầu web *@
-<div class="background_view">
-    @if (isOpenForm_AddNewConcept)
-    {
-        <div class="form_add_new_concept_background_view">
-            <div class="form_add_new_concept_view">
-                <div class="top_form_view">
-                    <div class="title_form"><a>Add New Concept</a></div>
-                    <div class="close_btn" @onclick="CloseAddNewConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
-                </div>
-                <div>
-                    <div class="concept_input_view">
-                        <a>Concept:</a>
-                        <div class="input_concept">
-                            <input id="input_concept" placeholder="concept" @oninput="SetNewConcept" />
+<AuthorizeView>
+    <Authorized>
+        @* Băt đầu web *@
+        <div class="background_view">
+            @if (isOpenForm_AddNewConcept)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="form_add_new_concept_view">
+                        <div class="top_form_view">
+                            <div class="title_form"><a>Add New Concept</a></div>
+                            <div class="close_btn" @onclick="CloseAddNewConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
+                        </div>
+                        <div>
+                            <div class="concept_input_view">
+                                <a>Concept:</a>
+                                <div class="input_concept">
+                                    <input id="input_concept" placeholder="concept" @oninput="SetNewConcept" />
+                                </div>
+                            </div>
+                            <div class="warning_input"><a>@warning_input_conecept</a></div>
+                            <div class="description_input_view">
+                                <a>Description:</a>
+                                <div class="input_description">
+                                    <textarea id="input_description" placeholder="@Description_text" @oninput="SetNewDescription"></textarea>
+                                </div>
+                            </div>
+                            <div class="warning_input"><a>@warning_input_description</a></div>
+                            <div class="confirm_btn_view" @onclick="AddNewConcept">
+                                <div class="confirm_btn"><a>Confirm</a></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="warning_input"><a>@warning_input_conecept</a></div>
-                    <div class="description_input_view">
-                        <a>Description:</a>
-                        <div class="input_description">
-                            <textarea id="input_description" placeholder="@Description_text" @oninput="SetNewDescription"></textarea>
+                </div>
+            }
+            @if (isOpenForm_EditConcept)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="form_add_new_concept_view">
+                        <div class="top_form_view">
+                            <div class="title_form"><a>Edit Concept</a></div>
+                            <div class="close_btn" @onclick="CloseEditConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
+                        </div>
+                        <div>
+                            <div class="concept_input_view">
+                                <a>Concept:</a>
+                                <div class="input_concept">
+                                    <input id="input_concept"
+                                           placeholder="concept"
+                                           @oninput="SetNewConcept"
+                                           value="@SelectedConcept?.Name" />
+                                </div>
+                            </div>
+                            <div class="warning_input"><a>@warning_input_conecept</a></div>
+                            <div class="description_input_view">
+                                <a>Description:</a>
+                                <div class="input_description">
+                                    <textarea id="input_description"
+                                              placeholder="@Description_text"
+                                              @oninput="SetNewDescription"
+                                              value="@SelectedConcept?.Content">
+                                    </textarea>
+                                </div>
+                            </div>
+                            <div class="warning_input"><a>@warning_input_description</a></div>
+                            <div class="confirm_btn_view" @onclick="EditConcept">
+                                <div class="confirm_btn"><a>Confirm</a></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="warning_input"><a>@warning_input_description</a></div>
-                    <div class="confirm_btn_view" @onclick="AddNewConcept">
-                        <div class="confirm_btn"><a>Confirm</a></div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    }
-    @if (isOpenForm_EditConcept)
-    {
-        <div class="form_add_new_concept_background_view">
-            <div class="form_add_new_concept_view">
-                <div class="top_form_view">
-                    <div class="title_form"><a>Edit Concept</a></div>
-                    <div class="close_btn" @onclick="CloseEditConceptForm"><img class="icon" src="assets/icon/close_480px.png" /></div>
-                </div>
-                <div>
-                    <div class="concept_input_view">
-                        <a>Concept:</a>
-                        <div class="input_concept">
-                            <input id="input_concept"
-                                   placeholder="concept"
-                                   @oninput="SetNewConcept"
-                                   value="@SelectedConcept?.Name" />
+            }
+            @if (isOpenForm_DeleteConcept)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="dialog_delete_view">
+                        <div class="dialog_title_view">
+                            <a>Bạn có chắc muôn xóa concept này?</a>                           
+                        </div>
+                        <div class="my-3">Concept "@SelectedConcept.Name"</div>
+                        <div class="dialog_buttons_view">
+                            <div class="button_dialog"
+                                 style="background-color: #7367F0"
+                                 @onclick="ConfirmDeleteConcept">
+                                <a>Yes</a>
+                            </div>
+                            <div class="button_dialog" @onclick="CancelDeleteConcept">
+                                <a>No</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="warning_input"><a>@warning_input_conecept</a></div>
-                    <div class="description_input_view">
-                        <a>Description:</a>
-                        <div class="input_description">
-                            <textarea id="input_description"
-                                      placeholder="@Description_text"
-                                      @oninput="SetNewDescription"
-                                      value="@SelectedConcept?.Content">
-                                </textarea>
-                        </div>
-                    </div>
-                    <div class="warning_input"><a>@warning_input_description</a></div>
-                    <div class="confirm_btn_view" @onclick="EditConcept">
-                        <div class="confirm_btn"><a>Confirm</a></div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    }
-    @if (isOpenForm_DeleteConcept)
-    {
-        <div class="form_add_new_concept_background_view">
-            <div class="dialog_delete_view">
-                <div class="dialog_title_view">
-                    <a>Are you confirm delete this?</a>
-                </div>
-                <div class="dialog_buttons_view">
-                    <div class="button_dialog"
-                         style="background-color: #7367F0"
-                         @onclick="ConfirmDeleteConcept">
-                        <a>Yes</a>
-                    </div>
-                    <div class="button_dialog" @onclick="CancelDeleteConcept">
-                        <a>No</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    <div class="main_view">
-        <div class="button_concept_view">
-            @* Generate Keyphrase (generate keyphrase từ description khi add một concept mới) *@
-            <div class="my_button" @onclick="() => {}"><a>Generate Keyphrase</a></div>
-            <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
-            <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
-            <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
-        </div>
-        <div class="content_view">
-            <div class="list_concept_view">
-                <ul>
-                    @if (isLoading_GetListConcept)
-                    {
-                        <a>Loading...</a>
-                    }
-                    else
-                    {
-                        if (Concepts != null && Concepts.Count() > 0)
+            }
+            @if (isOpenForm_GenerateKeyphraseDescript)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="dialog_delete_view">
+                        @if (isloading_GenerateKeyphraseDescript)
                         {
-                            int index = 1;
-                            foreach (var concept in Concepts)
-                            {
-                                <li>
-                                    <div class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
-                                         onclick="@(async Task() => {await SelectConceptFunction(concept);})">
-                                        <a>@index. @concept.Name</a>
-                                    </div>
-                                </li>
-
-                                index += 1;
-                            }
+                            <div class="loading_">
+                                <span class="loader"></span>
+                            </div>
                         }
                         else
                         {
-                            <a>Empty</a>
+                            <div class="dialog_title_view">
+                                <p class="m-4 d-flex text-center fs-5 fw-bold">Bạn có chắc muốn phát sinh tự động keyphrase từ description ?</p>
+                            </div>
+                            <div class="my-3">Concept "@SelectedConcept.Name"</div>
+                            <div class="dialog_buttons_view">
+                                <div class="button_dialog"
+                                     style="background-color: #7367F0"
+                                     @onclick="ConfirmGenerateKeyphraseDescript">
+                                    <a>Yes</a>
+                                </div>
+                                <div class="button_dialog" @onclick="CloseGenerateKeyphraseDescriptDialog">
+                                    <a>No</a>
+                                </div>
+                            </div>
                         }
-                    }
-                </ul>
-            </div>
-            <div class="content_concept_view">
-                <a id="content_of_concept">
-                    @if (SelectedConcept != null)
-                    {
-                        @SelectedConcept?.Content
-                        ;
-                    }
-                </a>
-            </div>
-            <div class="list_keyphrase_of_concept_view">
-                <div class="keyphrase_buttons_view">
-                    <div class="search_keyphrase_view">
-                        <input id="textInput" type="text" placeholder="new keyphrase" @oninput="SetNewKeyphrase" value="@new_keyphrase" />
-                    </div>
-                    <div 
-                        class="my_button add_new_keyphrase_button"
-                         @onclick="AddNewKeyphrase">
-                        <a>Add new keyphrase</a>
                     </div>
                 </div>
-                <div class="list_keyphrase_view">
-                    <ul>
-                        @if (isLoading_GetListKeyphrase)
-                        {
-                            <li><a>Loading...</a></li>
-                        }
-                        else
-                        {
-                            if (Keyphrases == null || Keyphrases.Count == 0)
+            }
+            <div class="main_view">
+                <div class="button_concept_view">
+                    @* Generate Keyphrase (generate keyphrase từ description khi add một concept mới) *@
+                    <div class="my_button" @onclick="OpenGenerateKeyphraseDescriptDialog"><a>Generate Keyphrase</a></div>
+                    <div class="my_button" @onclick="OpenAddNewConceptForm"><a>Add new concept</a></div>
+                    <div class="my_button" @onclick="OpenEditConceptForm"><a>Edit</a></div>
+                    <div class="my_button" @onclick="OpenDeleteConceptForm"><a>Delete</a></div>
+                </div>
+                <div class="content_view">
+                    <div class="list_concept_view">
+                        <ul>
+                            @if (isLoading_GetListConcept)
                             {
-                                <a>Empty</a>
+                                <a>Loading...</a>
                             }
                             else
                             {
-                                foreach (var keyphrase in Keyphrases)
+                                if (Concepts != null && Concepts.Count() > 0)
                                 {
-                                    <li>
-                                        <div class="keyphrase_not_selected">
-                                            <a>@keyphrase.KeyPhrase</a>
-
-                                            <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
-                                                <a>Xoá</a>
+                                    int index = 1;
+                                    foreach (var concept in Concepts)
+                                    {
+                                        <li>
+                                            <div class="@((SelectedConcept == concept) ? "item_selected" : "item_not_selected")"
+                                                 onclick="@(async Task() => {await SelectConceptFunction(concept);})">
+                                                <a>@index. @concept.Name</a>
                                             </div>
-                                        </div>
-                                    </li>
+                                        </li>
+
+                                        index += 1;
+                                    }
+                                }
+                                else
+                                {
+                                    <a>Empty</a>
                                 }
                             }
-                        }
-                    </ul>
+                        </ul>
+                    </div>
+                    <div class="content_concept_view">
+                        <a id="content_of_concept">
+                            @if (SelectedConcept != null)
+                            {
+                                @SelectedConcept?.Content
+                                ;
+                            }
+                        </a>
+                    </div>
+                    <div class="list_keyphrase_of_concept_view">
+                        <div class="keyphrase_buttons_view">
+                            <div class="search_keyphrase_view">
+                                <input id="textInput" type="text" placeholder="new keyphrase" @oninput="SetNewKeyphrase" value="@new_keyphrase" />
+                            </div>
+                            <div class="my_button add_new_keyphrase_button"
+                                 @onclick="AddNewKeyphrase">
+                                <a>Add new keyphrase</a>
+                            </div>
+                        </div>
+                        <div class="list_keyphrase_view">
+                            <ul>
+                                @if (isLoading_GetListKeyphrase)
+                                {
+                                    <li><a>Loading...</a></li>
+                                }
+                                else
+                                {
+                                    if (Keyphrases == null || Keyphrases.Count == 0)
+                                    {
+                                        <a>Empty</a>
+                                    }
+                                    else
+                                    {
+                                        foreach (var keyphrase in Keyphrases)
+                                        {
+                                            <li>
+                                                <div class="keyphrase_not_selected">
+                                                    <a>@keyphrase.KeyPhrase</a>
+
+                                                    <div onclick="@(async Task() => {await DeleteConceptKeyphrase(keyphrase);})">
+                                                        <a>Xoá</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-@* Kết thúc web *@
+        @* Kết thúc web *@
 
-@* Băt đầu script *@
-<script type="text/javascript">
+        @* Băt đầu script *@
+        <script type="text/javascript">
 
-</script>
-@* Kết thúc script *@
+        </script>
+        @* Kết thúc script *@
+    </Authorized>
+</AuthorizeView>
 
 @code {
     public Boolean isLoading_GetListConcept = true;
@@ -201,6 +236,9 @@
     public Boolean isOpenForm_AddNewConcept = false;
     public Boolean isOpenForm_EditConcept = false;
     public Boolean isOpenForm_DeleteConcept = false;
+    public Boolean isOpenForm_GenerateKeyphraseDescript = false;
+    public Boolean isloading_GenerateKeyphraseDescript = false;
+    public string message_GenerateKeyphraseDescript = string.Empty;
     public List<Concept> Concepts = new List<Concept>();
     public Concept? SelectedConcept = new Concept();
     public List<ConceptKeyphraseShow> Keyphrases = new List<ConceptKeyphraseShow>();
@@ -434,6 +472,18 @@
         StateHasChanged();
     }
 
+    public void OpenGenerateKeyphraseDescriptDialog()
+    {
+        isOpenForm_GenerateKeyphraseDescript = true;
+        StateHasChanged();
+    }
+
+    public void CloseGenerateKeyphraseDescriptDialog()
+    {
+        isOpenForm_GenerateKeyphraseDescript = false;
+        StateHasChanged();
+    }
+
     public void CloseDeleteConceptForm()
     {
         isOpenForm_DeleteConcept = false;
@@ -470,9 +520,26 @@
         }
     }
 
-    public void MapKeyphrase()
+    public async Task ConfirmGenerateKeyphraseDescript()
     {
-        // Step 3 - Add [KeyphraseMapping]
+        isloading_GenerateKeyphraseDescript = true;
+        await fetchGenerateKeyphraseDescript();
+        CloseGenerateKeyphraseDescriptDialog();
+        isloading_GenerateKeyphraseDescript = false;
+    }
+
+    public async Task fetchGenerateKeyphraseDescript()
+    {
+        if (SelectedConcept == null) return;
+        var rs = await conceptAS.GenerateKeyphraseDescript(SelectedConcept.ID);
+        if (rs)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Phát sinh dữ liệu thành công!");
+            await fetchConcept();
+        } else
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Phát sinh dữ liệu không thành công!");
+        }
     }
 
     public async Task AddNewKeyphrase()

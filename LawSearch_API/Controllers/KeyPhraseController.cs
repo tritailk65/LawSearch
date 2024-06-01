@@ -77,5 +77,14 @@ namespace LawSearch_API.Controllers
             return result.MessageSuccess("Generate keyphrase mapping success!");
         }
 
+        [HttpDelete, Authorize(Roles = "Admin")]
+        [Route("DeleteMapping")]
+        public APIResult DeleteKeyphraseMapping([BindRequired] int LawID)
+        {
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            keyPhraseService.DeleteKeyPhraseMapping(LawID);
+            APIResult result = new APIResult();
+            return result.MessageSuccess("Delete keyphrase mapping success!");
+        }
     }
 }

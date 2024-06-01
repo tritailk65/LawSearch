@@ -13,6 +13,6 @@ namespace LawSearch_Admin.Interfaces
 
         Task<ResponseMessage> DeleteKeyphrase(int id);
 
-
+        Task<bool> DeleteKeyphraseMapping(int LawID);
     }
 }

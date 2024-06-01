@@ -20,6 +20,7 @@
 .main_content {
     width: 80%;
     min-height: 88vh;
+    font-size:14px;
 }
 
 .top_content {
@@ -28,6 +29,7 @@
     padding-top: 10px;
     display: flex;
     flex-direction: row;
+    margin-top:12px;
 }
 
 .totalQuestions_view {
@@ -92,8 +94,9 @@
     width: 100%;
     height: 100%;
     padding: 10px;
+    padding-left: 20px;
     padding-right: 80px; /* Make space for the button */
-    font-size: 16px;
+    font-size: 14px;
     border: 2px solid #7065E8; /* Border color */
     border-radius: 50px;
     background-color: transparent; /* Transparent background */
@@ -126,8 +129,8 @@
 }
 
     .search-button img {
-        width: 35px;
-        height: 35px;
+        width: 26px;
+        height: 26px;
     }
 
     .search-button:hover {
@@ -139,7 +142,7 @@
     }
 
 .bottom_content {
-    margin-top: 30px;
+    margin-top: 22px;
 }
 
 .top_bar_table_view {
@@ -148,11 +151,11 @@
     padding: 20px;
     display: flex;
     flex-direction: row;
+    width: 100%;
 }
 
 .top_bar_table_btn {
     height: 55px;
-    font-size: 16px;
     border: none;
     background-color: #7065E8;
     color: white;
@@ -286,6 +289,7 @@ input:checked + .slider {
 }
 
 .roleList_view {
+    justify-content: center;
     width: 100%;
     padding: 0px 20px;
     display: flex;

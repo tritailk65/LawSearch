@@ -9,8 +9,12 @@ namespace LawSearch_Core.Interfaces
 {
     public interface IHistorySearchService
     {
-        List<HistorySearch> GetHistorySearchByDate(int UserID, DateTime fromDate, DateTime toDate);
+        List<HistorySearch> GetHistorySearchByDate(int UserID, string fromDate, string toDate);
 
         void AddHistorySearch(int UserID, string searchString);
+
+        void DeleteHistorySearch(int UserID, string fromDate, string toDate);
+
+        List<HistorySearch> GetAllHistorySearch();
     }
 }
