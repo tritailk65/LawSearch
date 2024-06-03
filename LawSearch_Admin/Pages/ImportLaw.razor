@@ -7,15 +7,27 @@
 <AuthorizeView>
     <Authorized>
         <div class="import-container">
-            <div class="title-container">
-                <div class="title">
-                    Document name:
+            <div class="title-container d-flex flex-wrap">
+                <div class="title my-3">
+                    Tên văn bản:
                 </div>
-                <input class="input" type="text" @bind-value="@Name" />
+                <input class="input my-3" type="text" @bind-value="@Name" />
+                <div class="title my-3">
+                        Số hiệu văn bản:
+                    </div>
+                    <input class="input my-3" type="text" @bind-value="@Number" />
+                <div class="title my-3">
+                    Ngày có hiệu lực:
+                </div>
+                <input class="input my-3" type="date" @bind-value="@EffectiveDate" />
+                <div class="title my-3">
+                    Ngày hết hiệu lực:
+                </div>
+                <input class="input my-3" type="date" @bind-value="@ExpirationDate" />
             </div>
             <div class="content-container">
-                <div class="title">
-                    Document content:
+                <div class="title my-3">
+                    Nội dung văn bản:
                 </div>
                 <TextArea @bind-ChildData="Content" />
             </div>
@@ -68,6 +80,10 @@
 @code {
     public string Name = string.Empty;
     public string Content = string.Empty;
+    public string Number = string.Empty;
+    public DateTime EffectiveDate = DateTime.Now;
+    public DateTime ExpirationDate= DateTime.Now;
+    public int LawType;
     public string messageImport = "";
     public bool isLoading = true;
     public bool isImportSuccess = false;
@@ -84,7 +100,7 @@
     public async void ImportNewLaw()
     {
         isLoading = true; //Default value
-        var rs = await lawDocAdminService.ImportLaw(Name, Content);
+        var rs = await lawDocAdminService.ImportLaw(Name, Content, Number, EffectiveDate, ExpirationDate, LawType);
         if(rs == true)
         {
             isLoading = false;

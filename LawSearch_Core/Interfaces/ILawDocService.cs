@@ -13,7 +13,7 @@ namespace LawSearch_Core.Interfaces
     {
         List<LawDoc> GetListLawDoc();
         DataTable GetLawHTML(int ID);
-        void ImportLaw(string name, string content);
+        void ImportLaw(LawDoc lawDoc, string content);
         void DeleteLawDocument(int id);
         void AddLawHTML(int LawID , string ContentHTML);
         void UpdateLawHTML(int LawID, string ContentHTML);

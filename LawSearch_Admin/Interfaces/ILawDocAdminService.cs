@@ -8,7 +8,7 @@ namespace LawSearch_Admin.Interfaces
         Task<List<LawDoc>> GetListLawDoc();
         Task<LawHTML> GetLawHTML(int id);
         Task<LawVM> GetDataLaw(int id);
-        Task<bool> ImportLaw(string name, string content);
+        Task<bool> ImportLaw(string name, string content, string number, DateTime effectiveDate, DateTime expirationDate, int lawType);
         Task<bool> DeleteLaw(int id);
         Task<bool> EditContentChapter(int id, string name, string title);
         Task<bool> EditeContentSection(int id, string name);

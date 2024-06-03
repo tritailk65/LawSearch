@@ -68,7 +68,7 @@ namespace LawSearch_Core.Services
             }
         }
 
-        public void ImportLaw(string name, string content)
+        public void ImportLaw(LawDoc lawDoc, string content)
         {
 
             #region Transaction init
@@ -89,9 +89,8 @@ namespace LawSearch_Core.Services
 
             try
             {
-                //Step 1: Parse document
                 LawDoc l = new LawDoc();
-                ParseContentLaw(command, true, content, name);
+                ParseContentLaw(command, true, content, lawDoc.Name, lawDoc);
 
                 transaction.Commit();
             } catch 
@@ -106,7 +105,7 @@ namespace LawSearch_Core.Services
         }
 
         //Parse Law
-        private void ParseContentLaw(IDbCommand command, bool isGenerateNewID, string content, string name)
+        private void ParseContentLaw(IDbCommand command, bool isGenerateNewID, string content, string name, LawDoc infoLaw)
         {
             if (content == "") return;
             LawDoc lawDoc = new LawDoc();
@@ -118,6 +117,14 @@ namespace LawSearch_Core.Services
             //Nếu ID trả về > 0 --> tiến hành import
             if (lawDoc.ID > 0)
             {
+                command.CommandText = $"Update Law " +
+                                        $"set LawNumber = N'{infoLaw.LawNumber}', " +
+                                            $"EffectiveDate = '{infoLaw.EffectiveDate}', " +
+                                            $"ExpirationDate = '{infoLaw.ExpirationDate}', " +
+                                            $"LawType = '{infoLaw.LawType}' " +
+                                        $"where id = {lawDoc.ID}";
+                db.ExecuteNonQueryCommand(command);
+
                 int chapterNumber = 1;
                 lawDoc.lstChapters = new List<Chapter>();
                 Chapter item = new Chapter();

@@ -14,8 +14,11 @@ namespace LawSearch_Core.Models
         public int ID { get; set; }
         public string Name { get; set; }
         public string Status { get; set; }
+        public DateTime EffectiveDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public int LawType { get; set; }
+        public string LawNumber {  get; set; }
         public List<Chapter> lstChapters { get; set; }
-
     }
 
     public class LawHTML
@@ -28,6 +31,9 @@ namespace LawSearch_Core.Models
     {
         public string Name { get; set; }
         public string Content { get; set; }
+        public string LawNumber { get; set; }
+        public int LawType { get; set; }
+        public DateTime EffectiveDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
     }
-
 }

@@ -16,7 +16,7 @@ namespace LawSearch_Admin.ViewModels
 
         public bool HasChildren => Children != null && Children.Any();
 
-        public TreeViewItem(string? text, string type, int iD, bool isCollapsed = false, bool isSelected = false)
+        public TreeViewItem(string? text, string type, int iD, bool isCollapsed = true, bool isSelected = false)
         {
             Text = text;
             Type = type;
@@ -25,7 +25,7 @@ namespace LawSearch_Admin.ViewModels
             IsSelected = isSelected;
         }
 
-        public TreeViewItem(string? text, List<TreeViewItem>? children = null, bool isCollapsed = false, bool isSelected = false)
+        public TreeViewItem(string? text, List<TreeViewItem>? children = null, bool isCollapsed = true, bool isSelected = false)
         {
             Text = text;
             Children = children;
