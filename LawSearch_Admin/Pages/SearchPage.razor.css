@@ -22,6 +22,24 @@
     width: 1000px;
 }
 
+@media (max-width: 1200px) {
+    .search-input {
+        max-width: 800px; /* Điều chỉnh cho màn hình nhỏ hơn */
+    }
+}
+
+@media (max-width: 992px) {
+    .search-input {
+        max-width: 600px; /* Điều chỉnh cho màn hình máy tính bảng */
+    }
+}
+
+@media (max-width: 768px) {
+    .search-input {
+        width: 100%; /* Chiếm toàn bộ chiều rộng màn hình trên thiết bị di động */
+    }
+}
+
 .input {
     width: 100%;
     height: 100%;
@@ -30,7 +48,8 @@
     border-radius: 20px 0 0 20px;
     color: white;
     font-weight: 500;
-    border: 1px solid #434968;
+    border: 2px solid #434968;
+    overflow-y:auto;
 }
 
 .search-button {
@@ -53,6 +72,68 @@
 .search-icon {
     width: 20px;
     height: 20px;
+}
+
+.search-suggestion {
+    width: 1070px;
+    border: 2px solid #434968;
+    height: fit-content;
+    border-radius: 0 0 20px 20px;
+    background-color: #25293C;
+    z-index: 200;
+    position: absolute;
+    margin-top: 49px;
+    padding-right: 70px;
+}
+
+@media (max-width: 1200px) {
+    .search-suggestion {
+        max-width: 870px; /* Điều chỉnh cho màn hình nhỏ hơn */
+    }
+}
+
+@media (max-width: 992px) {
+    .search-suggestion {
+        max-width: 670px; /* Điều chỉnh cho màn hình máy tính bảng */
+    }
+}
+
+@media (max-width: 768px) {
+    .search-suggestion {
+        display:none;
+    }
+}
+
+.search-container.suggest{
+    padding: 10px 10px 0px 10px;
+    height: 60px;
+    z-index: 100;
+}
+.input.suggest {
+    border-radius: 20px 0 0 0;
+}
+/*.search-button.suggest {
+    border-radius: 0 20px 0 0;
+}*/
+
+.selected {
+    background-color: #434968;
+}
+    
+.search-suggestion-item {
+    display: flex;
+    min-height: 40px;
+    cursor: pointer;
+}
+
+    .search-suggestion-item:hover {
+        background-color: #434968;
+    }
+
+.search-suggestion-icon {
+    padding: 2px;
+    align-items: center;
+    display: flex;
 }
 
 .result-container {

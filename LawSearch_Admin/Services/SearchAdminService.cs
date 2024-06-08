@@ -4,6 +4,7 @@ using LawSearch_Core.Models;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace LawSearch_Admin.Services
 {
@@ -20,10 +21,8 @@ namespace LawSearch_Admin.Services
 
         public async Task<SearchResult> GetResultSearchLaw(string input)
         {
-            SearchResult lst = new SearchResult();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
+            SearchResult lst = new SearchResult();
 
             var rs = await httpClient.GetFromJsonAsync<APIResultSingleVM<SearchResult>>($"api/Search?input={input}");
 

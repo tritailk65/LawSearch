@@ -83,8 +83,8 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
-            policy.WithOrigins("http://localhost:7201");
-            /*            policy.AllowAnyOrigin();*/
+            policy.WithOrigins("http://localhost", "http://localhost:7201", "http://searchlaw.name.vn:7201", "http://searchlaw.name.vn");
+            /*policy.AllowAnyOrigin();*/
             policy.AllowAnyHeader();
             policy.AllowAnyMethod();
             policy.AllowCredentials();
