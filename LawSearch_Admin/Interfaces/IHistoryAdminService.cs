@@ -8,6 +8,6 @@ namespace LawSearch_Admin.Interfaces
 
         Task DeleteHistorySearch(int UserID, DateTime fromDate, DateTime toDate);
 
-        Task AddHistorySearch(int UserID, string searchString);
+        Task AddHistorySearch(int UserID, string searchString, string searchResultTop);
     }
 }

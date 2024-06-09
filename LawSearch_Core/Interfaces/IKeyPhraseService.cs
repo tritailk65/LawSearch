@@ -11,6 +11,7 @@ namespace LawSearch_Core.Interfaces
         void DeleteKeyPhrase(int id);
         Task GenerateKeyphraseVNCoreNLP(int LawID);
         void GenerateKeyphraseMapping(int LawID);
-        void DeleteKeyPhraseMapping(int LawID);
+        void DeleteKeyPhraseMapping(int KeyphraseID, int ArticalID);
+        void DeleteAllKeyPhraseMapping(int LawID);
     }
 }

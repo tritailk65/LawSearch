@@ -11,7 +11,7 @@ namespace LawSearch_Core.Interfaces
     {
         List<HistorySearch> GetHistorySearchByDate(int UserID, string fromDate, string toDate);
 
-        void AddHistorySearch(int UserID, string searchString);
+        void AddHistorySearch(int UserID, string searchString, string searchResult);
 
         void DeleteHistorySearch(int UserID, string fromDate, string toDate);
 

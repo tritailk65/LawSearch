@@ -13,7 +13,30 @@
                 border-radius: 10px;
                 border: 2px solid #7367F0;
             }
-        </style>
+        </style>     
+        
+        @if (isOpenDeleteDiaglog)
+        {
+            <div class="form_add_new_concept_background_view">
+                <div class="dialog_delete_view">
+                    <div class="dialog_title_view">
+                        <a>Are you confirm delete history?</a>
+                    </div>
+                    <div class="my-3">From date: @model.fromDate - To Date: @model.toDate</div>
+                    <div class="dialog_buttons_view">
+                        <div class="button_dialog"
+                             style="background-color: #7367F0"
+                             @onclick="HandleConfirmDelete">
+                            <a>Yes</a>
+                        </div>
+                        <div class="button_dialog" @onclick="HandleCancleDelete">
+                            <a>No</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         <div class="main-content mt-4">
             <div class="d-flex align-items-center align-content-center w-100" style="background: #303348; border: 2px solid #44475D ;border-radius:10px; height:100px;">
                 <EditForm Model="model" OnValidSubmit="Submit">
@@ -55,6 +78,7 @@
                                 <tr>
                                     <th scope="col">Number</th>
                                     <th scope="col">Search</th>
+                                    <th scope="col">Result Top</th>
                                     <th scope="col">DateTime</th>
                                     <th scope="col">Count</th>
                                     <th scope="col">User</th>
@@ -67,6 +91,7 @@
                                     <tr  @onclick="() => RowHistoryClicked(data[index].Value)">
                                         <th scope="row"> @(i + 1)</th>
                                         <td>@data[i].Value</td>
+                                        <td>@((MarkupString)data[i].Result.Replace("\n", "<br>"))</td>
                                         <td>@data[i].DateTime</td>
                                         <td>@data[i].Count</td>
                                         <td>@data[i].UserName</td>
@@ -95,12 +120,13 @@
     private bool isEmpty = false;
     private string userID = string.Empty;
     private string currentAction = string.Empty;
+    private bool isOpenDeleteDiaglog = false;
 
     protected override async Task OnInitializedAsync()
     {
         data = null;
         loadingData = true;
-        model ??= new() { fromDate = DateTime.UtcNow.AddDays(-15), toDate = DateTime.UtcNow };
+        model ??= new() { fromDate = DateTime.Now.AddDays(-15), toDate = DateTime.Now };
 
         var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
         if (!string.IsNullOrEmpty(getUserIDFromCookie)) { userID = getUserIDFromCookie; }
@@ -121,12 +147,9 @@
 
     private async void Submit()
     {
-        //Console.WriteLine($"From date = {model?.fromDate} To date = {model?.toDate}");
-        //Console.WriteLine($"Submit: {currentAction}");
-
-        loadingData = true;
         if(model != null && currentAction == "Search")
         {
+            loadingData = true;
             var getData = await historyService.GetHistorySearch(Convert.ToInt32(userID), model.fromDate, model.toDate);
 
             if (getData != null)
@@ -144,9 +167,24 @@
         }
         if (model != null && currentAction == "DeleteHistory")
         {
+            isOpenDeleteDiaglog = true;           
+        }
+    }
+
+    private void RowHistoryClicked(string searchAgain)
+    {
+        NavigationManager.NavigateTo($"/{Uri.EscapeDataString(searchAgain)}");
+    }
+
+    private async Task HandleConfirmDelete()
+    {
+        if (model != null)
+        {
+            isOpenDeleteDiaglog = false;
+            loadingData = true;
             await historyService.DeleteHistorySearch(Convert.ToInt32(userID), model.fromDate, model.toDate);
             var getData = await historyService.GetHistorySearch(Convert.ToInt32(userID), model.fromDate, model.toDate);
-
+            
             if (getData != null)
             {
                 data = getData;
@@ -162,8 +200,8 @@
         }
     }
 
-    private void RowHistoryClicked(string searchAgain)
+    private void HandleCancleDelete()
     {
-        NavigationManager.NavigateTo($"/{Uri.EscapeDataString(searchAgain)}");
+        isOpenDeleteDiaglog = false;
     }
 }

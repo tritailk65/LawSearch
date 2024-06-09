@@ -22,9 +22,6 @@ namespace LawSearch_Admin.Services
         {
             List<KeyPhraseRelate> lst = new List<KeyPhraseRelate>();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhraseRelate>>($"api/keyphrase/GetKeyPhraseRelate?ID={id}");
             if (rs != null && rs.Status == 200 && rs.Data.Count != 0)
             {
@@ -37,9 +34,6 @@ namespace LawSearch_Admin.Services
         public async Task<List<KeyPhrase>> GetListKeyPhrase()
         {
             List<KeyPhrase> lst = new List<KeyPhrase>();
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.GetFromJsonAsync<APIResultVM<KeyPhrase>>($"api/keyphrase");
             if (rs != null && rs.Status == 200 && rs.Data.Count != 0)
@@ -55,9 +49,6 @@ namespace LawSearch_Admin.Services
             {
                 Keyphrase = keyphraseText
             };
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             HttpResponseMessage rs = await httpClient.PostAsJsonAsync($"api/KeyPhrase", k);
             ResponseMessage rm = new();
@@ -93,8 +84,6 @@ namespace LawSearch_Admin.Services
 
         public async Task<ResponseMessage> DeleteKeyphrase(int id)
         {
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await httpClient.DeleteAsync($"api/KeyPhrase?id=" + id);
             ResponseMessage rm = new();
@@ -115,7 +104,28 @@ namespace LawSearch_Admin.Services
             return rm;
         }
 
-        public async Task<bool> DeleteKeyphraseMapping(int LawID)
+        public async Task<ResponseMessage> DeleteKeyphraseMapping(int KeyphraseID, int ArticalID)
+        {
+            var rs = await httpClient.DeleteAsync($"api/KeyPhrase/DeleteMapping?KeyphraseID={KeyphraseID}&ArticalID={ArticalID}");
+            ResponseMessage rm = new();
+            if (rs.IsSuccessStatusCode)
+            {
+                rm.StatusAPI = true;
+                rm.Message = "Delete KeyPhrase Mapping Success";
+            }
+            else
+            {
+                var resultPost = rs.Content.ReadFromJsonAsync<APIResultSingleVM>().Result;
+                if (resultPost != null && resultPost.Message != null)
+                {
+                    rm.Message = "Delete Keyphrase Mapping Failed";
+                    rm.Error = resultPost.Message.ToString();
+                }
+            }
+            return rm;
+        }
+
+        public async Task<bool> DeleteAllKeyphraseMapping(int LawID)
         {
             try
             {
@@ -128,7 +138,8 @@ namespace LawSearch_Admin.Services
                 {
                     return false;
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return false;

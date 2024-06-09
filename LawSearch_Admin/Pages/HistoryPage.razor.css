@@ -92,3 +92,68 @@
         transform: rotate(-360deg);
     }
 }
+.form_add_new_concept_background_view {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(10, 20, 46, 0.7);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 400px 0px;
+}
+
+.dialog_delete_view {
+    width: 500px;
+    height: 270px;
+    background-color: #2F3349;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog_title_view {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+    .dialog_title_view a {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+.dialog_buttons_view {
+    width: 100%;
+    height: 93px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0px 40px;
+}
+
+.button_dialog {
+    width: 180px;
+    height: 50px;
+    background-color: #3B4054;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+    .button_dialog a {
+        font-size: 20px;
+        font-weight: bold;
+    }
+/* css dialog - end */

@@ -24,13 +24,13 @@
 
             <div class="form-group">
                 <label for="username">Username</label>
-                <InputText type="text" id="username" class="form-control" @bind-Value="loginVM.Username" placeholder="Enter username" @oninput="ClearErrorMessage" />
+                <InputText  type="text" id="username" class="form-control" @bind-Value="loginVM.Username" placeholder="Enter username" @oninput="ClearErrorMessage" />
                 <ValidationMessage For="()=> loginVM.Username"></ValidationMessage>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-container">
-                    <InputText type="password" id="password" class="form-control" @bind-Value="loginVM.Password" placeholder="Enter password" @oninput="ClearErrorMessage" />
+                    <InputText  type="password" id="password" class="form-control" @bind-Value="loginVM.Password" placeholder="Enter password" @oninput="ClearErrorMessage" />
                 </div>
                 <ValidationMessage For="()=> loginVM.Password"></ValidationMessage>
             </div>

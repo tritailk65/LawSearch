@@ -16,9 +16,9 @@ namespace LawSearch_Admin.Services
             _httpClient = httpClient;
         }
 
-        public async Task AddHistorySearch(int UserID, string searchString)
+        public async Task AddHistorySearch(int UserID, string searchString, string searchResultTop)
         {
-            var rs = await _httpClient.PostAsJsonAsync($"api/HistorySearch?UserID={UserID}&SearchString={searchString}", new { });
+            var rs = await _httpClient.PostAsJsonAsync($"api/HistorySearch?UserID={UserID}&SearchString={searchString}&SearchResult={searchResultTop}", new { });
         }
 
         public async Task DeleteHistorySearch(int UserID, DateTime fromDate, DateTime toDate)

@@ -267,7 +267,7 @@
     public async void DeleteLaw()
     {
         var rs = await conceptAdminService.DeleteConceptMapping(idLawSelect)
-                    && await keyphraseAdminService.DeleteKeyphraseMapping(idLawSelect)
+                    && await keyphraseAdminService.DeleteAllKeyphraseMapping(idLawSelect)
                     && await lawDocAdminService.DeleteLaw(idLawSelect);
         if (rs)
         {

@@ -6,13 +6,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.LocalStorage;
 using LawSearch_Admin.Extensions;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Net.Http.Headers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "http://localhost") });
 
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["BackendApiUrl"] ?? "http://localhost") });
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<ICookieService, CookieService>();
@@ -24,5 +25,6 @@ builder.Services.AddScoped<ISearchAdminService, SearchAdminService>();
 builder.Services.AddScoped<IUserAdminService, UserAdminService>();
 builder.Services.AddScoped<IHistoryAdminService, HistoryAdminService>();
 builder.Services.AddScoped<ICheckUserHasAccessService, ChechUserHasAccessService>();
+
 builder.Services.AddBlazoredLocalStorage();
 await builder.Build().RunAsync();

@@ -1,4 +1,4 @@
-using LawSearch_API.Extensions;
+﻿using LawSearch_API.Extensions;
 using LawSearch_API.Utils;
 using LawSearch_Core.Interfaces;
 using LawSearch_Core.Models;
@@ -73,7 +73,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            // Kiểm tra thời gian hết hạn của token
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero 
         };
     });
 
