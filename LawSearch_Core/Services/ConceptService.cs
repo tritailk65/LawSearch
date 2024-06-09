@@ -155,7 +155,13 @@ namespace LawSearch_Core.Services
             try
             {
                 _db.OpenConnection();
-                //check co concept voi id do hay khong
+
+                var sqlCheck = $"Select * from concept where id = {id}";
+                var checkID = _db.ExecuteReaderCommand(sqlCheck, "");
+                if (checkID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("Không tìm thấy ID Concept !", 400, 400);
+                }
 
                 string sql = string.Format(string.Format("delete from concept where ID = {0}", id));
                 _db.ExecuteNonQueryCommand(sql);

@@ -469,7 +469,58 @@ namespace LawSearch_Core.Services
             }
         }
 
-        public void DeleteKeyPhraseMapping(int LawID)
+        public void DeleteKeyPhraseMapping(int KeyphraseID, int ArticalID)
+        {
+            #region Transaction init
+            IDbConnection connection = _db.GetDbConnection();
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message.ToString(), 500);
+            }
+            IDbCommand command = _db.CreateCommand();
+            IDbTransaction transaction = _db.BeginTransaction();
+            command.Connection = connection;
+            command.Transaction = transaction;
+            #endregion
+
+            try
+            {
+                //Check ID Law
+                command.CommandText = "select * from Keyphrase where id = " + KeyphraseID;
+                var checkIDKeyphrase = _db.ExecuteReaderCommand(command, "");
+                if (checkIDKeyphrase.Rows.Count == 0)
+                {
+                    throw new BadRequestException("KeyphraseID not found", 400, 400);
+                }                
+                
+                command.CommandText = "select * from Artical where id = " + ArticalID;
+                var checkArticalID = _db.ExecuteReaderCommand(command, "");
+                if (checkArticalID.Rows.Count == 0)
+                {
+                    throw new BadRequestException("AticalID not found", 400, 400);
+                }
+
+                command.CommandText = $"delete KeyphraseMapping where KeyphraseID = {KeyphraseID} and ArticalID = {ArticalID}";
+                _db.ExecuteNonQueryCommand(command);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+
+        public void DeleteAllKeyPhraseMapping(int LawID)
         {
             #region Transaction init
             IDbConnection connection = _db.GetDbConnection();

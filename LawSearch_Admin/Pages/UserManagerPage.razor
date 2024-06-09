@@ -48,11 +48,11 @@
                         <form>
                             <div class="form_group form-group">
                                 <label for="username">Username</label>
-                                <input type="text" id="username" class="form-control" @bind="username_form" placeholder="Enter username" />
+                                <input type="text" id="username" class="form-control" @bind="username_form" placeholder="Enter username" autocomplete="off" />
                             </div>
                             <div class="form_group form-group">
                                 <label for="password">Password</label>
-                                <input type="text" id="password" class="form-control" @bind="password_form" placeholder="Enter password" />
+                            <input type="text" id="password" class="form-control" @bind="password_form" placeholder="Enter password" autocomplete="off" />
                             </div>
                             <div class="btns_view">
                                 <button type="button" class="form-btn btn btn-primary" @onclick="() => HandleCreateUser()">Create</button>

@@ -19,11 +19,15 @@ namespace LawSearch_Core.Services
             _dbService = dbService;
         }
 
-        public void AddHistorySearch(int UserID, string searchString)
+        public void AddHistorySearch(int UserID, string searchString, string searchResult)
         {
             try
             {
                 _dbService.OpenConnection();
+
+/*                var stringResult = $"TOP 1 - Điều 1: Phạm vi điều chỉnh\n" +
+                    $"TOP 2 - Điều 2: Đối tượng áp dụng\n" +
+                    $"TOP 3 - Điều 3: Giải thích từ ngữ";*/
 
                 var checkUserID = _dbService.ExecuteReaderCommand($"select * from [User] where ID = {UserID}", "");
                 if (checkUserID.Rows.Count == 0)
@@ -31,7 +35,7 @@ namespace LawSearch_Core.Services
                     throw new BadRequestException("UserID not found!", 404, 400);
                 }
 
-                string sql = $"exec QueryLog N'{searchString}', {UserID}";
+                string sql = $"exec QueryLog N'{searchString}', N'{searchResult}' , {UserID}";
                 _dbService.ExecuteNonQueryCommand(sql);
 
             } catch
@@ -75,7 +79,7 @@ namespace LawSearch_Core.Services
             {
                 _dbService.OpenConnection();
                 List<HistorySearch> rs = new List<HistorySearch>();
-                string sql = $"select q.ID, q.Value, q.Result, q.Datetime, q.Count, u.Username from Query q " +
+                string sql = $"select q.ID, q.Value, q.Result, q.Datetime, q.Count, q.Result, u.Username from Query q " +
                                 $"inner join [User] u on u.ID = q.UserID  " +                             
                                 $"order by Datetime DESC";
                 var dt = _dbService.ExecuteReaderCommand(sql, "");
@@ -95,7 +99,8 @@ namespace LawSearch_Core.Services
                             Value = Globals.GetinDT_String(dt, i, "Value"),
                             DateTime = dateTime,
                             Count = Globals.GetIDinDT(dt, i, "Count"),
-                            UserName = Globals.GetinDT_String(dt, i, "UserName")
+                            UserName = Globals.GetinDT_String(dt, i, "UserName"),
+                            Result = Globals.GetinDT_String(dt,i,"Result")
                         });
                     }
                 }
@@ -127,7 +132,7 @@ namespace LawSearch_Core.Services
                 string toDateFormat = toDate.AddDays(1).ToString("yyyy-MM-dd");*/
 
                 List<HistorySearch> rs = new List<HistorySearch>();
-                string sql = $"select q.ID, q.Value, q.Result, q.Datetime, q.Count, u.Username from Query q " +
+                string sql = $"select q.ID, q.Value, q.Result, q.Datetime, q.Count, q.Result, u.Username from Query q " +
                                 $"inner join [User] u on u.ID = q.UserID  " +
                                 $"where UserID = {UserID} and (DateTime >= '{fromDate}' and DateTime < '{toDate}') " +
                                 $"order by Datetime DESC";
@@ -148,7 +153,8 @@ namespace LawSearch_Core.Services
                             Value = Globals.GetinDT_String(dt, i, "Value"),
                             DateTime = dateTime,
                             Count = Globals.GetIDinDT(dt, i, "Count"),
-                            UserName = Globals.GetinDT_String(dt, i, "UserName")
+                            UserName = Globals.GetinDT_String(dt, i, "UserName"),
+                            Result = Globals.GetinDT_String(dt, i, "Result")
                         });
                     }
                 }

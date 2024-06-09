@@ -24,9 +24,6 @@ namespace LawSearch_Admin.Services
         public async Task<ArticalDetail> GetArticalDetail(int id)
         {
             ArticalDetail articalDetail = new ArticalDetail();
-            
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await _httpClient.GetFromJsonAsync<APIResultSingleVM<ArticalDetail>>($"/api/Artical/GetArticalDetail?id={id}");
             if(rs != null && rs.Status == 200 )
@@ -39,9 +36,6 @@ namespace LawSearch_Admin.Services
         public async Task<List<Artical>> GetListArtical()
         {
             List<Artical> lst = new List<Artical>();
-            
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             var rs = await _httpClient.GetFromJsonAsync<APIResultVM<Artical>>($"/api/Artical");
             if(rs != null && rs.Status == 200 && rs.Data.Count > 0)

@@ -42,10 +42,10 @@ namespace LawSearch_API.Controllers
         }
 
         [HttpPost, Authorize]
-        public APIResult AddHistorySearch([BindRequired] int UserID, [BindRequired] string SearchString)
+        public APIResult AddHistorySearch([BindRequired] int UserID, [BindRequired] string SearchString, [BindRequired] string SearchResult)
         {
             _logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
-            _historySearchService.AddHistorySearch(UserID,SearchString);
+            _historySearchService.AddHistorySearch(UserID, SearchString, SearchResult);
             APIResult result = new APIResult();
             return result.MessageSuccess("Add data success!");
         }

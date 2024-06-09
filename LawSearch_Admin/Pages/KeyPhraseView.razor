@@ -16,7 +16,7 @@
                         <div class="dialog_title_view">
                             <a>Are you confirm delete this?</a>
                         </div>
-                        <div class="my-3">Keyphrase "@SelectedKeyphrase.Keyphrase"</div>
+                        <div class="my-3">Keyphrase "@SelectedKeyphrase.ID"</div>
                         <div class="dialog_buttons_view">
                             <div class="button_dialog"
                                  style="background-color: #7367F0"
@@ -24,6 +24,27 @@
                                 <a>Yes</a>
                             </div>
                             <div class="button_dialog" @onclick="CancelDelete">
+                                <a>No</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (isOpenDialog_DeleteKeyphraseMapping)
+            {
+                <div class="form_add_new_concept_background_view">
+                    <div class="dialog_delete_view">
+                        <div class="dialog_title_view">
+                            <a>Are you confirm delete keyphrase mapping ?</a>
+                        </div>
+                        <div class="my-3">Keyphrase "@selectedKeyphraseRelate.KeyPhrase"</div>
+                        <div class="dialog_buttons_view">
+                            <div class="button_dialog"
+                                 style="background-color: #7367F0"
+                                 @onclick="HandleDeleteKeyphraseMapping">
+                                <a>Yes</a>
+                            </div>
+                            <div class="button_dialog" @onclick="CancleDeleteKeyphraseMapping">
                                 <a>No</a>
                             </div>
                         </div>
@@ -301,10 +322,11 @@
                                     }
                                     else
                                     {
-                                        foreach (KeyPhraseRelate kr in KeyphraseRelates)
+                                        for (var i = 0; i < KeyphraseRelates.Count; i++)
                                         {
+                                            var index = i;
                                             <tr>
-                                                @if (kr.LawName == "")
+                                                @if (KeyphraseRelates[i].LawName == "")
                                                 {
 
                                                     <td>...</td>
@@ -312,9 +334,9 @@
                                                 else
                                                 {
 
-                                                    <td>@kr.LawName</td>
+                                                    <td>@KeyphraseRelates[i].LawName</td>
                                                 }
-                                                @if (kr.ChapterName == "")
+                                                @if (KeyphraseRelates[i].ChapterName == "")
                                                 {
 
                                                     <td>...</td>
@@ -322,10 +344,10 @@
                                                 else
                                                 {
 
-                                                    <td>@kr.ChapterName</td>
+                                                    <td>@KeyphraseRelates[i].ChapterName</td>
                                                 }
 
-                                                @if (kr.ArticalName == "")
+                                                @if (KeyphraseRelates[i].ArticalName == "")
                                                 {
 
                                                     <td>...</td>
@@ -333,11 +355,11 @@
                                                 else
                                                 {
 
-                                                    <td>@kr.ArticalName</td>
+                                                    <td>@KeyphraseRelates[i].ArticalName</td>
                                                 }
 
-                                                <td>@kr.NumCount</td>
-                                                <td><div class="delete_btn_table"><img class="icon_table" src="assets/icon/trash_480px.png" /></div></td>
+                                                <td>@KeyphraseRelates[i].NumCount</td>
+                                                <td><div class="delete_btn_table" @onclick="() => ShowDialogDeleteKeyphraseMapping(KeyphraseRelates[index])"><img class="icon_table" src="assets/icon/trash_480px.png" /></div></td>
                                             </tr>
                                         }
                                     }
@@ -367,6 +389,7 @@
     public Boolean isLoadingKeyphrase = true;
     public Boolean isLoadingKeyphraseRelates = true;
     public Boolean isOpenDialog_DeleteDialog = false;
+    public bool isOpenDialog_DeleteKeyphraseMapping = false;
     public Boolean isLoadingAddNewKeyphrase = false;
     public Boolean isSearching = false;
     public List<KeyPhrase>? Keyphrases;
@@ -376,6 +399,7 @@
     public KeyPhrase? SelectedKeyphrase;
     public string SearchKeyphrase = "";
     public string NewKeyphrase = "";
+    public KeyPhraseRelate? selectedKeyphraseRelate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -532,4 +556,27 @@
         StateHasChanged();
     }
 
+    public void ShowDialogDeleteKeyphraseMapping(KeyPhraseRelate keyPhraseRelate)
+    {
+        selectedKeyphraseRelate = keyPhraseRelate;
+        isOpenDialog_DeleteKeyphraseMapping = true;
+    }
+
+    public void CancleDeleteKeyphraseMapping()
+    {
+        isOpenDialog_DeleteKeyphraseMapping = false;
+    }
+
+    public async void HandleDeleteKeyphraseMapping()
+    {
+
+        if (selectedKeyphraseRelate == null) return;
+
+        var message = await keyphraseService.DeleteKeyphraseMapping(selectedKeyphraseRelate.KeyPhraseID, selectedKeyphraseRelate.ArticalID);
+        await JsRuntime.InvokeVoidAsync("alert", message.Message);
+        //fetch lại key mapping
+        await fetchInfoKeyphrase(selectedKeyphraseRelate.KeyPhraseID);
+        isOpenDialog_DeleteKeyphraseMapping = false;
+        StateHasChanged();
+    }
 }

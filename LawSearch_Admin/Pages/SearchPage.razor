@@ -20,7 +20,7 @@
 
             <div class="@((isShowSuggestion ? "search-container suggest" : "search-container"))" >
                     <div class="search-input">
-                    <input class="@(isShowSuggestion ? "input suggest" : "input")" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" autocomplete="off"
+                    <input class="@((isShowSuggestion && ((lstHistorySuggest.Count > 0 || lstKeyprhaseSuggest.Count > 0)) ) ? "input suggest" : "input")" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" autocomplete="off"
                     @bind-value="input" 
                     @oninput="HandleSuggest" 
                     @onfocus="HandleFocusSearch" 
@@ -145,8 +145,6 @@
         if (!string.IsNullOrEmpty(input))
         {
             loadingData = true;
-            //Ghi history search
-            await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
 
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
@@ -162,10 +160,14 @@
             if (lstResultArtical.Count == 0)
             {
                 emptyResult = true;
+                await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input, "Không có kết quả");
             }
             else
             {
                 emptyResult = false;
+                var topResult = lstResultArtical[0];
+                var s = topResult.LawName + " | " + topResult.Title + " | " + topResult.Content;
+                await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input, s);
             }
 
             loadingData = false;
@@ -341,8 +343,7 @@
             {
                 loadingData = true;
                 invalidInput = false;
-                //Ghi history search
-                await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
+
                 var stopwatch = new System.Diagnostics.Stopwatch();
                 stopwatch.Start();
 
@@ -357,10 +358,15 @@
                 if (lstResultArtical.Count == 0)
                 {
                     emptyResult = true;
+                    await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input, "Không có kết quả");
                 }
                 else
                 {
                     emptyResult = false;
+                    var topResult = lstResultArtical[0];
+                    var s = topResult.LawName + " | " + topResult.Title + " | " + topResult.Content;
+                    //Ghi history search
+                    await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input, s);
                 }
 
                 loadingData = false;
