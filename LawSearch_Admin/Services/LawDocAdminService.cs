@@ -24,9 +24,6 @@ namespace LawSearch_Admin.Services
         {
             List<LawDoc> lst = new List<LawDoc>();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await _httpClient.GetFromJsonAsync<APIResultVM<LawDoc>>($"api/lawdoc");
             if(rs != null && rs.Status == 200)
             {
@@ -42,9 +39,6 @@ namespace LawSearch_Admin.Services
         {
             LawHTML l = new LawHTML();
 
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
-
             var rs = await _httpClient.GetFromJsonAsync<APIResultVM<LawHTML>>($"api/lawdoc/GetLawHTML?id={id}");
             if(rs != null && rs.Status == 200 && rs.Data.Count > 0)
             {
@@ -59,9 +53,6 @@ namespace LawSearch_Admin.Services
             List<ChapterVM> lstChapters = new List<ChapterVM>();
             List<SectionVM> lstSection = new List<SectionVM>();
             List<ArticalVM> lstArtical = new List<ArticalVM>();
-
-            //var authToken = await _cookie.GetValue(CookieKeys.authToken);
-            //_httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + authToken);
 
             //Load chapter
             var rsGetChapterByLawID = await _httpClient.GetFromJsonAsync<APIResultVM<ChapterVM>>($"api/Chapter/GetByLawID?ID={id}");
@@ -88,12 +79,16 @@ namespace LawSearch_Admin.Services
             return rs;
         }
 
-        public async Task<bool> ImportLaw(string name, string content)
+        public async Task<bool> ImportLaw(string name, string content, string number, DateTime effectiveDate, DateTime expirationDate,int lawType)
         {
             var formContent = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("Name", name),
-                new KeyValuePair<string, string>("Content",content)
+                new KeyValuePair<string, string>("Content",content),
+                new KeyValuePair<string, string>("LawNumber", number),
+                new KeyValuePair<string, string>("EffectiveDate",effectiveDate.ToString()),
+                new KeyValuePair<string, string>("ExpirationDate", expirationDate.ToString()),
+                new KeyValuePair<string, string>("LawType", lawType.ToString())
             });
 
             var rs = await _httpClient.PostAsync($"api/LawDoc", formContent);

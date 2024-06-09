@@ -26,7 +26,7 @@ namespace LawSearch_API.Controllers
         [HttpGet, Authorize]
         public APIResult SearchArticalByText([BindRequired] string input)
         {
-            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path);
+            logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host);
             var dtResult = _searchService.SearchLawByText(input);
             APIResult rs = new();
             return rs.Success(dtResult);

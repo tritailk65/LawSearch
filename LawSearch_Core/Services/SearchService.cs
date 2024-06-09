@@ -97,7 +97,7 @@ namespace LawSearch_Core.Services
 
                 #region Create candidate articles
                 List<KeyPhraseResult> lstCandidates = GetListArticalByConceptID(rs.lstConcepts.Select(x => x.ID).ToList());
-                
+                var debug = lstCandidates;
                 
                 #endregion
 
@@ -189,8 +189,19 @@ namespace LawSearch_Core.Services
         private List<KeyPhraseResult> GetListArticalByConceptID(List<int> lst)
         {
             List<KeyPhraseResult> lstResult = new();
-            DataTable dt = _db.ExecuteReaderCommand("Exec GetListArticalKeyPhraseByConceptID '" + string.Join(",", lst) + "'", "");
-            
+            DataTable dt = new DataTable();
+
+            if (lst.Count > 0)
+            {
+                string sql = $"select distinct k.ArticalID, k.KeyPhraseID, k.NumCount, kk.KeyPhrase, k.PositionWeight, kk.PosTag " +
+                    $"from  KeyPhraseMapping k with(nolock) " +
+                    $"inner join ConceptMapping c with(nolock) on c.ArticalID = k.ArticalID and (c.ConceptID in ({string.Join(",", lst)})) " +
+                    $"left join KeyPhrase kk with(nolock) on kk.ID = k.KeyPhraseID " +
+                    $"where k.ClauseID is null " +
+                    $"order by k.ArticalID";
+                dt = _db.ExecuteReaderCommand(sql, "");
+            } 
+
             SortedDictionary<int, List<KeyPhrase>> dic = new();
             KeyPhrase ph;
             for (int i = 0; i < Globals.DTCount(dt); i++)

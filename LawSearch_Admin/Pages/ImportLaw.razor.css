@@ -1,5 +1,5 @@
 ﻿.import-container {
-    width: 90%;
+    width: 80%;
     min-height: 88vh;
     background-color: #303348;
     border-radius: 20px;
@@ -8,7 +8,7 @@
 
 .title-container {
     display: flex;
-    height: 50px;
+    height: fit-content;
     margin: 20px;
     padding-top: 20px;
 }
@@ -17,13 +17,14 @@
     width: 18%;
     font-weight: 600;
     margin-left: 10px;
+    display: flex;
 }
 
 .input {
     background-color: #303348;
     border: 1px solid #BAB6E2;
     color: white;
-    width: 90%;
+    width: 80%;
     height: 39px;
 }
 

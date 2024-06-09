@@ -6,6 +6,9 @@
 @inject ICookieService _cookieService;
 @inject IHistoryAdminService _historySearchService;
 @inject AuthenticationStateProvider _authenticationStateProvider;
+@inject IKeyPhraseAdminService keyphraseAdminService;
+@inject IHistoryAdminService historySearchService;
+@inject IJSRuntime JSRuntime;
 
 <AuthorizeView>
     <Authorized>
@@ -14,14 +17,54 @@
             {
                 <label style="color: red">Vui lòng nhập nội dung tìm kiếm dài hơn 12 ký tự!</label>
             }
-            <div class="search-container ">
-                <div class="search-input">
-                    <input class="input" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" @bind-value="@input" />
+
+            <div class="@((isShowSuggestion ? "search-container suggest" : "search-container"))" >
+                    <div class="search-input">
+                    <input class="@(isShowSuggestion ? "input suggest" : "input")" type="text" placeholder="Hôm nay bạn cần tìm kiếm gì?" spellcheck="false" autocomplete="off"
+                    @bind-value="input" 
+                    @oninput="HandleSuggest" 
+                    @onfocus="HandleFocusSearch" 
+                    @onblur="HandleBlurSearch"
+                    @onkeydown="HandleKeyDown" 
+                    @onkeyup:preventDefault />
+                    </div>
+                    <div class="search-button" @onclick="SearchAction">
+                        <img class="search-icon" src="assets/icon/search_icon.png" />
+                    </div>
+                @if (isShowSuggestion)
+                {
+                    @if (lstHistorySuggest.Count > 0 || lstKeyprhaseSuggest.Count > 0)
+                    {
+                    <div class="search-suggestion py-1">
+                        @for (var i = 0; i < lstHistorySuggest.Count; i++)
+                        {
+                            var index = i;
+                            <div class="search-suggestion-item @(selectedSuggestionIndex == index ? "selected" : "")"
+                                     @onclick="() => HandleApplyHistorySg(lstHistorySuggest[index])"
+                                     @onmousedown="HandleMouseDown">
+                                <div class="search-suggestion-icon mx-2">
+                                        <img class="search-icon" src="assets/icon/time_icon.png" />
+                                    </div>
+                                    <div class="w-100 align-items-center d-flex" style="">@lstHistorySuggest[i] </div>
+                                </div>
+                            }
+                            @for (var i = 0; i < lstKeyprhaseSuggest.Count; i++)
+                            {
+                                var index = i;
+                                <div class="search-suggestion-item  @(selectedSuggestionIndex == index + lstHistorySuggest.Count ? "selected" : "")"
+                                    @onclick="() => HandleApplyHistorySg(lstKeyprhaseSuggest[index])"
+                                    @onmousedown="HandleMouseDown">
+                                    <div class="search-suggestion-icon mx-2">
+                                        <img class="search-icon" src="assets/icon/search_icon.png" />
+                                    </div>
+                                    <div class="w-100 align-items-center d-flex" style="">@lstKeyprhaseSuggest[i] </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
                 </div>
-                <div class="search-button" @onclick="SearchAction">
-                    <img class="search-icon" src="assets/icon/search_icon.png" />
-                </div>
-            </div>
+
 
             @if (lstResultArtical != null && !loadingData && !emptyResult && !invalidInput)
             {
@@ -41,7 +84,7 @@
                     <span class="loader"></span>
                 </div>
             }
-            @if (emptyResult)
+            @if (emptyResult && !loadingData)
             {
                 <div class="mt-4">
                     <h4>Không tìm thấy kết quả nào chứa tất cả các cụm từ tìm kiếm của bạn.</h4>
@@ -52,8 +95,8 @@
                     <ul>
                         <li>Xin bạn chắc chắn rằng tất cả các từ đều đúng chính tả.</li>
                         <li>Hãy thử những từ khóa khác.</li>
-                        <li>Hãy thử những từ khóa chung hơn</li>
-                        <li>Hãy thử bớt từ khóa.</li>
+                        <li>Hãy thử những từ khóa chung hơn.</li>
+                        <li>Hãy thử điều chỉnh độ dài câu hỏi.</li>
                     </ul>
                     <div class="d-flex w-50 justify-content-center align-items-center" style="height: 200px">
                         <div class="cube-loader">
@@ -74,8 +117,6 @@
 </AuthorizeView>
 
 @code{
-    public string keySearch = "";
-    public string conceptTop = "";
     [Parameter]
     public string input { get; set; } = string.Empty;
     public List<ArticalResult>? lstResultArtical = null;
@@ -85,6 +126,13 @@
     public bool loadingData = false;
     public bool emptyResult = false;
     public bool invalidInput = false;
+    public bool isShowSuggestion = false;
+    private List<HistorySearch>? historySearchData = new List<HistorySearch>();
+    private List<KeyPhrase>? allKeyphrase = new List<KeyPhrase>();
+    public List<string> lstHistorySuggest = new List<string>();
+    public List<string> lstKeyprhaseSuggest = new List<string>();
+    public int selectedSuggestionIndex = -1;
+    public bool shouldHandleBlur = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,15 +141,13 @@
         var getUserIDFromCookie = await _cookieService.GetValue(CookieKeys.userid);
         if (!string.IsNullOrEmpty(getUserIDFromCookie)) { UserID = getUserIDFromCookie; }
 
-        //Console.WriteLine(input);
+        //Search from history
         if (!string.IsNullOrEmpty(input))
         {
             loadingData = true;
             //Ghi history search
             await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
 
-            conceptTop = "";
-            keySearch = "";
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
@@ -122,17 +168,158 @@
                 emptyResult = false;
             }
 
-            foreach (var key in searchResult.keyphraseSearch)
-            {
-                keySearch = keySearch + key.Key + " / ";
-            }
-            foreach (var con in searchResult.conceptTop)
-            {
-                conceptTop = conceptTop + con.Name + " / ";
-            }
-
             loadingData = false;
             StateHasChanged();  //Re-render dom
+        }
+
+        //Get suggestion
+        if (!string.IsNullOrEmpty(UserID))
+        {
+            loadingData = true;
+            var getHistory = await historySearchService.GetHistorySearch(Convert.ToInt32(UserID), DateTime.Now.AddDays(-1), DateTime.Now);
+            if (getHistory != null)
+            {
+                historySearchData = getHistory;
+            }
+
+            var getKey = await keyphraseAdminService.GetListKeyPhrase();
+            if (getKey != null)
+            {
+                foreach (var key in getKey)
+                {
+                    key.Keyphrase = key.Keyphrase.Replace("_", " ");
+                }
+                allKeyphrase = getKey;
+            }
+            loadingData = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleSuggest(ChangeEventArgs e)
+    {
+        selectedSuggestionIndex = -1;
+        if(e.Value != null)
+        {
+            if (!isShowSuggestion && !string.IsNullOrEmpty(e.Value.ToString()))
+            {
+                isShowSuggestion = true;
+                StateHasChanged();
+            }
+            if (string.IsNullOrEmpty(e.Value.ToString()))
+            {
+                isShowSuggestion = false;
+                StateHasChanged();
+            }
+            // Handle filter list suggest
+            FilterListStringSuggest(e.Value.ToString());
+            Console.WriteLine(e.Value);
+        }
+    }
+
+    private void HandleFocusSearch()
+    {
+        isShowSuggestion = true;
+        StateHasChanged();
+    }
+
+    private void HandleMouseDown()
+    {
+        shouldHandleBlur = false;
+    }
+
+    private void HandleBlurSearch()
+    {
+        if(shouldHandleBlur)
+        {
+            isShowSuggestion = false;
+            StateHasChanged();
+        }
+        shouldHandleBlur = true;
+        //isShowSuggestion = false;
+        //StateHasChanged();
+    }
+
+    private void HandleApplyHistorySg(string value)
+    {
+        input = value;
+        isShowSuggestion = false;
+        SearchAction();
+    }
+
+    private void FilterListStringSuggest(string value)
+    {
+        // History fillter
+        if(value == "")
+        {
+            Console.WriteLine("HI");
+        }
+        var suggestHistory = (from hs in historySearchData
+                              where hs.Value.Contains(value)
+                              select hs.Value).Take(3);
+
+        lstHistorySuggest = suggestHistory.ToList();
+
+        // Keyphrase fillter
+        string[] tmp = value.Split(' ');
+        string lastString = tmp[tmp.Length - 1];
+
+        if (!string.IsNullOrEmpty(lastString))
+        {
+            var keyphrase = (from k in allKeyphrase
+                             where k.Keyphrase.StartsWith(lastString)
+                             select k.Keyphrase).Take(7).ToList();
+
+            for (var i = 0 ; i < keyphrase.Count; i++)
+            {
+                var splitString = value.Split(" ");
+
+                var suggestString = value.Replace(splitString[splitString.Length - 1],"") + keyphrase[i];   
+                keyphrase[i] = suggestString;
+            }
+
+            lstKeyprhaseSuggest = keyphrase.ToList();
+        }
+
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "ArrowUp")
+        {
+            if (selectedSuggestionIndex > 0)
+            {
+                selectedSuggestionIndex--;
+
+            }
+        }
+        else if (e.Key == "ArrowDown")
+        {
+
+            if (selectedSuggestionIndex < (lstHistorySuggest.Count + lstKeyprhaseSuggest.Count - 1))
+            {
+                selectedSuggestionIndex++;
+            }
+        }
+        if (e.Key == "Enter")
+        {
+            isShowSuggestion = false;
+            SearchAction();
+        }
+        UpdateInputFromSuggestion();
+    }
+
+    void UpdateInputFromSuggestion()
+    {
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < lstHistorySuggest.Count)
+        {
+            input = lstHistorySuggest[selectedSuggestionIndex];
+            StateHasChanged();
+        }
+        else if (selectedSuggestionIndex >= lstHistorySuggest.Count && selectedSuggestionIndex < (lstHistorySuggest.Count + lstKeyprhaseSuggest.Count))
+        {
+            input = lstKeyprhaseSuggest[selectedSuggestionIndex - lstHistorySuggest.Count];
+            StateHasChanged();
         }
     }
 
@@ -156,9 +343,6 @@
                 invalidInput = false;
                 //Ghi history search
                 await _historySearchService.AddHistorySearch(Convert.ToInt32(UserID), input);
-
-                conceptTop = "";
-                keySearch = "";
                 var stopwatch = new System.Diagnostics.Stopwatch();
                 stopwatch.Start();
 
@@ -179,14 +363,6 @@
                     emptyResult = false;
                 }
 
-                foreach (var key in searchResult.keyphraseSearch)
-                {
-                    keySearch = keySearch + key.Key + " / ";
-                }
-                foreach (var con in searchResult.conceptTop)
-                {
-                    conceptTop = conceptTop + con.Name + " / ";
-                }
                 loadingData = false;
                 StateHasChanged();  //Re-render dom
             }

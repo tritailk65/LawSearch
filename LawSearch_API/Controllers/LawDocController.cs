@@ -47,7 +47,15 @@ namespace LawSearch_API.Controllers
         public APIResult PostLaw([FromForm] LawImport lawImport)
         {
             logger.LogInformation(Request.Method + " " + Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString);
-            lawDocService.ImportLaw(lawImport.Name, lawImport.Content);
+            LawDoc lawDoc = new LawDoc
+            {
+                Name = lawImport.Name,
+                LawType = lawImport.LawType,
+                LawNumber = lawImport.LawNumber,
+                EffectiveDate = lawImport.EffectiveDate,
+                ExpirationDate = lawImport.ExpirationDate,
+            };
+            lawDocService.ImportLaw(lawDoc, lawImport.Content);
             APIResult rs = new();
 
             return rs.MessageSuccess("Import văn bản luật thành công");
